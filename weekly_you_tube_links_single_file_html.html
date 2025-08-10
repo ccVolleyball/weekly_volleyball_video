@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>每週 YouTube 連結</title>
+  <style>
+    :root{--bg:#f6f7f9;--card:#fff;--text:#111827;--muted:#6b7280;--primary:#111827;--radius:16px}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:linear-gradient(#ffffff,#f7f8fa);color:var(--text)}
+    .container{max-width:1040px;margin:0 auto;padding:16px}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:saturate(1.2) blur(8px);background:rgba(255,255,255,.85);border-bottom:1px solid #e5e7eb}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px}
+    .logo{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:12px;background:var(--primary);color:#fff}
+    .row{display:flex;gap:12px;align-items:center}
+    .spacer{flex:1}
+    button,.btn{appearance:none;border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+    button.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    select,input,textarea{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;font:inherit}
+    label{font-size:12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:16px}
+    @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:880px){.grid{grid-template-columns:repeat(3,1fr)}}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:var(--radius);overflow:hidden}
+    .card .thumb{position:relative;aspect-ratio:16/9;background:#f3f4f6}
+    .card .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .badge{position:absolute;top:8px;left:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.9);padding:4px 8px;border-radius:999px}
+    .p{padding:12px}
+    .muted{color:var(--muted)}
+    .section{margin:18px 0}
+    .danger{color:#b91c1c}
+    .hidden{display:none !important}
+    footer{color:#6b7280;font-size:12px;text-align:center;padding:36px 0}
+    .admin-panel{background:#fff;border:1px dashed #cbd5e1;border-radius:16px;padding:16px}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid #e5e7eb;padding:8px 6px;text-align:left;font-size:14px}
+    .nowrap{white-space:nowrap}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container row" style="padding:10px 16px">
+      <div class="brand"><span class="logo">YT</span><span>每週 YouTube 連結</span></div>
+      <div class="spacer"></div>
+      <button id="adminBtn" class="hidden" title="登入編輯模式">編輯</button>
+      <button id="logoutBtn" class="hidden" title="離開編輯模式">退出編輯</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="section">
+      <div class="row" style="align-items:flex-end;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:260px">
+          <label>選擇週次</label>
+          <select id="weekSelect"></select>
+        </div>
+        <button id="shareBtn" class="btn">複製此週分享連結</button>
+        <button id="openAllBtn" class="primary">開啟全部</button>
+      </div>
+    </section>
+
+    <section id="weekHeader" class="section">
+      <h1 id="weekTitle" style="margin:0 0 6px;font-size:24px"></h1>
+      <div class="muted" id="weekDate"></div>
+    </section>
+
+    <section id="cards" class="grid"></section>
+
+    <!-- Admin Panel (only for provider) -->
+    <section id="adminPanel" class="section admin-panel hidden">
+      <h2 style="margin:0 0 12px">編輯模式（僅自己可見）</h2>
+      <details>
+        <summary>新增 / 更新一週</summary>
+        <div class="row" style="margin-top:12px;gap:12px;align-items:flex-start;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <label>日期（週一，YYYY-MM-DD）</label>
+            <input id="inpDate" type="date" />
+          </div>
+          <div style="flex:2;min-width:260px">
+            <label>標題（可選）</label>
+            <input id="inpTitle" type="text" placeholder="例如：第 33 週 – 專題" />
+          </div>
+        </div>
+        <div class="section">
+          <label>YouTube 連結（每行一個）</label>
+          <textarea id="inpUrls" rows="8" class="mono" placeholder="https://www.youtube.com/watch?v=...\nhttps://youtu.be/...\nhttps://www.youtube.com/shorts/...\n"></textarea>
+        </div>
+        <div class="row">
+          <button id="saveWeekBtn" class="primary">儲存（先存本機）</button>
+          <button id="clearFormBtn">清空表單</button>
+        </div>
+      </details>
+
+      <div class="section">
+        <h3 style="margin:0 0 8px">目前週次（本機草稿，可刪改）</h3>
+        <div class="muted" style="margin-bottom:8px">說明：這些修改只存在你的瀏覽器。確認無誤後，請「匯出資料」，再將產出 JSON 內嵌回此 HTML 的 <span class="mono">const DATA = [...]</span> 中重新發佈，其他人才會看到更新。</div>
+        <table class="table" id="weeksTable">
+          <thead><tr><th>日期</th><th>標題</th><th class="nowrap">連結數</th><th>操作</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="row section" style="flex-wrap:wrap">
+        <button id="exportJsonBtn">匯出資料（JSON 檔）</button>
+        <button id="copyJsonBtn">複製 JSON</button>
+        <span class="muted">或手動複製 JSON 後，覆蓋本檔案中的 <span class="mono">const DATA</span>。</span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> 每週 YouTube 連結</div>
+  </footer>
+
+  <script>
+    // ===================== 可自訂區 =====================
+    const ADMIN_PASS = "09110724"; // ← 先改成你自己的密碼
+    // 初始資料（發佈時會顯示給所有訪客）。更新方式：在「編輯模式」匯出 JSON 後，貼回這裡。
+    const DATA = [
+      {
+        "date": "2025-08-10",
+        "title": "65Volleyball",
+        "urls": [
+          "https://www.youtube.com/watch?v=5RFF_A_SIzg",
+          "https://www.youtube.com/watch?v=b4AsMV4OBAA",
+          "https://www.youtube.com/watch?v=i3LJqki8Fms",
+          "https://www.youtube.com/watch?v=pzrP0K8hBYo",
+          "https://www.youtube.com/watch?v=mzKYWunfhzA",
+          "https://www.youtube.com/watch?v=BLiFiUHvdkw"
+        ]
+      },
+      {
+        "date": "2025-08-03",
+        "title": "65Volleyball",
+        "urls": [
+          "https://www.youtube.com/watch?v=3LhnX1GS6CI",
+          "https://www.youtube.com/watch?v=9dYbAzYHuF4",
+          "https://www.youtube.com/watch?v=PC-rJjfJj4o",
+          "https://www.youtube.com/watch?v=h_wO19_XD6Q",
+          "https://www.youtube.com/watch?v=e-ot6IEUfac",
+          "https://www.youtube.com/watch?v=-v9KSoc3gvE"
+        ]
+      }
+    ];
+    // =====================================================
+
+    // ==== 工具 ====
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+    const qs = new URLSearchParams(location.search);
+    const fmtDate = (iso) => new Date(iso+"T00:00:00").toLocaleDateString(undefined,{year:'numeric',month:'2-digit',day:'2-digit'});
+    function getYouTubeId(url){
+      try{
+        const u = new URL(url);
+        if(u.hostname.includes('youtu.be')) return u.pathname.replace('/','');
+        if(u.hostname.includes('youtube.com')){
+          if(u.searchParams.get('v')) return u.searchParams.get('v');
+          const m = u.pathname.match(/\/shorts\/([\w-]+)/);
+          if(m) return m[1];
+        }
+      }catch{}
+      return null;
+    }
+
+    // ==== 狀態 ====
+    let baseWeeks = [...DATA];              // 來源（所有訪客可見）
+    let localWeeks = loadLocalWeeks();      // 只存在提供者瀏覽器
+    let weeks = mergeWeeks(baseWeeks, localWeeks);
+
+    function loadLocalWeeks(){
+      try{ return JSON.parse(localStorage.getItem('weekly-yt-data')||'[]'); }catch{return []}
+    }
+    function saveLocalWeeks(arr){ localStorage.setItem('weekly-yt-data', JSON.stringify(arr)); }
+    function mergeWeeks(base, local){
+      const map = new Map(base.map(w=>[w.date,w]));
+      local.forEach(w=>map.set(w.date,w));
+      return Array.from(map.values()).sort((a,b)=>b.date.localeCompare(a.date));
+    }
+
+    // ==== 渲染 ====
+    const weekSelect = $('#weekSelect');
+    const cards = $('#cards');
+    const weekTitle = $('#weekTitle');
+    const weekDate = $('#weekDate');
+
+    function renderSelect(){
+      weekSelect.innerHTML = weeks.map(w=>`<option value="${w.date}">${w.title? (w.title+" – "):''}${w.date}</option>`).join('');
+      const want = qs.get('date');
+      weekSelect.value = weeks.find(w=>w.date===want)?.date || weeks[0]?.date || '';
+      renderWeek();
+    }
+
+    function renderWeek(){
+      const w = weeks.find(x=>x.date===weekSelect.value);
+      if(!w){ cards.innerHTML = '<div class="muted">尚無資料</div>'; return; }
+      weekTitle.textContent = w.title || '每週清單';
+      weekDate.textContent = '週期開始：' + fmtDate(w.date);
+      cards.innerHTML = w.urls.map((u,i)=>{
+        const id = getYouTubeId(u);
+        const thumb = id? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
+        const label = id? `https://youtu.be/${id}` : u;
+        return `
+          <a class="card" href="${u}" target="_blank" rel="noreferrer">
+            <div class="thumb">${thumb?`<img src="${thumb}" alt="">`:''}<span class="badge">#${i+1}</span></div>
+            <div class="p row" style="justify-content:space-between">
+              <div class="muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80%">${label}</div>
+              <span aria-hidden>↗</span>
+            </div>
+          </a>`;
+      }).join('');
+    }
+
+    // ==== 使用者動作（共用）====
+    weekSelect.addEventListener('change',()=>{
+      renderWeek();
+      const url = new URL(location.href);
+      url.searchParams.set('date', weekSelect.value);
+      history.replaceState(null,'',url);
+    });
+
+    $('#openAllBtn').addEventListener('click',()=>{
+      const w = weeks.find(x=>x.date===weekSelect.value);
+      if(!w) return;
+      w.urls.forEach((u,i)=>setTimeout(()=>window.open(u,'_blank'), i*130));
+    });
+
+    $('#shareBtn').addEventListener('click', async ()=>{
+      const url = new URL(location.href);
+      url.searchParams.set('date', weekSelect.value);
+      await navigator.clipboard.writeText(url.toString());
+      const btn = $('#shareBtn');
+      const old = btn.textContent; btn.textContent = '已複製';
+      setTimeout(()=>btn.textContent = old, 1200);
+    });
+
+    // ==== Admin / Provider ====
+    const adminBtn = $('#adminBtn');
+    const logoutBtn = $('#logoutBtn');
+    const adminPanel = $('#adminPanel');
+
+    function isAdminUrl(){ return qs.get('admin') === '1'; }
+    function setAdminUI(on){
+      adminPanel.classList.toggle('hidden', !on);
+      adminBtn.classList.toggle('hidden', on);
+      logoutBtn.classList.toggle('hidden', !on);
+    }
+
+    if(isAdminUrl()){
+      adminBtn.classList.remove('hidden');
+    }
+
+    let authed = false;
+
+    adminBtn.addEventListener('click', ()=>{
+      const p = prompt('請輸入編輯密碼：');
+      if(p === ADMIN_PASS){
+        authed = true; setAdminUI(true); renderWeeksTable(); preloadFormFromSelected();
+      }else if(p!==null){
+        alert('密碼錯誤');
+      }
+    });
+
+    logoutBtn.addEventListener('click', ()=>{ authed=false; setAdminUI(false); });
+
+    function renderWeeksTable(){
+      const tbody = $('#weeksTable tbody');
+      tbody.innerHTML = weeks.map(w=>{
+        const count = w.urls.length;
+        return `<tr>
+          <td class="mono">${w.date}</td>
+          <td>${w.title||''}</td>
+          <td class="nowrap">${count}</td>
+          <td class="nowrap">
+            <button data-act="edit" data-date="${w.date}">編輯</button>
+            <button data-act="del" data-date="${w.date}" class="danger">刪除（本機）</button>
+          </td>
+        </tr>`;
+      }).join('');
+
+      tbody.querySelectorAll('button').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const date = e.currentTarget.getAttribute('data-date');
+          const act = e.currentTarget.getAttribute('data-act');
+          const w = weeks.find(x=>x.date===date);
+          if(act==='edit' && w){ fillForm(w); window.scrollTo({top:0,behavior:'smooth'}); }
+          if(act==='del'){
+            if(confirm('僅刪除此日期在「本機草稿」的版本，確定？')){
+              localWeeks = loadLocalWeeks().filter(x=>x.date!==date);
+              saveLocalWeeks(localWeeks);
+              weeks = mergeWeeks(baseWeeks, localWeeks);
+              renderSelect(); renderWeeksTable();
+            }
+          }
+        });
+      });
+    }
+
+    // 表單
+    const inpDate = $('#inpDate');
+    const inpTitle = $('#inpTitle');
+    const inpUrls = $('#inpUrls');
+    $('#clearFormBtn').addEventListener('click', ()=>{ inpDate.value=''; inpTitle.value=''; inpUrls.value=''; });
+
+    function fillForm(w){ inpDate.value=w.date; inpTitle.value=w.title||''; inpUrls.value=(w.urls||[]).join('\n'); }
+    function preloadFormFromSelected(){
+      const w = weeks.find(x=>x.date===weekSelect.value);
+      if(w) fillForm(w);
+    }
+
+    $('#saveWeekBtn').addEventListener('click', ()=>{
+      if(!authed) return alert('請先登入編輯模式');
+      const date = inpDate.value.trim();
+      if(!date) return alert('請輸入日期');
+      const urls = inpUrls.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+      if(urls.length===0) return alert('請至少輸入一個連結');
+      const title = inpTitle.value.trim();
+
+      // upsert to local
+      const map = new Map(loadLocalWeeks().map(w=>[w.date,w]));
+      map.set(date, {date, title, urls});
+      localWeeks = Array.from(map.values());
+      saveLocalWeeks(localWeeks);
+      weeks = mergeWeeks(baseWeeks, localWeeks);
+      renderSelect(); renderWeeksTable();
+      weekSelect.value = date; renderWeek();
+      alert('已儲存到本機草稿。若要讓所有訪客看到，請點「匯出資料」。');
+    });
+
+    // 匯出 JSON
+    $('#exportJsonBtn').addEventListener('click', ()=>{
+      const byDate = new Map(DATA.map(w=>[w.date,w]));
+      loadLocalWeeks().forEach(w=>byDate.set(w.date,w));
+      const out = Array.from(byDate.values()).sort((a,b)=>b.date.localeCompare(a.date));
+      const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'weekly-youtube-data.json'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    $('#copyJsonBtn').addEventListener('click', async ()=>{
+      const byDate = new Map(DATA.map(w=>[w.date,w]));
+      loadLocalWeeks().forEach(w=>byDate.set(w.date,w));
+      const out = Array.from(byDate.values()).sort((a,b)=>b.date.localeCompare(a.date));
+      await navigator.clipboard.writeText(JSON.stringify(out, null, 2));
+      alert('已複製 JSON，請回到 HTML 中覆蓋 const DATA = [...]');
+    });
+
+    // 初始
+    $('#year').textContent = new Date().getFullYear();
+    renderSelect();
+  </script>
+</body>
+</html>
