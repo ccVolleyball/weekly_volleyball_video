@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>📦 版本控管 v8.3 - 佈局鎖定與篩選最終修正</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+    <style>
+        body { font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; background: #f4f7f9; padding: 15px; }
+        .workspace-card { margin-bottom: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); border-top: 4px solid #409EFF; }
+        .toolbar { margin-bottom: 20px; display: flex; gap: 12px; background: #fff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .main-table { width: 100%; border-collapse: collapse; background: #fff; table-layout: fixed; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .main-table th, .main-table td { border: 1px solid #dcdfe6; padding: 10px; vertical-align: top; }
+        .main-table th { background: #f8f9fa; font-weight: bold; text-align: center; height: 45px; }
+        
+        details { width: 100%; margin-bottom: 5px; }
+        summary { cursor: pointer; font-weight: bold; color: #303133; list-style: none; display: flex; align-items: center; padding: 5px 0; }
+        summary::-webkit-details-marker { display: none; }
+        .arrow-icon { margin-right: 8px; transition: transform 0.2s; font-size: 14px; color: #409EFF; }
+        details[open] > summary .arrow-icon { transform: rotate(90deg); }
+
+        .tree-branch { margin-left: 10px; padding-left: 15px; border-left: 1px solid #dcdfe6; position: relative; }
+        .tree-node { position: relative; padding: 3px 0; width: 100%; }
+        .tree-node::before { content: ""; position: absolute; left: -15px; top: 16px; width: 12px; border-top: 1px solid #dcdfe6; }
+
+        /* Group 3 終極佈局：使用內部表格鎖定 */
+        .inner-layout-table { width: 100%; border-collapse: collapse; }
+        .inner-layout-table td { border: none !important; padding: 2px !important; }
+        .td-label { width: 140px; }
+        .td-value { width: auto; }
+        .td-ops { width: 65px; text-align: right; }
+
+        .btn-op { cursor: pointer; font-size: 18px; transition: 0.2s; }
+        .btn-del { color: #F56C6C; }
+        .btn-add { color: #67C23A; }
+        .module-card { border: 1px solid #f0f0f0; border-radius: 4px; padding: 10px; margin-bottom: 12px; background: #fafafa; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <el-card class="workspace-card">
+            <template #header><div style="font-weight: bold;"><el-icon><Filter /></el-icon> 過濾工作區</div></template>
+            <el-row :gutter="20">
+                <el-col :span="6">
+                    <div style="font-size: 13px; margin-bottom: 8px;">用途篩選 (NA 顯示全部)：</div>
+                    <el-select v-model="filterUsage" placeholder="選擇用途" style="width: 100%">
+                        <el-option label="顯示所有 (NA)" value="NA" />
+                        <el-option v-for="item in allUsages" :key="item" :label="item" :value="item" />
+                    </el-select>
+                </el-col>
+                <el-col :span="18">
+                    <div style="font-size: 13px; margin-bottom: 8px;">快速標籤概覽：</div>
+                    <div class="tag-list">
+                        <el-tag v-for="row in releasedRows" :key="row.id" type="success" effect="dark">發行: {{ row.releaseNote || '未命名' }} ({{ row.version }})</el-tag>
+                        <el-tag v-for="row in targetRows" :key="row.id" type="warning">客戶: {{ row.customerName || '未註明' }} ({{ row.version }})</el-tag>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-card>
+
+        <div class="toolbar">
+            <el-button type="primary" :icon="Plus" @click="addNewRow">新增發行項次</el-button>
+            <el-button type="success" :icon="Download" @click="exportData">儲存 JSON</el-button>
+            <el-upload action="" :auto-upload="false" :on-change="importData" :show-file-list="false" accept=".json">
+                <el-button type="warning" :icon="UploadFilled">載入紀錄</el-button>
+            </el-upload>
+        </div>
+
+        <table class="main-table">
+            <thead>
+                <tr>
+                    <th width="70">項次</th>
+                    <th width="28%">Group 1 (基本資訊)</th>
+                    <th width="28%">Group 2 (SVN 資訊)</th>
+                    <th>Group 3 (模組項目)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(row, idx) in filteredTableData" :key="row.id">
+                    <td align="center">
+                        <div style="font-weight: bold; margin: 10px 0; font-size: 1.2rem;">{{ idx + 1 }}</div>
+                        <el-button type="text" @click="cloneRow(idx)">複製</el-button><br>
+                        <el-button type="text" style="color:#F56C6C" @click="tableData.splice(idx,1)">刪除</el-button>
+                    </td>
+
+                    <td>
+                        <details open>
+                            <summary><el-icon class="arrow-icon"><CaretRight /></el-icon>基本資訊</summary>
+                            <div class="tree-branch">
+                                <div class="tree-node"><el-input v-model="row.fwName" placeholder="安裝包名稱" size="small"/></div>
+                                <div class="tree-node"><el-input v-model="row.version" placeholder="版本" size="small"/></div>
+                                <div class="tree-node">
+                                    <el-checkbox v-model="row.isSpecial">特規</el-checkbox>
+                                    <el-checkbox v-model="row.isReleased">發行</el-checkbox>
+                                    <el-checkbox v-model="row.isTarget">目標客戶</el-checkbox>
+                                </div>
+                                <div v-if="row.isReleased" class="tree-node"><el-input v-model="row.releaseNote" placeholder="註明發行版本為何" size="small"/></div>
+                                <div v-if="row.isTarget" class="tree-node"><el-input v-model="row.customerName" placeholder="輸入客戶名稱 (如 TSMC)" size="small"/></div>
+                                <div class="tree-node"><el-date-picker v-model="row.date" size="small" value-format="YYYY-MM-DD" style="width:100%"/></div>
+                                <div class="tree-node"><el-input v-model="row.usage" placeholder="變更用途" type="textarea" :rows="2" size="small"/></div>
+                            </div>
+                        </details>
+                    </td>
+
+                    <td>
+                        <details open>
+                            <summary><el-icon class="arrow-icon"><CaretRight /></el-icon>SVN 資訊</summary>
+                            <div class="tree-branch">
+                                <div class="tree-node"><el-input v-model="row.uiPath" placeholder="UI 路徑" size="small"/></div>
+                                <div class="tree-node"><el-input v-model="row.uiVer" placeholder="UI 版本" size="small"/></div>
+                                <el-divider style="margin: 8px 0"></el-divider>
+                                <div class="tree-node"><el-input v-model="row.dbPath" placeholder="debug.ipk 路徑" size="small"/></div>
+                                <div class="tree-node"><el-input v-model="row.dbVer" placeholder="debug.ipk 版本" size="small"/></div>
+                                <el-divider style="margin: 8px 0"></el-divider>
+                                <div class="tree-node"><el-input v-model="row.db13Path" placeholder="debug13.ipk 路徑" size="small"/></div>
+                                <div class="tree-node"><el-input v-model="row.db13Ver" placeholder="debug13.ipk 版本" size="small"/></div>
+                            </div>
+                        </details>
+                    </td>
+
+                    <td>
+                        <div style="margin-bottom: 10px; display: flex; gap: 8px;">
+                            <el-button type="warning" size="small" :icon="Upload" @click="openImportDialog(row)">一鍵加入</el-button>
+                            <el-button size="small" @click="toggleAll(row, true)">展開</el-button>
+                            <el-button size="small" @click="toggleAll(row, false)">收合</el-button>
+                        </div>
+                        
+                        <div v-for="(mod, mIdx) in row.modules" :key="mod.id" class="module-card">
+                            <details :open="mod.isOpen">
+                                <summary @click.prevent="mod.isOpen = !mod.isOpen">
+                                    <el-icon class="arrow-icon" :style="{ transform: mod.isOpen ? 'rotate(90deg)' : '' }"><CaretRight /></el-icon>
+                                    <span style="font-size:0.9rem; margin-right:8px;">模組名稱:</span>
+                                    <el-input v-model="mod.name" placeholder="名稱" size="small" style="width: 150px" @click.stop/>
+                                    <el-icon class="btn-op btn-del" style="margin-left: 10px;" @click.stop="row.modules.splice(mIdx, 1)"><Delete /></el-icon>
+                                </summary>
+                                
+                                <div class="tree-branch">
+                                    <details open>
+                                        <summary><el-icon class="arrow-icon"><CaretRight /></el-icon>子元件清單</summary>
+                                        <div class="tree-branch">
+                                            <table class="inner-layout-table">
+                                                <tr v-for="(info, iIdx) in mod.infoList" :key="iIdx">
+                                                    <td class="td-label"><el-input v-model="info.label" placeholder="項目" size="small"/></td>
+                                                    <td class="td-value"><el-input v-model="info.value" placeholder="版本資訊" size="small"/></td>
+                                                    <td class="td-ops">
+                                                        <el-icon class="btn-op btn-add" @click="mod.infoList.splice(iIdx + 1, 0, {label: '', value: ''})"><CirclePlus /></el-icon>
+                                                        <el-icon class="btn-op btn-del" @click="mod.infoList.splice(iIdx, 1)"><Close /></el-icon>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <div style="color: #409EFF; font-size: 12px; cursor: pointer; margin-top: 8px;" @click="mod.infoList.push({label:'', value:''})">+ 新增至末端</div>
+                                        </div>
+                                    </details>
+                                </div>
+                            </details>
+                        </div>
+                        <el-button type="primary" plain :icon="Plus" size="small" style="width:100%" @click="addModule(row)">新增模組</el-button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <el-dialog v-model="importVisible" title="貼上設備回傳資訊" width="70%">
+            <el-input v-model="importText" type="textarea" :rows="10" placeholder="貼上 Sys. Version... 字串"></el-input>
+            <template #footer>
+                <el-button @click="importVisible = false">取消</el-button>
+                <el-button type="primary" @click="parseImportText">解析並匯入</el-button>
+            </template>
+        </el-dialog>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+        const { Plus, Download, UploadFilled, Close, Delete, CaretRight, Upload, CirclePlus, Filter } = ElementPlusIconsVue;
+
+        createApp({
+            setup() {
+                const tableData = ref([]);
+                const filterUsage = ref("NA");
+                const importVisible = ref(false);
+                const importText = ref("");
+                const currentTargetRow = ref(null);
+
+                const allUsages = computed(() => {
+                    const usages = tableData.value.map(r => r.usage).filter(u => u && u.trim() !== "");
+                    return [...new Set(usages)];
+                });
+
+                const filteredTableData = computed(() => {
+                    if (!filterUsage.value || filterUsage.value === "NA") return tableData.value;
+                    return tableData.value.filter(r => r.usage === filterUsage.value);
+                });
+
+                const releasedRows = computed(() => tableData.value.filter(r => r.isReleased));
+                const targetRows = computed(() => tableData.value.filter(r => r.isTarget));
+
+                const addNewRow = () => {
+                    tableData.value.push({
+                        id: Date.now(), fwName: '', version: '', date: new Date().toISOString().substring(0, 10), usage: '',
+                        isSpecial: false, isReleased: false, isTarget: false, releaseNote: '', customerName: '',
+                        uiPath: '', uiVer: '', dbPath: '', dbVer: '', db13Path: '', db13Ver: '', modules: []
+                    });
+                };
+
+                const toggleAll = (row, status) => { row.modules.forEach(m => m.isOpen = status); };
+                const openImportDialog = (row) => { currentTargetRow.value = row; importVisible.value = true; };
+
+                const parseImportText = () => {
+                    if (!importText.value.trim()) return;
+                    const row = currentTargetRow.value;
+                    const slotBlocks = importText.value.split(/\s+SLOT\s+\d+:\s+/);
+                    slotBlocks.forEach(block => {
+                        if (!block.trim() || block.includes("empty slot")) return;
+                        const fwMatch = block.match(/FW\s+=>\s+Chroma,([^,]+),/);
+                        const moduleName = fwMatch ? fwMatch[1] : "未知模組";
+                        const newModule = { id: Date.now() + Math.random(), name: moduleName, infoList: [], isOpen: true };
+                        const fwFullMatch = block.match(/FW\s+=>\s+(.*?)(?=\s+\w+\s+=>|$)/);
+                        if (fwFullMatch) newModule.infoList.push({ label: 'FW', value: fwFullMatch[1].trim() });
+                        const fpgaMatch = block.match(/FPGA\s+=>\s+(.*)/);
+                        if (fpgaMatch) {
+                            const fpgas = fpgaMatch[1].split(/\s+(?=[A-Z]\d+)/);
+                            fpgas.forEach(f => {
+                                const fTrim = f.trim();
+                                if (fTrim) {
+                                    const firstComma = fTrim.indexOf(",");
+                                    if (firstComma !== -1) newModule.infoList.push({ label: fTrim.substring(0, firstComma), value: fTrim.substring(firstComma + 1) });
+                                }
+                            });
+                        }
+                        row.modules.push(newModule);
+                    });
+                    importVisible.value = false;
+                    importText.value = "";
+                };
+
+                const addModule = (row) => { row.modules.push({ id: Date.now(), name: '', infoList: [{label: '', value: ''}], isOpen: true }); };
+                const cloneRow = (idx) => {
+                    const cloned = JSON.parse(JSON.stringify(tableData.value[idx]));
+                    cloned.id = Date.now();
+                    tableData.value.splice(idx + 1, 0, cloned);
+                };
+
+                const exportData = () => {
+                    const blob = new Blob([JSON.stringify(tableData.value, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `release_config.json`; a.click();
+                };
+
+                const importData = (file) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => { tableData.value = JSON.parse(e.target.result); };
+                    reader.readAsText(file.raw);
+                };
+
+                return { tableData, addNewRow, addModule, cloneRow, exportData, importData, Plus, Download, UploadFilled, Close, Delete, CaretRight, Upload, CirclePlus, Filter, importVisible, importText, openImportDialog, parseImportText, toggleAll, filterUsage, allUsages, filteredTableData, releasedRows, targetRows };
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+</html>
