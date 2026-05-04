@@ -54,7 +54,11 @@
       <div class="row" style="align-items:flex-end;gap:16px;flex-wrap:wrap">
         <div style="flex:1;min-width:260px">
           <label>選擇週次</label>
-          <select id="weekSelect"></select>
+          <div class="row" style="gap:8px">
+            <button id="prevBtn" class="btn" title="下一週 (較新)">◄</button>
+            <select id="weekSelect"></select>
+            <button id="nextBtn" class="btn" title="上一週 (較舊)">►</button>
+          </div>
         </div>
         <button id="shareBtn" class="btn">複製此週分享連結</button>
         <button id="openAllBtn" class="primary">開啟全部</button>
@@ -845,11 +849,42 @@
     const weekDate = $('#weekDate');
 
     function renderSelect(){
-      weekSelect.innerHTML = weeks.map(w=>`<option value="${w.date}">${w.title? (w.title+" – "):''}${w.date}</option>`).join('');
+      // 利用年份與月份進行群組化
+      let currentMonth = "";
+      let optionsHtml = "";
+      
+      weeks.forEach(w => {
+        const month = w.date.substring(0, 7); // 取得 YYYY-MM
+        if (month !== currentMonth) {
+          if (currentMonth !== "") optionsHtml += `</optgroup>`;
+          optionsHtml += `<optgroup label="${month}">`;
+          currentMonth = month;
+        }
+        optionsHtml += `<option value="${w.date}">${w.title ? (w.title + " – ") : ''}${w.date}</option>`;
+      });
+      if (currentMonth !== "") optionsHtml += `</optgroup>`;
+      
+      weekSelect.innerHTML = optionsHtml;
+      
       const want = qs.get('date');
       weekSelect.value = weeks.find(w=>w.date===want)?.date || weeks[0]?.date || '';
       renderWeek();
     }
+
+    // 綁定上下週按鈕事件
+    $('#prevBtn').addEventListener('click', () => {
+      if (weekSelect.selectedIndex > 0) {
+        weekSelect.selectedIndex -= 1;
+        weekSelect.dispatchEvent(new Event('change'));
+      }
+    });
+
+    $('#nextBtn').addEventListener('click', () => {
+      if (weekSelect.selectedIndex < weekSelect.options.length - 1) {
+        weekSelect.selectedIndex += 1;
+        weekSelect.dispatchEvent(new Event('change'));
+      }
+    });
 
     function renderWeek(){
       const w = weeks.find(x=>x.date===weekSelect.value);
