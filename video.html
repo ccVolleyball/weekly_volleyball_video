@@ -37,6 +37,19 @@
     .table th,.table td{border-bottom:1px solid #e5e7eb;padding:8px 6px;text-align:left;font-size:14px}
     .nowrap{white-space:nowrap}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    /* 年份與日期選擇器樣式 */
+    .year-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; overflow-x: auto; }
+    .year-tab { padding: 6px 16px; border-radius: 20px; border: none; background: transparent; color: var(--muted); cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.2s; }
+    .year-tab:hover { color: var(--primary); background: #f3f4f6; }
+    .year-tab.active { background: var(--primary); color: #fff; }
+
+    .month-row { display: flex; align-items: flex-start; gap: 16px; padding: 12px 0; border-bottom: 1px dashed #e5e7eb; }
+    .month-row:last-child { border-bottom: none; }
+    .month-label { font-weight: 700; color: var(--muted); width: 45px; flex-shrink: 0; padding-top: 6px; }
+    .date-pills { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+    .date-pill { padding: 6px 12px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 14px; transition: all 0.2s; color: var(--text); }
+    .date-pill:hover { border-color: #cbd5e1; background: #f8fafc; }
+.date-pill.active { background: #e5e7eb; border-color: #d1d5db; font-weight: 700; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
   </style>
 </head>
 <body>
@@ -51,15 +64,16 @@
 
   <main class="container">
     <section class="section">
-      <div class="row" style="align-items:flex-end;gap:16px;flex-wrap:wrap">
-        <div style="flex:1;min-width:260px">
-          <label>選擇週次</label>
-          <div class="row" style="gap:8px">
-            <button id="prevBtn" class="btn" title="下一週 (較新)">◄</button>
-            <select id="weekSelect"></select>
-            <button id="nextBtn" class="btn" title="上一週 (較舊)">►</button>
-          </div>
-        </div>
+      <div class="card p" style="margin-bottom: 16px;">
+        <!-- 年份頁籤會長在這裡 -->
+        <div id="yearTabs" class="year-tabs"></div>
+        <!-- 該年份的月份與日期列表會長在這裡 -->
+        <div id="monthList"></div>
+      </div>
+      
+      <div class="row" style="justify-content: flex-end; gap: 16px; flex-wrap: wrap">
+        <!-- 保留原本的 select 但隱藏起來，確保其他邏輯正常運作 -->
+        <select id="weekSelect" class="hidden"></select>
         <button id="shareBtn" class="btn">複製此週分享連結</button>
         <button id="openAllBtn" class="primary">開啟全部</button>
       </div>
@@ -848,43 +862,87 @@
     const weekTitle = $('#weekTitle');
     const weekDate = $('#weekDate');
 
-    function renderSelect(){
-      // 利用年份與月份進行群組化
-      let currentMonth = "";
-      let optionsHtml = "";
+    let currentYear = ''; // 記錄當前選擇的年份
+
+    function renderSelect() {
+      // 1. 建立隱藏的 select 選項 (維持原有邏輯)
+      weekSelect.innerHTML = weeks.map(w => `<option value="${w.date}">${w.date}</option>`).join('');
       
-      weeks.forEach(w => {
-        const month = w.date.substring(0, 7); // 取得 YYYY-MM
-        if (month !== currentMonth) {
-          if (currentMonth !== "") optionsHtml += `</optgroup>`;
-          optionsHtml += `<optgroup label="${month}">`;
-          currentMonth = month;
-        }
-        optionsHtml += `<option value="${w.date}">${w.title ? (w.title + " – ") : ''}${w.date}</option>`;
-      });
-      if (currentMonth !== "") optionsHtml += `</optgroup>`;
-      
-      weekSelect.innerHTML = optionsHtml;
-      
+      // 初始化選中的日期
       const want = qs.get('date');
-      weekSelect.value = weeks.find(w=>w.date===want)?.date || weeks[0]?.date || '';
+      weekSelect.value = weeks.find(w => w.date === want)?.date || weeks[0]?.date || '';
+      
+      // 決定當下要顯示的年份 (優先看網址帶的日期，沒有就抓最新的資料年份)
+      currentYear = weekSelect.value ? weekSelect.value.substring(0, 4) : (weeks[0]?.date.substring(0, 4) || new Date().getFullYear().toString());
+
+      renderCustomPicker();
       renderWeek();
     }
 
-    // 綁定上下週按鈕事件
-    $('#prevBtn').addEventListener('click', () => {
-      if (weekSelect.selectedIndex > 0) {
-        weekSelect.selectedIndex -= 1;
-        weekSelect.dispatchEvent(new Event('change'));
-      }
-    });
+    function renderCustomPicker() {
+      // 2. 將資料依年份、月份分組
+      const grouped = {};
+      weeks.forEach(w => {
+        const year = w.date.substring(0, 4);
+        const month = parseInt(w.date.substring(5, 7), 10) + "月"; // 轉成 "1月", "12月"
+        if (!grouped[year]) grouped[year] = {};
+        if (!grouped[year][month]) grouped[year][month] = [];
+        grouped[year][month].push(w);
+      });
 
-    $('#nextBtn').addEventListener('click', () => {
-      if (weekSelect.selectedIndex < weekSelect.options.length - 1) {
-        weekSelect.selectedIndex += 1;
-        weekSelect.dispatchEvent(new Event('change'));
-      }
-    });
+      // 3. 渲染年份頁籤
+      const years = Object.keys(grouped).sort((a, b) => b - a); // 遞減排序
+      const yearTabs = $('#yearTabs');
+      yearTabs.innerHTML = years.map(y => 
+        `<button class="year-tab ${y === currentYear ? 'active' : ''}" data-year="${y}">${y}年</button>`
+      ).join('');
+
+      // 綁定年份點擊事件
+      $$('.year-tab').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          currentYear = e.target.getAttribute('data-year');
+          renderCustomPicker(); // 重新渲染下方月份
+        });
+      });
+
+      // 4. 渲染月份與日期標籤
+      const monthList = $('#monthList');
+      const yearData = grouped[currentYear] || {};
+      // 確保月份由大到小排列 (12月 -> 1月)
+      const months = Object.keys(yearData).sort((a, b) => parseInt(b) - parseInt(a)); 
+      
+      let html = '';
+      months.forEach(m => {
+        html += `
+          <div class="month-row">
+            <div class="month-label">${m}</div>
+            <div class="date-pills">
+              ${yearData[m].map(w => {
+                const isSelected = w.date === weekSelect.value;
+                // 只顯示 MM-DD，例如 05-03
+                const shortDate = w.date.substring(5); 
+                return `<button class="date-pill ${isSelected ? 'active' : ''}" data-date="${w.date}">${shortDate}</button>`;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      });
+      monthList.innerHTML = html || '<div class="muted">該年無資料</div>';
+
+      // 綁定日期點擊事件
+      $$('.date-pill').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const selectedDate = e.target.getAttribute('data-date');
+          weekSelect.value = selectedDate;
+          // 觸發原本 select 的 change 事件，這樣網址更新跟畫面渲染都會連動
+          weekSelect.dispatchEvent(new Event('change')); 
+          
+          // 更新按鈕的 active 狀態
+          $$('.date-pill').forEach(p => p.classList.remove('active'));
+          e.target.classList.add('active');
+        });
+      });
+    }
 
     function renderWeek(){
       const w = weeks.find(x=>x.date===weekSelect.value);
