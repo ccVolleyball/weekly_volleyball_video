@@ -11,7 +11,7 @@
         .form-group { display: inline-block; margin-right: 15px; margin-bottom: 15px; vertical-align: top; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
         input[type="text"], input[type="date"], select, textarea { padding: 8px; width: 150px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
-        textarea { resize: both; } /* 讓輸入框也可以縮放 */
+        textarea { resize: both; } 
         button { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; color: #fff; font-weight: bold; margin-right: 5px; margin-bottom: 5px; }
         
         .btn-add { background-color: #28a745; } .btn-add:hover { background-color: #218838; }
@@ -31,7 +31,7 @@
 
         .table-responsive { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th, td { border: 1px solid #ddd; padding: 0; text-align: left; } /* 取消 td 原本的 padding 交給內層 div */
+        th, td { border: 1px solid #ddd; padding: 0; text-align: left; } 
         th { background-color: #f2f2f2; position: relative; padding: 10px; cursor: pointer; }
         th:hover { background-color: #e9e9e9; }
         tr:nth-child(even) { background-color: #fcfcfc; }
@@ -39,17 +39,17 @@
         a.map-link { color: #4285F4; text-decoration: none; font-weight: bold; }
         a.map-link:hover { text-decoration: underline; }
 
-        /* 💡 這個 class 讓表格內的儲存格可以自由拖曳縮放長寬 */
+        /* 儲存格拖曳縮放用 CSS */
         .resizable-cell {
             resize: both;
             overflow: auto;
             padding: 10px;
             min-width: 60px;
             min-height: 25px;
-            max-width: 800px; /* 防止拉到破版 */
+            max-width: 800px; 
             max-height: 500px;
             box-sizing: border-box;
-            white-space: pre-wrap; /* 讓換行符號正常顯示 */
+            white-space: pre-wrap; 
         }
     </style>
 </head>
@@ -68,60 +68,6 @@
             </script>
         </select>
         <span id="loadingMsg" style="color: #007bff; font-weight: bold; display: none;">資料載入與同步中...</span>
-    </div>
-
-    <div id="notePage" class="app-page" style="display: none;">
-        <div class="section">
-            <h2 id="noteFormTitle">新增筆記 / 事件</h2>
-            <div class="form-group"><label>流水號 (col1)</label><input type="text" id="noteCol1" placeholder="例如：001"></div>
-            <div class="form-group"><label>日期 (col2)</label><input type="date" id="noteCol2"></div>
-            <div class="form-group"><label>分類 (col3)</label><input type="text" id="noteCol3" placeholder="例如：工作/個人"></div>
-            <div class="form-group">
-                <label>內容 (col4)</label>
-                <textarea id="noteCol4" rows="3" style="width: 300px;" placeholder="請輸入筆記內容..."></textarea>
-            </div>
-            <br>
-            <div class="form-group"><label>保留欄位5</label><input type="text" id="noteCol5"></div>
-            <div class="form-group"><label>保留欄位6</label><input type="text" id="noteCol6"></div>
-            <div class="form-group"><label>保留欄位7</label><input type="text" id="noteCol7"></div>
-            <div class="form-group"><label>保留欄位8</label><input type="text" id="noteCol8"></div>
-            <div class="form-group"><label>保留欄位9</label><input type="text" id="noteCol9"></div>
-            <div class="form-group"><label>保留欄位10</label><input type="text" id="noteCol10"></div>
-            
-            <div style="margin-top: 10px;">
-                <button id="submitNoteBtn" class="btn-add" onclick="submitNoteData()">儲存筆記</button>
-                <button id="cancelNoteBtn" class="btn-cancel" onclick="cancelNoteEdit()">取消編輯</button>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>筆記總覽 (表格右下角可拖曳縮放大小)</h2>
-            <div>
-                <input type="text" id="noteFilterInput" placeholder="輸入關鍵字..." onkeypress="if(event.key === 'Enter') addNoteFilterKeyword()">
-                <button class="btn-filter" onclick="addNoteFilterKeyword()">新增過濾條件</button>
-                <div class="keyword-tags" id="noteKeywordContainer"></div>
-            </div>
-            <div class="table-responsive">
-                <table id="noteTable">
-                    <thead>
-                        <tr>
-                            <th onclick="sortNoteTable('col1')">流水號 ↕</th>
-                            <th onclick="sortNoteTable('col2')">日期 ↕</th>
-                            <th onclick="sortNoteTable('col3')">分類 ↕</th>
-                            <th onclick="sortNoteTable('col4')">內容 ↕</th>
-                            <th onclick="sortNoteTable('col5')">欄位5 ↕</th>
-                            <th onclick="sortNoteTable('col6')">欄位6 ↕</th>
-                            <th onclick="sortNoteTable('col7')">欄位7 ↕</th>
-                            <th onclick="sortNoteTable('col8')">欄位8 ↕</th>
-                            <th onclick="sortNoteTable('col9')">欄位9 ↕</th>
-                            <th onclick="sortNoteTable('col10')">欄位10 ↕</th>
-                            <th>操作</th> 
-                        </tr>
-                    </thead>
-                    <tbody id="noteTableBody"></tbody>
-                </table>
-            </div>
-        </div>
     </div>
 
     <div id="foodPage" class="app-page">
@@ -194,6 +140,60 @@
         </div>
     </div>
 
+    <div id="notePage" class="app-page" style="display: none;">
+        <div class="section">
+            <h2 id="noteFormTitle">新增筆記 / 事件</h2>
+            <div class="form-group"><label>流水號 (col1)</label><input type="text" id="noteCol1" placeholder="例如：001"></div>
+            <div class="form-group"><label>日期 (col2)</label><input type="date" id="noteCol2"></div>
+            <div class="form-group"><label>分類 (col3)</label><input type="text" id="noteCol3" placeholder="例如：工作/個人"></div>
+            <div class="form-group">
+                <label>內容 (col4)</label>
+                <textarea id="noteCol4" rows="3" style="width: 300px;" placeholder="請輸入筆記內容..."></textarea>
+            </div>
+            <br>
+            <div class="form-group"><label>保留欄位5</label><input type="text" id="noteCol5"></div>
+            <div class="form-group"><label>保留欄位6</label><input type="text" id="noteCol6"></div>
+            <div class="form-group"><label>保留欄位7</label><input type="text" id="noteCol7"></div>
+            <div class="form-group"><label>保留欄位8</label><input type="text" id="noteCol8"></div>
+            <div class="form-group"><label>保留欄位9</label><input type="text" id="noteCol9"></div>
+            <div class="form-group"><label>保留欄位10</label><input type="text" id="noteCol10"></div>
+            
+            <div style="margin-top: 10px;">
+                <button id="submitNoteBtn" class="btn-add" onclick="submitNoteData()">儲存筆記</button>
+                <button id="cancelNoteBtn" class="btn-cancel" onclick="cancelNoteEdit()">取消編輯</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>筆記總覽 (表格右下角可拖曳縮放大小)</h2>
+            <div>
+                <input type="text" id="noteFilterInput" placeholder="輸入關鍵字..." onkeypress="if(event.key === 'Enter') addNoteFilterKeyword()">
+                <button class="btn-filter" onclick="addNoteFilterKeyword()">新增過濾條件</button>
+                <div class="keyword-tags" id="noteKeywordContainer"></div>
+            </div>
+            <div class="table-responsive">
+                <table id="noteTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortNoteTable('col1')">流水號 ↕</th>
+                            <th onclick="sortNoteTable('col2')">日期 ↕</th>
+                            <th onclick="sortNoteTable('col3')">分類 ↕</th>
+                            <th onclick="sortNoteTable('col4')">內容 ↕</th>
+                            <th onclick="sortNoteTable('col5')">欄位5 ↕</th>
+                            <th onclick="sortNoteTable('col6')">欄位6 ↕</th>
+                            <th onclick="sortNoteTable('col7')">欄位7 ↕</th>
+                            <th onclick="sortNoteTable('col8')">欄位8 ↕</th>
+                            <th onclick="sortNoteTable('col9')">欄位9 ↕</th>
+                            <th onclick="sortNoteTable('col10')">欄位10 ↕</th>
+                            <th>操作</th> 
+                        </tr>
+                    </thead>
+                    <tbody id="noteTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div id="genericPage" class="app-page" style="display: none;">
         <div class="section">
             <h2 id="genericFormTitle">新增擴充資料</h2>
@@ -211,13 +211,20 @@
         </div>
         
         <div class="section">
-            <h2 id="genericTableTitle">資料總覽</h2>
+            <h2 id="genericTableTitle">資料總覽 (表格右下角可拖曳縮放大小)</h2>
+            
+            <div>
+                <input type="text" id="genericFilterInput" placeholder="輸入關鍵字..." onkeypress="if(event.key === 'Enter') addGenericFilterKeyword()">
+                <button class="btn-filter" onclick="addGenericFilterKeyword()">新增過濾條件</button>
+                <div class="keyword-tags" id="genericKeywordContainer"></div>
+            </div>
+
             <div class="table-responsive">
                 <table id="genericTable">
                     <thead>
                         <tr id="genericTableHeader">
                             <script>
-                                for(let i=1; i<=10; i++){ document.write(`<th>欄位 ${i}</th>`); }
+                                for(let i=1; i<=10; i++){ document.write(`<th onclick="sortGenericTable('col${i}')">欄位 ${i} ↕</th>`); }
                                 document.write(`<th>操作</th>`);
                             </script>
                         </tr>
@@ -229,7 +236,7 @@
     </div>
 
     <script>
-        // 🚨 這裡必須換成您自己的亂碼 API 網址！ 🚨
+        // 🚨 這裡請記得填上您自己最新的 Google Apps Script 網址 🚨
         const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
 
         let filterKeywords = [];
@@ -238,17 +245,17 @@
         
         let sportsDataList = []; let editingSportsId = null;
         
-        // --- 新增：隨身筆記變數 ---
         let noteDataList = []; let editingNoteId = null;
-        let noteFilterKeywords = []; 
-        let noteSortCol = ''; let noteSortAsc = true;
+        let noteFilterKeywords = []; let noteSortCol = ''; let noteSortAsc = true;
 
+        // --- 新增：擴充網頁的獨立過濾與排序變數 ---
         let genericDataList = []; let editingGenericId = null;
         let currentGenericSheet = ''; 
+        let genericFilterKeywords = []; let genericSortCol = ''; let genericSortAsc = true;
 
         window.onload = function() {
             document.getElementById('sportDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('noteCol2').value = new Date().toISOString().split('T')[0]; // 筆記預設今天
+            document.getElementById('noteCol2').value = new Date().toISOString().split('T')[0];
             loadData('美食紀錄');
         };
 
@@ -276,6 +283,9 @@
                 
                 document.getElementById('genericFormTitle').innerText = `新增 ${currentGenericSheet} 資料`;
                 document.getElementById('genericTableTitle').innerText = `${currentGenericSheet} 總覽`;
+                
+                // 切換分頁時，清空上一個擴充分頁的過濾條件
+                genericFilterKeywords = []; genericSortCol = ''; renderGenericKw();
                 loadData(currentGenericSheet);
             }
         }
@@ -287,126 +297,38 @@
                 const data = await response.json();
                 
                 if (sheetName === '美食紀錄') {
-                    foodDataList = data.map(item => ({
-                        ...item, fullText: `${item.city} ${item.district} ${item.address} ${item.storeName} ${item.category} ${item.other}`.toLowerCase()
-                    }));
+                    foodDataList = data.map(item => ({ ...item, fullText: `${item.city} ${item.district} ${item.address} ${item.storeName} ${item.category} ${item.other}`.toLowerCase() }));
                     renderFoodTable();
                 } else if (sheetName === '運動紀錄') {
                     sportsDataList = data; renderSportsTable();
                 } else if (sheetName === '擴充預留網頁1') {
-                    noteDataList = data.map(item => ({
-                        ...item, fullText: `${item.col1} ${item.col2} ${item.col3} ${item.col4} ${item.col5} ${item.col6} ${item.col7} ${item.col8} ${item.col9} ${item.col10}`.toLowerCase()
-                    }));
+                    noteDataList = data.map(item => ({ ...item, fullText: `${item.col1} ${item.col2} ${item.col3} ${item.col4} ${item.col5} ${item.col6} ${item.col7} ${item.col8} ${item.col9} ${item.col10}`.toLowerCase() }));
                     renderNoteTable();
                 } else if (sheetName.startsWith('擴充預留網頁')) {
-                    genericDataList = data; renderGenericTable();
+                    // 🌟 幫擴充網頁產生供搜尋用的 fullText 字串 🌟
+                    genericDataList = data.map(item => ({ ...item, fullText: `${item.col1} ${item.col2} ${item.col3} ${item.col4} ${item.col5} ${item.col6} ${item.col7} ${item.col8} ${item.col9} ${item.col10}`.toLowerCase() }));
+                    renderGenericTable();
                 }
             } catch (error) {
                 console.error(`載入 ${sheetName} 失敗:`, error);
             } finally { toggleLoading(false); }
         }
 
-        // ================= 隨身筆記 / 事件簿功能 =================
-        async function submitNoteData() {
-            const payload = {
-                sheetName: '擴充預留網頁1',
-                id: editingNoteId || Date.now(),
-                action: editingNoteId ? 'edit' : 'add'
-            };
-            for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`noteCol${i}`).value; }
-            
-            const fullText = Object.values(payload).join(' ').toLowerCase();
-            
-            if (editingNoteId) {
-                const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId));
-                if (idx > -1) noteDataList[idx] = { ...payload, fullText };
-            } else { noteDataList.push({ ...payload, fullText }); }
-            
-            renderNoteTable(); cancelNoteEdit();
-            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); } 
-            catch (e) { alert("雲端更新失敗！"); }
-        }
-
-        function editNoteData(id) {
-            const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return;
-            for(let i=1; i<=10; i++) { 
-                let val = item[`col${i}`] || '';
-                // 如果是日期欄位且有時間戳，幫忙去除非日期字元
-                if (i === 2 && val.includes('T')) val = val.split('T')[0];
-                document.getElementById(`noteCol${i}`).value = val; 
-            }
-            editingNoteId = id;
-            document.getElementById('noteFormTitle').innerText = '編輯筆記 / 事件';
-            document.getElementById('submitNoteBtn').innerText = '儲存修改';
-            document.getElementById('submitNoteBtn').className = 'btn-edit';
-            document.getElementById('cancelNoteBtn').style.display = 'inline-block';
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
-
-        function cancelNoteEdit() {
-            editingNoteId = null;
-            for(let i=1; i<=10; i++) { document.getElementById(`noteCol${i}`).value = ''; }
-            document.getElementById('noteCol2').value = new Date().toISOString().split('T')[0];
-            document.getElementById('noteFormTitle').innerText = '新增筆記 / 事件';
-            document.getElementById('submitNoteBtn').innerText = '儲存筆記';
-            document.getElementById('submitNoteBtn').className = 'btn-add';
-            document.getElementById('cancelNoteBtn').style.display = 'none';
-        }
-
-        async function deleteNoteData(id) {
-            if (!confirm('確定刪除此筆記？')) return;
-            noteDataList = noteDataList.filter(d => String(d.id) !== String(id));
-            renderNoteTable();
-            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁1' }) }); } 
-            catch (e) { alert("刪除失敗！"); }
-        }
-
-        function sortNoteTable(col) {
-            if (noteSortCol === col) noteSortAsc = !noteSortAsc; else { noteSortCol = col; noteSortAsc = true; }
-            noteDataList.sort((a, b) => {
-                let valA = a[col] || ''; let valB = b[col] || '';
-                if (valA < valB) return noteSortAsc ? -1 : 1;
-                if (valA > valB) return noteSortAsc ? 1 : -1;
-                return 0;
-            });
-            renderNoteTable();
-        }
-
-        function addNoteFilterKeyword() {
-            const kw = document.getElementById('noteFilterInput').value.trim().toLowerCase();
-            if (kw && !noteFilterKeywords.includes(kw)) { noteFilterKeywords.push(kw); renderNoteKw(); renderNoteTable(); }
-            document.getElementById('noteFilterInput').value = '';
-        }
-        function removeNoteKeyword(kw) { noteFilterKeywords = noteFilterKeywords.filter(k => k !== kw); renderNoteKw(); renderNoteTable(); }
-        function renderNoteKw() {
-            const c = document.getElementById('noteKeywordContainer'); c.innerHTML = '';
-            noteFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeNoteKeyword('${kw}')">✖</span></div>`; });
-        }
-
-        function renderNoteTable() {
-            const tbody = document.getElementById('noteTableBody'); tbody.innerHTML = '';
-            noteDataList.forEach(data => {
-                if (noteFilterKeywords.length > 0 && !noteFilterKeywords.some(kw => data.fullText.includes(kw))) return;
-                const tr = document.createElement('tr');
-                let colsHtml = '';
-                // 將內容包裝在 resizable-cell 裡面，允許獨立調整高寬
-                for(let i=1; i<=10; i++) { 
-                    let val = data[`col${i}`] || '';
-                    if(i === 2 && val.includes('T')) val = val.split('T')[0]; // 日期格式化
-                    colsHtml += `<td><div class="resizable-cell">${val}</div></td>`; 
-                }
-                tr.innerHTML = `${colsHtml}<td><div class="resizable-cell" style="resize:none;"><button class="btn-edit" onclick="editNoteData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteNoteData('${data.id}')">刪除</button></div></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-
-        // ================= 擴充通用網頁 (2~10) =================
+        // ================= 擴充通用網頁 (2~10) 全新升級版 =================
         async function submitGenericData() {
             const payload = { sheetName: currentGenericSheet, id: editingGenericId || Date.now(), action: editingGenericId ? 'edit' : 'add' };
             for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`genCol${i}`).value.trim(); }
-            if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = payload;
-            } else { genericDataList.push(payload); }
+            
+            // 建立用來過濾的合併字串
+            const fullText = Object.values(payload).join(' ').toLowerCase();
+
+            if (editingGenericId) { 
+                const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); 
+                if (idx > -1) genericDataList[idx] = { ...payload, fullText };
+            } else { 
+                genericDataList.push({ ...payload, fullText }); 
+            }
+            
             renderGenericTable(); cancelGenericEdit();
             fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         }
@@ -423,33 +345,90 @@
             if (!confirm('確定刪除此筆資料？')) return; genericDataList = genericDataList.filter(d => String(d.id) !== String(id)); renderGenericTable();
             fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentGenericSheet }) });
         }
+
+        // 🌟 新增：擴充網頁的排序功能 🌟
+        function sortGenericTable(col) {
+            if (genericSortCol === col) genericSortAsc = !genericSortAsc; else { genericSortCol = col; genericSortAsc = true; }
+            genericDataList.sort((a, b) => {
+                let valA = a[col] || ''; let valB = b[col] || '';
+                if (valA < valB) return genericSortAsc ? -1 : 1;
+                if (valA > valB) return genericSortAsc ? 1 : -1;
+                return 0;
+            });
+            renderGenericTable();
+        }
+
+        // 🌟 新增：擴充網頁的過濾功能 🌟
+        function addGenericFilterKeyword() {
+            const kw = document.getElementById('genericFilterInput').value.trim().toLowerCase();
+            if (kw && !genericFilterKeywords.includes(kw)) { genericFilterKeywords.push(kw); renderGenericKw(); renderGenericTable(); }
+            document.getElementById('genericFilterInput').value = '';
+        }
+        function removeGenericKeyword(kw) { genericFilterKeywords = genericFilterKeywords.filter(k => k !== kw); renderGenericKw(); renderGenericTable(); }
+        function renderGenericKw() {
+            const c = document.getElementById('genericKeywordContainer'); c.innerHTML = '';
+            genericFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeGenericKeyword('${kw}')">✖</span></div>`; });
+        }
+
+        // 🌟 更新：擴充網頁表格渲染 (加入 resize 與 filter) 🌟
         function renderGenericTable() {
             const tbody = document.getElementById('genericTableBody'); tbody.innerHTML = '';
             genericDataList.forEach(data => {
+                // 如果有關鍵字，資料必須包含其中一個 (OR邏輯) 才顯示
+                if (genericFilterKeywords.length > 0 && !genericFilterKeywords.some(kw => data.fullText.includes(kw))) return;
+                
                 const tr = document.createElement('tr'); let colsHtml = '';
-                for(let i=1; i<=10; i++) { colsHtml += `<td><div style="padding:10px">${data[`col${i}`] || ''}</div></td>`; }
-                tr.innerHTML = `${colsHtml}<td><div style="padding:10px"><button class="btn-edit" onclick="editGenericData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteGenericData('${data.id}')">刪除</button></div></td>`;
+                // 將內容包裝在 resizable-cell 中，實現自由縮放
+                for(let i=1; i<=10; i++) { colsHtml += `<td><div class="resizable-cell">${data[`col${i}`] || ''}</div></td>`; }
+                tr.innerHTML = `${colsHtml}<td><div class="resizable-cell" style="resize:none;"><button class="btn-edit" onclick="editGenericData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteGenericData('${data.id}')">刪除</button></div></td>`;
                 tbody.appendChild(tr);
             });
         }
 
 
-        // ================= 美食功能 (壓縮代碼) =================
+        // ================= 隨身筆記 / 事件簿功能 (擴充1) =================
+        async function submitNoteData() {
+            const payload = { sheetName: '擴充預留網頁1', id: editingNoteId || Date.now(), action: editingNoteId ? 'edit' : 'add' };
+            for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`noteCol${i}`).value; }
+            const fullText = Object.values(payload).join(' ').toLowerCase();
+            if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); }
+            renderNoteTable(); cancelNoteEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        }
+        function editNoteData(id) {
+            const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            for(let i=1; i<=10; i++) { let val = item[`col${i}`] || ''; if (i === 2 && val.includes('T')) val = val.split('T')[0]; document.getElementById(`noteCol${i}`).value = val; }
+            editingNoteId = id; document.getElementById('noteFormTitle').innerText = '編輯筆記 / 事件'; document.getElementById('submitNoteBtn').innerText = '儲存修改'; document.getElementById('submitNoteBtn').className = 'btn-edit'; document.getElementById('cancelNoteBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+        function cancelNoteEdit() {
+            editingNoteId = null; for(let i=1; i<=10; i++) { document.getElementById(`noteCol${i}`).value = ''; }
+            document.getElementById('noteCol2').value = new Date().toISOString().split('T')[0]; document.getElementById('noteFormTitle').innerText = '新增筆記 / 事件'; document.getElementById('submitNoteBtn').innerText = '儲存筆記'; document.getElementById('submitNoteBtn').className = 'btn-add'; document.getElementById('cancelNoteBtn').style.display = 'none';
+        }
+        function deleteNoteData(id) { if (!confirm('確定刪除此筆記？')) return; noteDataList = noteDataList.filter(d => String(d.id) !== String(id)); renderNoteTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁1' }) }); }
+        function sortNoteTable(col) { if (noteSortCol === col) noteSortAsc = !noteSortAsc; else { noteSortCol = col; noteSortAsc = true; } noteDataList.sort((a, b) => { let valA = a[col] || ''; let valB = b[col] || ''; if (valA < valB) return noteSortAsc ? -1 : 1; if (valA > valB) return noteSortAsc ? 1 : -1; return 0; }); renderNoteTable(); }
+        function addNoteFilterKeyword() { const kw = document.getElementById('noteFilterInput').value.trim().toLowerCase(); if (kw && !noteFilterKeywords.includes(kw)) { noteFilterKeywords.push(kw); renderNoteKw(); renderNoteTable(); } document.getElementById('noteFilterInput').value = ''; }
+        function removeNoteKeyword(kw) { noteFilterKeywords = noteFilterKeywords.filter(k => k !== kw); renderNoteKw(); renderNoteTable(); }
+        function renderNoteKw() { const c = document.getElementById('noteKeywordContainer'); c.innerHTML = ''; noteFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeNoteKeyword('${kw}')">✖</span></div>`; }); }
+        function renderNoteTable() {
+            const tbody = document.getElementById('noteTableBody'); tbody.innerHTML = '';
+            noteDataList.forEach(data => {
+                if (noteFilterKeywords.length > 0 && !noteFilterKeywords.some(kw => data.fullText.includes(kw))) return;
+                const tr = document.createElement('tr'); let colsHtml = '';
+                for(let i=1; i<=10; i++) { let val = data[`col${i}`] || ''; if(i === 2 && val.includes('T')) val = val.split('T')[0]; colsHtml += `<td><div class="resizable-cell">${val}</div></td>`; }
+                tr.innerHTML = `${colsHtml}<td><div class="resizable-cell" style="resize:none;"><button class="btn-edit" onclick="editNoteData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteNoteData('${data.id}')">刪除</button></div></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ================= 美食功能 (維持高度壓縮) =================
         async function submitFoodData() {
-            const city = document.getElementById('city').value.trim(), district = document.getElementById('district').value.trim();
-            const address = document.getElementById('address').value.trim(), storeName = document.getElementById('storeName').value.trim();
-            const category = document.getElementById('category').value.trim(), other = document.getElementById('other').value.trim();
+            const city = document.getElementById('city').value.trim(), district = document.getElementById('district').value.trim(), address = document.getElementById('address').value.trim(), storeName = document.getElementById('storeName').value.trim(), category = document.getElementById('category').value.trim(), other = document.getElementById('other').value.trim();
             if (!storeName) return alert('店名為必填！');
             const payload = { sheetName: '美食紀錄', id: editingFoodId || Date.now(), action: editingFoodId ? 'edit' : 'add', city, district, address, storeName, category, other };
             const fullText = `${city} ${district} ${address} ${storeName} ${category} ${other}`.toLowerCase();
             if (editingFoodId) { const idx = foodDataList.findIndex(d => String(d.id) === String(editingFoodId)); if (idx > -1) foodDataList[idx] = { ...payload, fullText }; } else { foodDataList.push({ ...payload, fullText }); }
             renderFoodTable(); cancelFoodEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         }
-        function editFoodData(id) {
-            const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return;
-            document.getElementById('city').value = item.city || ''; document.getElementById('district').value = item.district || ''; document.getElementById('address').value = item.address || ''; document.getElementById('storeName').value = item.storeName || ''; document.getElementById('category').value = item.category || ''; document.getElementById('other').value = item.other || '';
-            editingFoodId = id; document.getElementById('foodFormTitle').innerText = '編輯美食資料'; document.getElementById('submitFoodBtn').innerText = '儲存修改'; document.getElementById('submitFoodBtn').className = 'btn-edit'; document.getElementById('cancelFoodBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
+        function editFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; document.getElementById('city').value = item.city || ''; document.getElementById('district').value = item.district || ''; document.getElementById('address').value = item.address || ''; document.getElementById('storeName').value = item.storeName || ''; document.getElementById('category').value = item.category || ''; document.getElementById('other').value = item.other || ''; editingFoodId = id; document.getElementById('foodFormTitle').innerText = '編輯美食資料'; document.getElementById('submitFoodBtn').innerText = '儲存修改'; document.getElementById('submitFoodBtn').className = 'btn-edit'; document.getElementById('cancelFoodBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function cancelFoodEdit() { editingFoodId = null; document.querySelectorAll('#foodPage .form-group input').forEach(input => input.value = ''); document.getElementById('foodFormTitle').innerText = '新增美食店家'; document.getElementById('submitFoodBtn').innerText = '新增資料'; document.getElementById('submitFoodBtn').className = 'btn-add'; document.getElementById('cancelFoodBtn').style.display = 'none'; }
         function deleteFoodData(id) { if (!confirm('確定刪除此美食紀錄？')) return; foodDataList = foodDataList.filter(d => String(d.id) !== String(id)); renderFoodTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '美食紀錄' }) }); }
         function renderFoodTable() {
@@ -457,7 +436,7 @@
             foodDataList.forEach(data => {
                 if (filterKeywords.length > 0 && !filterKeywords.some(kw => data.fullText.includes(kw))) return;
                 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((data.city||'')+' '+(data.address||'')+' '+(data.storeName||''))}`;
-                tbody.innerHTML += `<tr><td><div style="padding:10px">${data.city || ''}</div></td><td><div style="padding:10px">${data.district || ''}</div></td><td><div style="padding:10px">${data.address || ''}</div></td><td><div style="padding:10px">${data.storeName || ''}</div></td><td><div style="padding:10px">${data.category || ''}</div></td><td><div style="padding:10px">${data.other || ''}</div></td><td><div style="padding:10px"><a href="${mapUrl}" target="_blank" class="map-link">搜尋</a></div></td><td><div style="padding:10px"><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></div></td></tr>`;
+                tbody.innerHTML += `<tr><td><div class="resizable-cell">${data.city || ''}</div></td><td><div class="resizable-cell">${data.district || ''}</div></td><td><div class="resizable-cell">${data.address || ''}</div></td><td><div class="resizable-cell">${data.storeName || ''}</div></td><td><div class="resizable-cell">${data.category || ''}</div></td><td><div class="resizable-cell">${data.other || ''}</div></td><td><div class="resizable-cell" style="resize:none;"><a href="${mapUrl}" target="_blank" class="map-link">搜尋</a></div></td><td><div class="resizable-cell" style="resize:none;"><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></div></td></tr>`;
             });
         }
         function addFilterKeyword() { const kw = document.getElementById('filterInput').value.trim().toLowerCase(); if (kw && !filterKeywords.includes(kw)) { filterKeywords.push(kw); renderKw(); renderFoodTable(); } document.getElementById('filterInput').value = ''; }
@@ -466,7 +445,7 @@
         function testGoogleMap() { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(document.getElementById('city').value+' '+document.getElementById('address').value+' '+document.getElementById('storeName').value)}`, '_blank'); }
         function sortTable(col) { if (sortCol === col) sortAsc = !sortAsc; else { sortCol = col; sortAsc = true; } foodDataList.sort((a, b) => { if ((a[col]||'') < (b[col]||'')) return sortAsc ? -1 : 1; if ((a[col]||'') > (b[col]||'')) return sortAsc ? 1 : -1; return 0; }); renderFoodTable(); }
 
-        // ================= 運動功能 (壓縮代碼) =================
+        // ================= 運動功能 (維持高度壓縮) =================
         async function submitSportsData() {
             const date = document.getElementById('sportDate').value, type = document.getElementById('sportType').value, distance = document.getElementById('sportDistance').value.trim(), notes = document.getElementById('sportNotes').value.trim();
             if (!date) return alert('請選擇日期！');
@@ -474,18 +453,14 @@
             if (editingSportsId) { const idx = sportsDataList.findIndex(d => String(d.id) === String(editingSportsId)); if (idx > -1) sportsDataList[idx] = payload; } else { sportsDataList.push(payload); }
             renderSportsTable(); cancelSportsEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         }
-        function editSportsData(id) {
-            const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return;
-            document.getElementById('sportDate').value = (item.date && item.date.includes('T')) ? item.date.split('T')[0] : item.date; document.getElementById('sportType').value = item.type || '跑步'; document.getElementById('sportDistance').value = item.distance === '-' ? '' : item.distance; document.getElementById('sportNotes').value = item.notes === '-' ? '' : item.notes;
-            editingSportsId = id; document.getElementById('sportsFormTitle').innerText = '編輯運動紀錄'; document.getElementById('submitSportsBtn').innerText = '儲存修改'; document.getElementById('submitSportsBtn').className = 'btn-edit'; document.getElementById('cancelSportsBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
+        function editSportsData(id) { const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return; document.getElementById('sportDate').value = (item.date && item.date.includes('T')) ? item.date.split('T')[0] : item.date; document.getElementById('sportType').value = item.type || '跑步'; document.getElementById('sportDistance').value = item.distance === '-' ? '' : item.distance; document.getElementById('sportNotes').value = item.notes === '-' ? '' : item.notes; editingSportsId = id; document.getElementById('sportsFormTitle').innerText = '編輯運動紀錄'; document.getElementById('submitSportsBtn').innerText = '儲存修改'; document.getElementById('submitSportsBtn').className = 'btn-edit'; document.getElementById('cancelSportsBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function cancelSportsEdit() { editingSportsId = null; document.getElementById('sportDate').value = new Date().toISOString().split('T')[0]; document.getElementById('sportType').value = '跑步'; document.getElementById('sportDistance').value = ''; document.getElementById('sportNotes').value = ''; document.getElementById('sportsFormTitle').innerText = '新增運動紀錄'; document.getElementById('submitSportsBtn').innerText = '新增紀錄'; document.getElementById('submitSportsBtn').className = 'btn-add'; document.getElementById('cancelSportsBtn').style.display = 'none'; }
         function deleteSportsData(id) { if (!confirm('確定刪除此運動紀錄？')) return; sportsDataList = sportsDataList.filter(d => String(d.id) !== String(id)); renderSportsTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '運動紀錄' }) }); }
         function renderSportsTable() {
             const tbody = document.getElementById('sportsTableBody'); tbody.innerHTML = '';
             [...sportsDataList].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(data => {
                 const dateStr = (data.date && data.date.includes('T')) ? data.date.split('T')[0] : data.date;
-                tbody.innerHTML += `<tr><td><div style="padding:10px">${dateStr || ''}</div></td><td><div style="padding:10px">${data.type || ''}</div></td><td><div style="padding:10px">${data.distance || ''}</div></td><td><div style="padding:10px">${data.notes || ''}</div></td><td><div style="padding:10px"><button class=\"btn-edit\" onclick=\"editSportsData('${data.id}')\">編輯</button><button class=\"btn-delete\" onclick=\"deleteSportsData('${data.id}')\">刪除</button></div></td></tr>`;
+                tbody.innerHTML += `<tr><td><div class="resizable-cell">${dateStr || ''}</div></td><td><div class="resizable-cell">${data.type || ''}</div></td><td><div class="resizable-cell">${data.distance || ''}</div></td><td><div class="resizable-cell">${data.notes || ''}</div></td><td><div class="resizable-cell" style="resize:none;"><button class=\"btn-edit\" onclick=\"editSportsData('${data.id}')\">編輯</button><button class=\"btn-delete\" onclick=\"deleteSportsData('${data.id}')\">刪除</button></div></td></tr>`;
             });
         }
     </script>
