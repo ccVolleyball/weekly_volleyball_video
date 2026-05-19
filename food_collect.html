@@ -28,10 +28,10 @@
         .tag { background-color: #e2e3e5; padding: 5px 10px; border-radius: 15px; font-size: 13px; display: flex; align-items: center; }
         .tag span { margin-left: 8px; cursor: pointer; color: #dc3545; font-weight: bold; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f2f2f2; cursor: pointer; position: relative; }
-        th:hover { background-color: #e9e9e9; }
+        .table-responsive { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; white-space: nowrap; }
+        th { background-color: #f2f2f2; position: relative; }
         tr:nth-child(even) { background-color: #fcfcfc; }
         tr:hover { background-color: #f1f1f1; }
         a.map-link { color: #4285F4; text-decoration: none; font-weight: bold; }
@@ -40,13 +40,18 @@
 </head>
 <body>
 
-    <div style="margin-bottom: 20px; padding: 15px; background-color: #e9ecef; border-radius: 8px; display: flex; align-items: center;">
-        <label for="pageSelector" style="font-size: 16px; margin-right: 10px; margin-bottom: 0;">切換系統頁面：</label>
-        <select id="pageSelector" onchange="switchPage()" style="padding: 8px; font-size: 16px; width: 200px;">
+    <div style="margin-bottom: 20px; padding: 15px; background-color: #e9ecef; border-radius: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <label for="pageSelector" style="font-size: 16px; margin-bottom: 0;">切換系統頁面：</label>
+        <select id="pageSelector" onchange="switchPage()" style="padding: 8px; font-size: 16px; width: auto;">
             <option value="foodPage">🍔 美食店家地圖</option>
             <option value="sportsPage">🏃‍♂️ 運動訓練紀錄</option>
+            <script>
+                for(let i=1; i<=10; i++){
+                    document.write(`<option value="extPage${i}">📄 擴充預留網頁${i}</option>`);
+                }
+            </script>
         </select>
-        <span id="loadingMsg" style="margin-left: 15px; color: #007bff; font-weight: bold; display: none;">資料載入與同步中...</span>
+        <span id="loadingMsg" style="color: #007bff; font-weight: bold; display: none;">資料載入與同步中...</span>
     </div>
 
     <div id="foodPage" class="app-page">
@@ -68,21 +73,21 @@
         <div class="section">
             <h2>美食清單與過濾</h2>
             <div>
-                <input type="text" id="filterInput" placeholder="輸入關鍵字..." onkeypress="handleFilterKeyPress(event)">
+                <input type="text" id="filterInput" placeholder="輸入關鍵字..." onkeypress="if(event.key === 'Enter') addFilterKeyword()">
                 <button class="btn-filter" onclick="addFilterKeyword()">新增過濾條件</button>
                 <div class="keyword-tags" id="keywordContainer"></div>
             </div>
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th onclick="sortTable('city')">縣市</th><th onclick="sortTable('district')">區域</th>
-                        <th onclick="sortTable('address')">地址</th><th onclick="sortTable('storeName')">店名</th>
-                        <th onclick="sortTable('category')">分類</th><th onclick="sortTable('other')">其他</th>
-                        <th>地圖</th><th>操作</th> 
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
+            <div class="table-responsive">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>縣市</th><th>區域</th><th>地址</th><th>店名</th>
+                            <th>分類</th><th>其他</th><th>地圖</th><th>操作</th> 
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -108,27 +113,61 @@
         
         <div class="section">
             <h2>訓練紀錄總覽</h2>
-            <table id="sportsTable">
-                <thead>
-                    <tr>
-                        <th>日期</th><th>運動類型</th><th>距離 (km)</th><th>備註</th><th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="sportsTableBody"></tbody>
-            </table>
+            <div class="table-responsive">
+                <table id="sportsTable">
+                    <thead><tr><th>日期</th><th>運動類型</th><th>距離 (km)</th><th>備註</th><th>操作</th></tr></thead>
+                    <tbody id="sportsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="genericPage" class="app-page" style="display: none;">
+        <div class="section">
+            <h2 id="genericFormTitle">新增擴充資料</h2>
+            <div id="genericInputsContainer">
+                <script>
+                    for(let i=1; i<=10; i++){
+                        document.write(`<div class="form-group"><label id="genLabel${i}">欄位 ${i}</label><input type="text" id="genCol${i}"></div>`);
+                    }
+                </script>
+            </div>
+            <div style="margin-top: 10px;">
+                <button id="submitGenericBtn" class="btn-add" onclick="submitGenericData()">新增資料</button>
+                <button id="cancelGenericBtn" class="btn-cancel" onclick="cancelGenericEdit()">取消編輯</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 id="genericTableTitle">資料總覽</h2>
+            <div class="table-responsive">
+                <table id="genericTable">
+                    <thead>
+                        <tr id="genericTableHeader">
+                            <script>
+                                for(let i=1; i<=10; i++){ document.write(`<th>欄位 ${i}</th>`); }
+                                document.write(`<th>操作</th>`);
+                            </script>
+                        </tr>
+                    </thead>
+                    <tbody id="genericTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
         let filterKeywords = [];
-        let sortCol = '';
-        let sortAsc = true;
         let foodDataList = []; 
         let sportsDataList = []; 
+        let genericDataList = [];
+
         let editingFoodId = null; 
         let editingSportsId = null;
+        let editingGenericId = null;
+        let currentGenericSheet = ''; // 紀錄目前在哪個擴充網頁
 
-        // 💡 您的專屬 API 網址
+        // 🚨 這裡必須換成您自己的亂碼 API 網址！ 🚨
         const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
 
         window.onload = function() {
@@ -136,18 +175,32 @@
             loadData('美食紀錄');
         };
 
-        function toggleLoading(show) {
-            document.getElementById('loadingMsg').style.display = show ? 'inline' : 'none';
-        }
+        function toggleLoading(show) { document.getElementById('loadingMsg').style.display = show ? 'inline' : 'none'; }
 
         function switchPage() {
             const selectedPageId = document.getElementById('pageSelector').value;
-            document.querySelectorAll('.app-page').forEach(page => {
-                page.style.display = (page.id === selectedPageId) ? 'block' : 'none';
-            });
-            cancelFoodEdit();
-            cancelSportsEdit();
-            loadData(selectedPageId === 'foodPage' ? '美食紀錄' : '運動紀錄');
+            
+            document.querySelectorAll('.app-page').forEach(page => { page.style.display = 'none'; });
+            cancelFoodEdit(); cancelSportsEdit(); cancelGenericEdit();
+
+            if (selectedPageId === 'foodPage') {
+                document.getElementById('foodPage').style.display = 'block';
+                loadData('美食紀錄');
+            } else if (selectedPageId === 'sportsPage') {
+                document.getElementById('sportsPage').style.display = 'block';
+                loadData('運動紀錄');
+            } else if (selectedPageId.startsWith('extPage')) {
+                // 處理擴充網頁 1~10
+                document.getElementById('genericPage').style.display = 'block';
+                const pageNum = selectedPageId.replace('extPage', '');
+                currentGenericSheet = '擴充預留網頁' + pageNum;
+                
+                // 動態更改標題
+                document.getElementById('genericFormTitle').innerText = `新增 ${currentGenericSheet} 資料`;
+                document.getElementById('genericTableTitle').innerText = `${currentGenericSheet} 總覽`;
+                
+                loadData(currentGenericSheet);
+            }
         }
 
         async function loadData(sheetName) {
@@ -158,212 +211,160 @@
                 
                 if (sheetName === '美食紀錄') {
                     foodDataList = data.map(item => ({
-                        ...item,
-                        fullText: `${item.city} ${item.district} ${item.address} ${item.storeName} ${item.category} ${item.other}`.toLowerCase()
+                        ...item, fullText: `${item.city} ${item.district} ${item.address} ${item.storeName} ${item.category} ${item.other}`.toLowerCase()
                     }));
                     renderFoodTable();
                 } else if (sheetName === '運動紀錄') {
-                    sportsDataList = data;
-                    renderSportsTable();
+                    sportsDataList = data; renderSportsTable();
+                } else if (sheetName.startsWith('擴充預留網頁')) {
+                    genericDataList = data; renderGenericTable();
                 }
             } catch (error) {
                 console.error(`載入 ${sheetName} 失敗:`, error);
-            } finally {
-                toggleLoading(false);
-            }
+            } finally { toggleLoading(false); }
         }
 
-        // ================= 美食功能 =================
-        async function submitFoodData() {
-            const city = document.getElementById('city').value.trim();
-            const district = document.getElementById('district').value.trim();
-            const address = document.getElementById('address').value.trim();
-            const storeName = document.getElementById('storeName').value.trim();
-            const category = document.getElementById('category').value.trim();
-            const other = document.getElementById('other').value.trim();
-
-            if (!storeName) { alert('店名為必填！'); return; }
-
+        // ================= 通用網頁功能 (網頁1~10) =================
+        async function submitGenericData() {
             const payload = {
-                sheetName: '美食紀錄', id: editingFoodId ? editingFoodId : Date.now(), 
-                action: editingFoodId ? 'edit' : 'add', city, district, address, storeName, category, other
+                sheetName: currentGenericSheet,
+                id: editingGenericId ? editingGenericId : Date.now(),
+                action: editingGenericId ? 'edit' : 'add'
             };
 
-            const fullText = `${city} ${district} ${address} ${storeName} ${category} ${other}`.toLowerCase();
-            if (editingFoodId) {
-                const idx = foodDataList.findIndex(d => String(d.id) === String(editingFoodId));
-                if (idx > -1) foodDataList[idx] = { ...payload, fullText };
-            } else { foodDataList.push({ ...payload, fullText }); }
+            // 抓取 10 個輸入框的值
+            for(let i=1; i<=10; i++) {
+                payload[`col${i}`] = document.getElementById(`genCol${i}`).value.trim();
+            }
+
+            if (editingGenericId) {
+                const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId));
+                if (idx > -1) genericDataList[idx] = payload;
+            } else { genericDataList.push(payload); }
             
-            renderFoodTable(); cancelFoodEdit(); 
+            renderGenericTable(); cancelGenericEdit();
+
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); } 
             catch (e) { alert("雲端更新失敗！"); }
         }
 
-        function editFoodData(id) {
-            const item = foodDataList.find(d => String(d.id) === String(id));
+        function editGenericData(id) {
+            const item = genericDataList.find(d => String(d.id) === String(id));
             if (!item) return;
-            document.getElementById('city').value = item.city || '';
-            document.getElementById('district').value = item.district || '';
-            document.getElementById('address').value = item.address || '';
-            document.getElementById('storeName').value = item.storeName || '';
-            document.getElementById('category').value = item.category || '';
-            document.getElementById('other').value = item.other || '';
             
-            editingFoodId = id;
-            document.getElementById('foodFormTitle').innerText = '編輯美食資料';
-            document.getElementById('submitFoodBtn').innerText = '儲存修改';
-            document.getElementById('submitFoodBtn').className = 'btn-edit';
-            document.getElementById('cancelFoodBtn').style.display = 'inline-block';
+            for(let i=1; i<=10; i++) { document.getElementById(`genCol${i}`).value = item[`col${i}`] || ''; }
+            
+            editingGenericId = id;
+            document.getElementById('genericFormTitle').innerText = `編輯 ${currentGenericSheet} 資料`;
+            document.getElementById('submitGenericBtn').innerText = '儲存修改';
+            document.getElementById('submitGenericBtn').className = 'btn-edit';
+            document.getElementById('cancelGenericBtn').style.display = 'inline-block';
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
-        function cancelFoodEdit() {
-            editingFoodId = null;
-            document.querySelectorAll('#foodPage .form-group input').forEach(input => input.value = '');
-            document.getElementById('foodFormTitle').innerText = '新增美食店家';
-            document.getElementById('submitFoodBtn').innerText = '新增資料';
-            document.getElementById('submitFoodBtn').className = 'btn-add';
-            document.getElementById('cancelFoodBtn').style.display = 'none';
+        function cancelGenericEdit() {
+            editingGenericId = null;
+            for(let i=1; i<=10; i++) { document.getElementById(`genCol${i}`).value = ''; }
+            
+            document.getElementById('genericFormTitle').innerText = `新增 ${currentGenericSheet} 資料`;
+            document.getElementById('submitGenericBtn').innerText = '新增資料';
+            document.getElementById('submitGenericBtn').className = 'btn-add';
+            document.getElementById('cancelGenericBtn').style.display = 'none';
         }
 
-        async function deleteFoodData(id) {
-            if (!confirm('確定刪除此美食紀錄？')) return;
-            foodDataList = foodDataList.filter(d => String(d.id) !== String(id));
-            renderFoodTable();
-            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '美食紀錄' }) }); } 
+        async function deleteGenericData(id) {
+            if (!confirm('確定刪除此筆資料？')) return;
+            genericDataList = genericDataList.filter(d => String(d.id) !== String(id));
+            renderGenericTable();
+            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentGenericSheet }) }); } 
             catch (e) { alert("刪除失敗！"); }
         }
 
+        function renderGenericTable() {
+            const tbody = document.getElementById('genericTableBody'); tbody.innerHTML = '';
+            
+            genericDataList.forEach(data => {
+                const tr = document.createElement('tr');
+                let colsHtml = '';
+                for(let i=1; i<=10; i++) { colsHtml += `<td>${data[`col${i}`] || ''}</td>`; }
+                
+                tr.innerHTML = `
+                    ${colsHtml}
+                    <td><button class="btn-edit" onclick="editGenericData('${data.id}')">編輯</button>
+                        <button class="btn-delete" onclick="deleteGenericData('${data.id}')">刪除</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ================= 以下為原本的美食與運動功能 (縮減行數) =================
+        // 美食
+        async function submitFoodData() {
+            const city = document.getElementById('city').value.trim(), district = document.getElementById('district').value.trim();
+            const address = document.getElementById('address').value.trim(), storeName = document.getElementById('storeName').value.trim();
+            const category = document.getElementById('category').value.trim(), other = document.getElementById('other').value.trim();
+            if (!storeName) { alert('店名為必填！'); return; }
+            const payload = { sheetName: '美食紀錄', id: editingFoodId || Date.now(), action: editingFoodId ? 'edit' : 'add', city, district, address, storeName, category, other };
+            const fullText = `${city} ${district} ${address} ${storeName} ${category} ${other}`.toLowerCase();
+            if (editingFoodId) { const idx = foodDataList.findIndex(d => String(d.id) === String(editingFoodId)); if (idx > -1) foodDataList[idx] = { ...payload, fullText };
+            } else { foodDataList.push({ ...payload, fullText }); }
+            renderFoodTable(); cancelFoodEdit(); 
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        }
+        function editFoodData(id) {
+            const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            document.getElementById('city').value = item.city || ''; document.getElementById('district').value = item.district || '';
+            document.getElementById('address').value = item.address || ''; document.getElementById('storeName').value = item.storeName || '';
+            document.getElementById('category').value = item.category || ''; document.getElementById('other').value = item.other || '';
+            editingFoodId = id; document.getElementById('foodFormTitle').innerText = '編輯美食資料'; document.getElementById('submitFoodBtn').innerText = '儲存修改'; document.getElementById('submitFoodBtn').className = 'btn-edit'; document.getElementById('cancelFoodBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+        function cancelFoodEdit() {
+            editingFoodId = null; document.querySelectorAll('#foodPage .form-group input').forEach(input => input.value = '');
+            document.getElementById('foodFormTitle').innerText = '新增美食店家'; document.getElementById('submitFoodBtn').innerText = '新增資料'; document.getElementById('submitFoodBtn').className = 'btn-add'; document.getElementById('cancelFoodBtn').style.display = 'none';
+        }
+        function deleteFoodData(id) {
+            if (!confirm('確定刪除此美食紀錄？')) return; foodDataList = foodDataList.filter(d => String(d.id) !== String(id)); renderFoodTable();
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '美食紀錄' }) });
+        }
         function renderFoodTable() {
             const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
             foodDataList.forEach(data => {
                 if (filterKeywords.length > 0 && !filterKeywords.some(kw => data.fullText.includes(kw))) return;
-                const tr = document.createElement('tr');
-                const query = `${data.city||''} ${data.address||''} ${data.storeName||''}`.trim();
-                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-                tr.innerHTML = `
-                    <td>${data.city || ''}</td><td>${data.district || ''}</td><td>${data.address || ''}</td>
-                    <td>${data.storeName || ''}</td><td>${data.category || ''}</td><td>${data.other || ''}</td>
-                    <td><a href="${mapUrl}" target="_blank" class="map-link">搜尋</a></td>
-                    <td><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button>
-                        <button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></td>`;
-                tbody.appendChild(tr);
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((data.city||'')+' '+(data.address||'')+' '+(data.storeName||''))}`;
+                tbody.innerHTML += `<tr><td>${data.city || ''}</td><td>${data.district || ''}</td><td>${data.address || ''}</td><td>${data.storeName || ''}</td><td>${data.category || ''}</td><td>${data.other || ''}</td><td><a href="${mapUrl}" target="_blank" class="map-link">搜尋</a></td><td><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></td></tr>`;
             });
         }
-
-        // ================= 運動功能 =================
-        async function submitSportsData() {
-            const date = document.getElementById('sportDate').value;
-            const type = document.getElementById('sportType').value;
-            const distance = document.getElementById('sportDistance').value.trim();
-            const notes = document.getElementById('sportNotes').value.trim();
-            
-            if (!date) { alert('請選擇日期！'); return; }
-
-            const payload = {
-                sheetName: '運動紀錄', id: editingSportsId ? editingSportsId : Date.now(),
-                action: editingSportsId ? 'edit' : 'add',
-                date, type, distance: distance || '-', notes: notes || '-'
-            };
-
-            if (editingSportsId) {
-                const idx = sportsDataList.findIndex(d => String(d.id) === String(editingSportsId));
-                if (idx > -1) sportsDataList[idx] = payload;
-            } else { sportsDataList.push(payload); }
-            
-            renderSportsTable(); cancelSportsEdit();
-
-            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); } 
-            catch (e) { alert("雲端更新失敗！"); }
-        }
-
-        function editSportsData(id) {
-            const item = sportsDataList.find(d => String(d.id) === String(id));
-            if (!item) return;
-            
-            let displayDate = item.date || '';
-            if(displayDate && displayDate.includes('T')) displayDate = displayDate.split('T')[0];
-            
-            document.getElementById('sportDate').value = displayDate;
-            document.getElementById('sportType').value = item.type || '跑步';
-            document.getElementById('sportDistance').value = item.distance === '-' ? '' : item.distance;
-            document.getElementById('sportNotes').value = item.notes === '-' ? '' : item.notes;
-            
-            editingSportsId = id;
-            document.getElementById('sportsFormTitle').innerText = '編輯運動紀錄';
-            document.getElementById('submitSportsBtn').innerText = '儲存修改';
-            document.getElementById('submitSportsBtn').className = 'btn-edit';
-            document.getElementById('cancelSportsBtn').style.display = 'inline-block';
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
-
-        function cancelSportsEdit() {
-            editingSportsId = null;
-            document.getElementById('sportDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('sportType').value = '跑步';
-            document.getElementById('sportDistance').value = '';
-            document.getElementById('sportNotes').value = '';
-            
-            document.getElementById('sportsFormTitle').innerText = '新增運動紀錄';
-            document.getElementById('submitSportsBtn').innerText = '新增紀錄';
-            document.getElementById('submitSportsBtn').className = 'btn-add';
-            document.getElementById('cancelSportsBtn').style.display = 'none';
-        }
-
-        async function deleteSportsData(id) {
-            if (!confirm('確定刪除此運動紀錄？')) return;
-            sportsDataList = sportsDataList.filter(d => String(d.id) !== String(id));
-            renderSportsTable();
-            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '運動紀錄' }) }); } 
-            catch (e) { alert("刪除失敗！"); }
-        }
-
-        function renderSportsTable() {
-            const tbody = document.getElementById('sportsTableBody');
-            tbody.innerHTML = '';
-            const sortedList = [...sportsDataList].sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            sortedList.forEach(data => {
-                let displayDate = data.date;
-                if(displayDate && displayDate.includes('T')) displayDate = displayDate.split('T')[0];
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${displayDate || ''}</td><td>${data.type || ''}</td>
-                    <td>${data.distance || ''}</td><td>${data.notes || ''}</td>
-                    <td><button class="btn-edit" onclick="editSportsData('${data.id}')">編輯</button>
-                        <button class="btn-delete" onclick="deleteSportsData('${data.id}')">刪除</button></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // ================= 附屬功能區 =================
-        function testGoogleMap() {
-            const c = document.getElementById('city').value, a = document.getElementById('address').value, s = document.getElementById('storeName').value;
-            if (!c && !a && !s) { alert('請填寫資訊'); return; }
-            const query = `${c||''} ${a||''} ${s||''}`.trim();
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
-        }
-        function addFilterKeyword() {
-            const kw = document.getElementById('filterInput').value.trim().toLowerCase();
-            if (kw && !filterKeywords.includes(kw)) { filterKeywords.push(kw); renderKw(); renderFoodTable(); }
-            document.getElementById('filterInput').value = '';
-        }
-        function handleFilterKeyPress(e) { if (e.key === 'Enter') addFilterKeyword(); }
+        function addFilterKeyword() { const kw = document.getElementById('filterInput').value.trim().toLowerCase(); if (kw && !filterKeywords.includes(kw)) { filterKeywords.push(kw); renderKw(); renderFoodTable(); } document.getElementById('filterInput').value = ''; }
         function removeKeyword(kw) { filterKeywords = filterKeywords.filter(k => k !== kw); renderKw(); renderFoodTable(); }
-        function renderKw() {
-            const c = document.getElementById('keywordContainer'); c.innerHTML = '';
-            filterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeKeyword('${kw}')">✖</span></div>`; });
+        function renderKw() { const c = document.getElementById('keywordContainer'); c.innerHTML = ''; filterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeKeyword('${kw}')">✖</span></div>`; }); }
+        function testGoogleMap() { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(document.getElementById('city').value+' '+document.getElementById('address').value+' '+document.getElementById('storeName').value)}`, '_blank'); }
+
+        // 運動
+        async function submitSportsData() {
+            const date = document.getElementById('sportDate').value, type = document.getElementById('sportType').value, distance = document.getElementById('sportDistance').value.trim(), notes = document.getElementById('sportNotes').value.trim();
+            if (!date) return alert('請選擇日期！');
+            const payload = { sheetName: '運動紀錄', id: editingSportsId || Date.now(), action: editingSportsId ? 'edit' : 'add', date, type, distance: distance || '-', notes: notes || '-' };
+            if (editingSportsId) { const idx = sportsDataList.findIndex(d => String(d.id) === String(editingSportsId)); if (idx > -1) sportsDataList[idx] = payload; } else { sportsDataList.push(payload); }
+            renderSportsTable(); cancelSportsEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         }
-        function sortTable(col) {
-            if (sortCol === col) sortAsc = !sortAsc; else { sortCol = col; sortAsc = true; }
-            foodDataList.sort((a, b) => {
-                if ((a[col]||'') < (b[col]||'')) return sortAsc ? -1 : 1;
-                if ((a[col]||'') > (b[col]||'')) return sortAsc ? 1 : -1;
-                return 0;
+        function editSportsData(id) {
+            const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            document.getElementById('sportDate').value = (item.date && item.date.includes('T')) ? item.date.split('T')[0] : item.date; document.getElementById('sportType').value = item.type || '跑步'; document.getElementById('sportDistance').value = item.distance === '-' ? '' : item.distance; document.getElementById('sportNotes').value = item.notes === '-' ? '' : item.notes;
+            editingSportsId = id; document.getElementById('sportsFormTitle').innerText = '編輯運動紀錄'; document.getElementById('submitSportsBtn').innerText = '儲存修改'; document.getElementById('submitSportsBtn').className = 'btn-edit'; document.getElementById('cancelSportsBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+        function cancelSportsEdit() {
+            editingSportsId = null; document.getElementById('sportDate').value = new Date().toISOString().split('T')[0]; document.getElementById('sportType').value = '跑步'; document.getElementById('sportDistance').value = ''; document.getElementById('sportNotes').value = '';
+            document.getElementById('sportsFormTitle').innerText = '新增運動紀錄'; document.getElementById('submitSportsBtn').innerText = '新增紀錄'; document.getElementById('submitSportsBtn').className = 'btn-add'; document.getElementById('cancelSportsBtn').style.display = 'none';
+        }
+        function deleteSportsData(id) {
+            if (!confirm('確定刪除此運動紀錄？')) return; sportsDataList = sportsDataList.filter(d => String(d.id) !== String(id)); renderSportsTable();
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '運動紀錄' }) });
+        }
+        function renderSportsTable() {
+            const tbody = document.getElementById('sportsTableBody'); tbody.innerHTML = '';
+            [...sportsDataList].sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(data => {
+                const dateStr = (data.date && data.date.includes('T')) ? data.date.split('T')[0] : data.date;
+                tbody.innerHTML += `<tr><td>${dateStr || ''}</td><td>${data.type || ''}</td><td>${data.distance || ''}</td><td>${data.notes || ''}</td><td><button class="btn-edit" onclick="editSportsData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteSportsData('${data.id}')">刪除</button></td></tr>`;
             });
-            renderFoodTable();
         }
     </script>
 </body>
