@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -394,7 +393,22 @@
             genericDataList.forEach(data => {
                 if (genericFilterKeywords.length > 0 && !genericFilterKeywords.some(kw => data.fullText.includes(kw))) return;
                 const tr = document.createElement('tr'); let colsHtml = '';
-                for(let i=1; i<=10; i++) { let val = data[`col${i}`] || ''; if(i === 2 && val.includes('T')) val = val.split('T')[0]; colsHtml += `<td><div class="resizable-cell">${val}</div></td>`; }
+                
+                for(let i=1; i<=10; i++) { 
+                    let val = data[`col${i}`] || ''; 
+                    if(i === 2 && val.includes('T')) val = val.split('T')[0]; 
+                    
+                    // 🌟 新增邏輯：如果是擴充網頁4 的 col8，就加上 Google Map 連結 🌟
+                    if (currentPageName === '擴充預留網頁4' && i === 8 && val.trim() !== '') {
+                        // 使用標準的 Google Map 搜尋網址
+                        const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val.trim())}`;
+                        colsHtml += `<td><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 ${val}</a></div></td>`;
+                    } else {
+                        // 其他一般欄位維持純文字
+                        colsHtml += `<td><div class="resizable-cell">${val}</div></td>`; 
+                    }
+                }
+                
                 tr.innerHTML = `${colsHtml}<td><div class="resizable-cell" style="resize:none; min-width: 140px;">
                     <button class="btn-copy" onclick="copyGenericData('${data.id}')">複製</button>
                     <button class="btn-edit" onclick="editGenericData('${data.id}')">編輯</button>
