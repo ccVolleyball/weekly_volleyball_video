@@ -5,29 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>個人資料管理系統</title>
     <style>
+        /* 🌟 核心：定義全域動態主題變數 🌟 */
+        :root {
+            --theme-primary: #007bff;
+            --theme-light: #f0f7ff;
+            --theme-dark: #0056b3;
+        }
+
         body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f9f9f9; color: #333; }
-        h2 { border-bottom: 2px solid #ccc; padding-bottom: 5px; margin-top: 0; }
+        h2 { border-bottom: 2px solid #ccc; padding-bottom: 5px; margin-top: 0; color: var(--theme-dark); }
         .section { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        /* 讓說明與排序區塊的邊框與背景跟隨主題 */
+        .theme-box { border-left: 5px solid var(--theme-primary); background-color: var(--theme-light); padding: 15px; }
+        .theme-text { color: var(--theme-dark) !important; }
+
         .form-group { display: inline-block; margin-right: 15px; margin-bottom: 15px; vertical-align: top; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #555; }
-        input[type="text"], input[type="date"], select, textarea { padding: 8px; width: 160px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; box-sizing: border-box; }
+        input[type="text"], input[type="date"], select, textarea { padding: 8px; width: 160px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; box-sizing: border-box; transition: border-color 0.3s; }
+        input:focus, textarea:focus { border-color: var(--theme-primary); outline: none; }
         textarea { resize: both; } 
-        button { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; color: #fff; font-weight: bold; margin-right: 5px; margin-bottom: 5px; }
+        button { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; color: #fff; font-weight: bold; margin-right: 5px; margin-bottom: 5px; transition: filter 0.2s; }
+        button:hover { filter: brightness(0.9); }
         
-        .btn-add { background-color: #28a745; } .btn-add:hover { background-color: #218838; }
-        .btn-map { background-color: #4285F4; } .btn-map:hover { background-color: #357AE8; }
-        .btn-filter { background-color: #17a2b8; } .btn-filter:hover { background-color: #138496; }
+        .btn-add { background-color: var(--theme-primary); } 
+        .btn-filter { background-color: var(--theme-primary); } 
         
-        .btn-edit { background-color: #ffc107; color: #333; padding: 5px 10px; font-size: 13px;} .btn-edit:hover { background-color: #e0a800; }
-        .btn-copy { background-color: #17a2b8; color: #fff; padding: 5px 10px; font-size: 13px;} .btn-copy:hover { background-color: #138496; }
-        .btn-delete { background-color: #dc3545; padding: 5px 10px; font-size: 13px;} .btn-delete:hover { background-color: #c82333; }
-        .btn-cancel { background-color: #6c757d; display: none; } .btn-cancel:hover { background-color: #5a6268; }
+        .btn-edit { background-color: #ffc107; color: #333; padding: 5px 10px; font-size: 13px;} 
+        .btn-copy { background-color: #17a2b8; color: #fff; padding: 5px 10px; font-size: 13px;} 
+        .btn-delete { background-color: #dc3545; padding: 5px 10px; font-size: 13px;} 
+        .btn-cancel { background-color: #6c757d; display: none; } 
 
         .keyword-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px; }
         .tag { background-color: #e2e3e5; padding: 5px 10px; border-radius: 15px; font-size: 13px; display: flex; align-items: center; }
         .tag span { margin-left: 8px; cursor: pointer; color: #dc3545; font-weight: bold; }
 
-        .col-toggle-box { background: #f1f8ff; border: 1px solid #cce5ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 14px; }
+        .col-toggle-box { background: var(--theme-light); border: 1px solid #cce5ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 14px; }
         .col-toggle-box label { display: inline-block; margin-right: 12px; font-weight: normal; cursor: pointer; color: #333; margin-bottom: 0; }
         .col-toggle-box input[type="checkbox"] { margin-right: 4px; cursor: pointer; }
 
@@ -46,62 +59,85 @@
         .table-responsive { overflow-x: auto; margin-top: 5px; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th, td { border: 1px solid #ddd; padding: 0; text-align: left; vertical-align: top;} 
-        th { background-color: #f2f2f2; position: relative; padding: 10px; cursor: pointer; }
-        th:hover { background-color: #e9e9e9; }
+        th { background-color: #f2f2f2; position: relative; padding: 10px; cursor: pointer; color: var(--theme-dark); }
+        th:hover { background-color: var(--theme-light); }
         tr:nth-child(even) { background-color: #fcfcfc; }
         tr:hover { background-color: #f1f1f1; }
-        a.map-link { color: #4285F4; text-decoration: none; font-weight: bold; }
+        a.map-link { color: var(--theme-primary); text-decoration: none; font-weight: bold; }
 
         .resizable-cell { resize: both; overflow: auto; padding: 10px; min-width: 60px; min-height: 25px; max-width: 800px; max-height: 500px; box-sizing: border-box; white-space: pre-wrap; word-wrap: break-word; }
         
-        .action-cell { white-space: nowrap; padding: 10px; width: 1%; }
+        .action-cell { white-space: nowrap; padding: 10px; width: 1%; text-align: center; }
         .action-cell button { margin-bottom: 0; display: inline-block; }
         
         .desc-header:hover { opacity: 0.8; }
         #descToggleIcon { display: inline-block; transition: transform 0.2s; font-size: 14px; margin-left: 8px;}
         .collapsed #descToggleIcon { transform: rotate(-90deg); }
 
-        /* 🌟 新增：彈出視窗 (Modal) 專用 CSS 🌟 */
-        .modal-overlay {
-            display: none; 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); z-index: 1000;
-            justify-content: center; align-items: center;
-        }
-        .modal-content {
-            background: #fff; padding: 25px; border-radius: 10px; 
-            width: 90%; max-width: 900px; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        }
-        .modal-content h3 { margin-top: 0; color: #0056b3; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
-        .modal-content textarea { 
-            width: 100%; height: 60vh; /* 佔據螢幕高度的60% */
-            resize: vertical; margin-bottom: 15px; font-size: 15px; padding: 12px; 
-            font-family: inherit; line-height: 1.5; border: 1px solid #ccc; border-radius: 5px;
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 90%; max-width: 900px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .modal-content h3 { margin-top: 0; color: var(--theme-dark); border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
+        .modal-content textarea { width: 100%; height: 60vh; resize: vertical; margin-bottom: 15px; font-size: 15px; padding: 12px; font-family: inherit; line-height: 1.5; border: 1px solid #ccc; border-radius: 5px; }
         .modal-actions { text-align: right; }
+
+        /* ====================================================
+           🌟 超狂升級：手機版卡片式排版 (Card Layout RWD) 🌟
+           當螢幕小於 768px 時，表格會自動變身成漂亮的卡片
+        ==================================================== */
+        @media screen and (max-width: 768px) {
+            body { margin: 10px; }
+            .section { padding: 15px; }
+            .form-group { display: block; width: 100%; margin-right: 0; }
+            .form-group input, .form-group select, .form-group textarea { width: 100% !important; }
+            
+            /* 表格轉卡片核心 CSS */
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead tr { display: none; } /* 隱藏原本的表頭 */
+            
+            tr { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); padding: 10px; background: #fff; }
+            td { display: flex; flex-direction: column; border: none; border-bottom: 1px solid #f1f1f1; padding: 8px 0; text-align: left; }
+            td:last-child { border-bottom: none; flex-direction: row; justify-content: flex-end; align-items: center; padding-top: 12px; gap: 5px; }
+            
+            /* 透過 data-label 屬性自動產生卡片的標題 */
+            td::before { 
+                content: attr(data-label); 
+                font-weight: bold; 
+                color: var(--theme-primary); 
+                margin-bottom: 4px; 
+                font-size: 13px; 
+            }
+            
+            .resizable-cell { min-width: 100% !important; padding: 0; font-size: 15px; }
+            .action-cell { white-space: normal; padding: 0; width: 100%; }
+            .col-toggle-box { display: flex; flex-wrap: wrap; gap: 8px; }
+            .table-responsive { overflow: hidden; }
+        }
     </style>
 </head>
 <body>
 
-    <div style="margin-bottom: 20px; padding: 15px; background-color: #e9ecef; border-radius: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <label for="pageSelector" style="font-size: 16px; margin-bottom: 0;">切換系統頁面：</label>
-        <select id="pageSelector" onchange="switchPage()" style="padding: 8px; font-size: 16px; width: auto;">
+    <div style="margin-bottom: 20px; padding: 15px; background-color: var(--theme-light); border: 1px solid var(--theme-primary); border-radius: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; transition: all 0.3s;">
+        <label for="pageSelector" style="font-size: 16px; margin-bottom: 0; font-weight: bold; color: var(--theme-dark);">切換資料庫：</label>
+        <select id="pageSelector" onchange="switchPage()" style="padding: 8px; font-size: 16px; width: auto; font-weight: bold;">
             <option value="foodPage">🍔 美食店家地圖</option>
             <option value="sportsPage">🏃‍♂️ 運動訓練紀錄</option>
-            <option value="notePage">📝 隨身筆記 (擴充1)</option>
-            <option value="travelPage">✈️ 旅遊筆記 (擴充7)</option>
-            <script>
-                for(let i=2; i<=10; i++){ 
-                    if(i !== 7) document.write(`<option value="extPage${i}">📄 擴充預留網頁${i}</option>`); 
-                }
-            </script>
+            <option value="travelPage">✈️ 旅遊行程筆記</option>
+            <option value="notePage">📝 隨身綜合筆記</option>
+            <option value="extPage2">🍽️ 飲食日常紀錄</option>
+            <option value="extPage3">🔗 網路連結紀錄</option>
+            <option value="extPage4">🗼 東京旅遊紀錄</option>
+            <option value="extPage5">📰 時事焦點紀錄</option>
+            <option value="extPage6">📄 擴充預留網頁6</option>
+            <option value="extPage8">📄 擴充預留網頁8</option>
+            <option value="extPage9">📄 擴充預留網頁9</option>
+            <option value="extPage10">📄 擴充預留網頁10</option>
         </select>
-        <span id="loadingMsg" style="color: #007bff; font-weight: bold; display: none;">資料載入與同步中...</span>
+        <span id="loadingMsg" style="color: var(--theme-primary); font-weight: bold; display: none;">資料載入與同步中...</span>
     </div>
 
-    <div class="section" style="background-color: #f0f7ff; border-left: 5px solid #007bff; padding: 15px;">
+    <div class="section theme-box">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-            <h3 class="desc-header" style="margin: 0; color: #0056b3; cursor: pointer;" onclick="toggleDescCollapse()">📖 頁面說明 / 欄位定義 <span id="descToggleIcon">▼</span></h3>
+            <h3 class="desc-header theme-text" style="margin: 0; cursor: pointer;" onclick="toggleDescCollapse()">📖 頁面說明 / 欄位定義 <span id="descToggleIcon">▼</span></h3>
             <div style="margin-top: 5px;" id="descBtnGroup">
                 <button class="btn-edit" id="editDescBtn" onclick="enableDescEdit()">編輯說明</button>
             </div>
@@ -113,7 +149,7 @@
 
     <div id="descModal" class="modal-overlay">
         <div class="modal-content">
-            <h3>✏️ 編輯頁面說明 / 欄位定義</h3>
+            <h3 class="theme-text">✏️ 編輯頁面說明 / 欄位定義</h3>
             <textarea id="descModalInput" placeholder="請輸入這個頁面的說明，或是記錄這10個欄位分別代表什麼意思..."></textarea>
             <div class="modal-actions">
                 <button class="btn-delete" onclick="deleteDescription()" style="float: left;">🗑️ 清除內容</button>
@@ -123,18 +159,18 @@
         </div>
     </div>
 
-    <div class="section" style="background-color: #fff4e6; border-left: 5px solid #ff9800; padding: 15px;">
+    <div class="section theme-box" style="opacity: 0.95;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-            <h3 style="margin: 0 0 5px 0; color: #e65100;">🔃 多重優先權排序</h3>
+            <h3 class="theme-text" style="margin: 0 0 5px 0;">🔃 多重優先權排序</h3>
             <button class="btn-cancel" style="display: inline-block; padding: 4px 8px; font-size: 12px;" onclick="resetMultiSort()">清除所有排序設定</button>
         </div>
-        <div style="font-size: 13px; color: #666; margin-bottom: 10px;">設定最多 5 層優先權，新資料輸入後會自動排入正確順序（點擊下方表格標題也可快速設定第一優先權）。</div>
+        <div style="font-size: 13px; color: #666; margin-bottom: 10px;">設定最多 5 層優先權，新資料輸入後會自動排入正確順序（點擊下方表格標題也可快速設定）。</div>
         <div id="multiSortContainer" style="display: flex; flex-wrap: wrap; gap: 10px;">
             <script>
                 for(let i=1; i<=5; i++) {
                     document.write(`
-                        <div style="background: #ffe0b2; padding: 8px; border-radius: 5px; border: 1px solid #ffcc80;">
-                            <span style="font-weight:bold; color: #d84315; font-size: 13px;">優先順序 ${i}</span><br>
+                        <div style="background: rgba(255,255,255,0.6); padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                            <span class="theme-text" style="font-weight:bold; font-size: 13px;">優先順序 ${i}</span><br>
                             <select id="sortCol${i}" onchange="applyGlobalMultiSort()" style="margin-top: 5px; width: 120px; padding: 4px; font-size: 13px;"></select>
                             <select id="sortDir${i}" onchange="applyGlobalMultiSort()" style="margin-top: 5px; width: 85px; padding: 4px; font-size: 13px;">
                                 <option value="asc">升冪 ▴</option>
@@ -147,92 +183,6 @@
         </div>
     </div>
 
-    <div id="travelPage" class="app-page" style="display: none;">
-        <div class="section">
-            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">
-                <label style="display:inline-block; margin-right: 20px; cursor: pointer; color: #0056b3; font-weight: bold;">
-                    <input type="radio" name="travelAddMode" value="single" checked onchange="toggleTravelAddMode()"> 單筆詳細模式
-                </label>
-                <label style="display:inline-block; cursor: pointer; color: #e65100; font-weight: bold;">
-                    <input type="radio" name="travelAddMode" value="batch" onchange="toggleTravelAddMode()"> 多筆快速模式 (網頁直接填表)
-                </label>
-            </div>
-
-            <div id="travelSingleForm">
-                <h2 id="travelFormTitle" style="border:none; margin-top:0;">新增旅遊筆記</h2>
-                <div style="font-size: 13px; color: #555; margin-bottom: 15px; background:#f4f4f4; padding:8px; border-radius:5px;">💡 <strong>智慧合併：</strong>如果您只要補資料，輸入相同的「名稱」並填入新欄位，系統會自動幫您合併，不會洗掉舊筆記！</div>
-                <div class="form-group"><label>主類別 (col1)</label><input type="text" id="travelCol1" placeholder="例如：景點/住宿/美食"></div>
-                <div class="form-group"><label>名稱(店名或地點) (col2)</label><input type="text" id="travelCol2" placeholder="合併鍵(必填)" style="border: 2px solid #ff9800;"></div>
-                <div class="form-group"><label>地點(地址/座標) (col3)</label><textarea id="travelCol3" rows="2" placeholder="供 Map 匯入使用"></textarea></div>
-                <div class="form-group"><label>地理區域 (col4)</label><input type="text" id="travelCol4" placeholder="例如：東京"></div>
-                <div class="form-group"><label>彈性標籤 (col5)</label><input type="text" id="travelCol5" placeholder="例如：必去/夜景/排隊"></div>
-                <br>
-                <div class="form-group"><label>必訪亮點 / 筆記 (col6)</label><textarea id="travelCol6" rows="4" style="width: 250px;"></textarea></div>
-                <div class="form-group"><label>實用資訊包 (col7)</label><textarea id="travelCol7" rows="4" style="width: 250px;"></textarea></div>
-                
-                <div style="margin-top: 10px;">
-                    <button id="submitTravelBtn" class="btn-add" onclick="submitTravelData()">儲存/合併筆記</button>
-                    <button id="cancelTravelBtn" class="btn-cancel" onclick="cancelTravelEdit()">取消編輯</button>
-                </div>
-            </div>
-
-            <div id="travelBatchForm" style="display: none;">
-                <h2 style="border:none; margin-top:0;">網頁版多筆快速輸入</h2>
-                <p style="font-size: 13px; color: #555; margin-bottom: 10px; background:#f4f4f4; padding:8px; border-radius:5px;">💡 不用開 Excel！直接在下方輸入多筆資料。名稱相同的也會自動智慧合併，只填部分欄位也沒問題！</p>
-                <div class="table-responsive">
-                    <table style="width: 100%; min-width: 900px; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background:#e9ecef;">
-                                <th style="padding: 8px; border:1px solid #ccc;">主類別</th>
-                                <th style="padding: 8px; border:1px solid #ccc; color:#e65100;">名稱 <small>(必填/合併鍵)</small></th>
-                                <th style="padding: 8px; border:1px solid #ccc;">地點</th>
-                                <th style="padding: 8px; border:1px solid #ccc;">地理區域</th>
-                                <th style="padding: 8px; border:1px solid #ccc;">彈性標籤</th>
-                                <th style="padding: 8px; border:1px solid #ccc;">必訪亮點/筆記</th>
-                                <th style="padding: 8px; border:1px solid #ccc;">實用資訊包</th>
-                                <th style="padding: 8px; border:1px solid #ccc;">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="travelBatchTbody"></tbody>
-                    </table>
-                </div>
-                <div style="margin-top: 15px;">
-                    <button class="btn-cancel" style="display:inline-block; background-color:#6c757d;" onclick="addTravelBatchRow()">➕ 增加一行輸入列</button>
-                    <button class="btn-add" style="background-color: #e65100;" onclick="submitTravelBatchUI()">🚀 一鍵儲存上方所有資料</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>旅遊行程總覽</h2>
-            <div style="margin-bottom: 15px;">
-                <input type="text" id="travelFilterInput" placeholder="輸入關鍵字..." onkeypress="if(event.key === 'Enter') addTravelFilterKeyword()">
-                <button class="btn-filter" onclick="addTravelFilterKeyword()">新增過濾條件</button>
-                <div class="keyword-tags" id="travelKeywordContainer"></div>
-            </div>
-            <div class="col-toggle-box">
-                <span style="font-weight:bold; color:#0056b3;">👁️ 顯示欄位：</span>
-                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 1, this)">主類別</label>
-                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 2, this)">名稱</label>
-                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 3, this)">地點</label>
-                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 4, this)">區域</label>
-                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 5, this)">標籤</label>
-                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 6, this)">必訪亮點/筆記</label>
-                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 7, this)">實用資訊包</label>
-                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 8, this)">地圖</label>
-            </div>
-            <div class="table-responsive">
-                <table id="travelTable">
-                    <thead><tr>
-                        <th onclick="handleHeaderSort('col1')">主類別 ↕</th><th onclick="handleHeaderSort('col2')">名稱 ↕</th><th onclick="handleHeaderSort('col3')">地點 ↕</th><th onclick="handleHeaderSort('col4')">地理區域 ↕</th><th onclick="handleHeaderSort('col5')">彈性標籤 ↕</th><th onclick="handleHeaderSort('col6')">必訪亮點/筆記 ↕</th><th onclick="handleHeaderSort('col7')">實用資訊包 ↕</th><th>地圖</th><th>操作</th>
-                    </tr></thead>
-                    <tbody id="travelTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-
     <div id="foodPage" class="app-page">
         <div class="section">
             <h2 id="foodFormTitle">新增美食店家</h2>
@@ -243,7 +193,7 @@
             <h2>美食清單與過濾</h2>
             <div style="margin-bottom: 15px;"><input type="text" id="filterInput" onkeypress="if(event.key === 'Enter') addFilterKeyword()"><button class="btn-filter" onclick="addFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="keywordContainer"></div></div>
             <div class="col-toggle-box">
-                <span style="font-weight:bold; color:#0056b3;">👁️ 顯示欄位：</span>
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
                 <label><input type="checkbox" checked onchange="toggleCol('dataTable', 1, this)">縣市</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 2, this)">區域</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 3, this)">地址</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 4, this)">店名</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 5, this)">分類</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 6, this)">其他</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 7, this)">地圖</label>
             </div>
             <div class="table-responsive">
@@ -264,13 +214,84 @@
         <div class="section">
             <h2>訓練紀錄總覽</h2>
             <div class="col-toggle-box">
-                <span style="font-weight:bold; color:#0056b3;">👁️ 顯示欄位：</span>
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
                 <label><input type="checkbox" checked onchange="toggleCol('sportsTable', 1, this)">日期</label><label><input type="checkbox" checked onchange="toggleCol('sportsTable', 2, this)">運動類型</label><label><input type="checkbox" checked onchange="toggleCol('sportsTable', 3, this)">距離 (km)</label><label><input type="checkbox" checked onchange="toggleCol('sportsTable', 4, this)">備註</label>
             </div>
             <div class="table-responsive">
                 <table id="sportsTable">
                     <thead><tr><th onclick="handleHeaderSort('date')">日期 ↕</th><th onclick="handleHeaderSort('type')">運動類型 ↕</th><th onclick="handleHeaderSort('distance')">距離 (km) ↕</th><th onclick="handleHeaderSort('notes')">備註 ↕</th><th>操作</th></tr></thead>
                     <tbody id="sportsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="travelPage" class="app-page" style="display: none;">
+        <div class="section">
+            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">
+                <label style="display:inline-block; margin-right: 20px; cursor: pointer; color: var(--theme-dark); font-weight: bold;">
+                    <input type="radio" name="travelAddMode" value="single" checked onchange="toggleTravelAddMode()"> 單筆詳細模式
+                </label>
+                <label style="display:inline-block; cursor: pointer; color: #e65100; font-weight: bold;">
+                    <input type="radio" name="travelAddMode" value="batch" onchange="toggleTravelAddMode()"> 多筆快速合併 (網頁填表)
+                </label>
+            </div>
+
+            <div id="travelSingleForm">
+                <h2 id="travelFormTitle" style="border:none; margin-top:0;">新增旅遊筆記</h2>
+                <div style="font-size: 13px; color: #555; margin-bottom: 15px; background:var(--theme-light); padding:8px; border-radius:5px;">💡 <strong>智慧合併：</strong>只要名稱相同，系統會自動把新欄位資料補進去，不會洗掉舊筆記！</div>
+                <div class="form-group"><label>主類別 (col1)</label><input type="text" id="travelCol1" placeholder="例如：景點/住宿/美食"></div>
+                <div class="form-group"><label>名稱(店名或地點) (col2)</label><input type="text" id="travelCol2" placeholder="合併鍵(必填)" style="border: 2px solid var(--theme-primary);"></div>
+                <div class="form-group"><label>地點(地址/座標) (col3)</label><textarea id="travelCol3" rows="2" placeholder="供 Map 匯入使用"></textarea></div>
+                <div class="form-group"><label>地理區域 (col4)</label><input type="text" id="travelCol4" placeholder="例如：東京"></div>
+                <div class="form-group"><label>彈性標籤 (col5)</label><input type="text" id="travelCol5" placeholder="例如：必去/夜景/排隊"></div>
+                <br>
+                <div class="form-group"><label>必訪亮點 / 筆記 (col6)</label><textarea id="travelCol6" rows="4" style="width: 250px;"></textarea></div>
+                <div class="form-group"><label>實用資訊包 (col7)</label><textarea id="travelCol7" rows="4" style="width: 250px;"></textarea></div>
+                
+                <div style="margin-top: 10px;">
+                    <button id="submitTravelBtn" class="btn-add" onclick="submitTravelData()">儲存/合併筆記</button>
+                    <button id="cancelTravelBtn" class="btn-cancel" onclick="cancelTravelEdit()">取消編輯</button>
+                </div>
+            </div>
+
+            <div id="travelBatchForm" style="display: none;">
+                <h2 style="border:none; margin-top:0;">網頁版多筆快速輸入</h2>
+                <div class="table-responsive">
+                    <table style="width: 100%; min-width: 900px; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background:var(--theme-light);">
+                                <th style="padding: 8px; border:1px solid #ccc;">主類別</th>
+                                <th style="padding: 8px; border:1px solid #ccc; color:var(--theme-dark);">名稱 <small>(必填/合併鍵)</small></th>
+                                <th style="padding: 8px; border:1px solid #ccc;">地點</th>
+                                <th style="padding: 8px; border:1px solid #ccc;">地理區域</th>
+                                <th style="padding: 8px; border:1px solid #ccc;">彈性標籤</th>
+                                <th style="padding: 8px; border:1px solid #ccc;">必訪亮點/筆記</th>
+                                <th style="padding: 8px; border:1px solid #ccc;">實用資訊包</th>
+                                <th style="padding: 8px; border:1px solid #ccc;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="travelBatchTbody"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button class="btn-cancel" style="display:inline-block; background-color:#6c757d;" onclick="addTravelBatchRow()">➕ 增加一行輸入列</button>
+                    <button class="btn-add" style="background-color: var(--theme-dark);" onclick="submitTravelBatchUI()">🚀 一鍵儲存上方所有資料</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>旅遊行程總覽</h2>
+            <div style="margin-bottom: 15px;"><input type="text" id="travelFilterInput" onkeypress="if(event.key === 'Enter') addTravelFilterKeyword()"><button class="btn-filter" onclick="addTravelFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="travelKeywordContainer"></div></div>
+            <div class="col-toggle-box">
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
+                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 1, this)">主類別</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 2, this)">名稱</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 3, this)">地點</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 4, this)">區域</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 5, this)">標籤</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 6, this)">必訪亮點/筆記</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 7, this)">實用資訊包</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 8, this)">地圖</label>
+            </div>
+            <div class="table-responsive">
+                <table id="travelTable">
+                    <thead><tr><th onclick="handleHeaderSort('col1')">主類別 ↕</th><th onclick="handleHeaderSort('col2')">名稱 ↕</th><th onclick="handleHeaderSort('col3')">地點 ↕</th><th onclick="handleHeaderSort('col4')">地理區域 ↕</th><th onclick="handleHeaderSort('col5')">彈性標籤 ↕</th><th onclick="handleHeaderSort('col6')">必訪亮點/筆記 ↕</th><th onclick="handleHeaderSort('col7')">實用資訊包 ↕</th><th>地圖</th><th>操作</th></tr></thead>
+                    <tbody id="travelTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -287,7 +308,7 @@
             <h2>筆記總覽</h2>
             <div style="margin-bottom: 15px;"><input type="text" id="noteFilterInput" onkeypress="if(event.key === 'Enter') addNoteFilterKeyword()"><button class="btn-filter" onclick="addNoteFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="noteKeywordContainer"></div></div>
             <div class="col-toggle-box">
-                <span style="font-weight:bold; color:#0056b3;">👁️ 顯示欄位：</span>
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
                 <label><input type="checkbox" checked onchange="toggleCol('noteTable', 1, this)">流水號</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 2, this)">日期</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 3, this)">分類</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 4, this)">內容</label>
                 <script>for(let i=5; i<=10; i++){ document.write(`<label><input type="checkbox" checked onchange="toggleCol('noteTable', ${i}, this)">欄位 ${i}</label>`); }</script>
             </div>
@@ -315,7 +336,7 @@
             <h2 id="genericTableTitle">資料總覽</h2>
             <div style="margin-bottom: 15px;"><input type="text" id="genericFilterInput" onkeypress="if(event.key === 'Enter') addGenericFilterKeyword()"><button class="btn-filter" onclick="addGenericFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="genericKeywordContainer"></div></div>
             <div class="col-toggle-box">
-                <span style="font-weight:bold; color:#0056b3;">👁️ 顯示欄位：</span>
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
                 <script>for(let i=1; i<=10; i++){ document.write(`<label><input type="checkbox" checked onchange="toggleCol('genericTable', ${i}, this)">欄位 ${i}</label>`); }</script>
             </div>
             <div class="table-responsive">
@@ -332,6 +353,22 @@
     <script>
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
         const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
+
+        // 🌟 網頁配置字典：對應您要求的新名稱與獨立的主題顏色 🌟
+        const PAGE_CONFIG = {
+            'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
+            'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
+            'travelPage': { sheet: '擴充預留網頁7', name: '旅遊行程筆記', color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
+            'notePage':   { sheet: '擴充預留網頁1', name: '隨身綜合筆記', color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
+            'extPage2':   { sheet: '擴充預留網頁2', name: '飲食日常紀錄', color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
+            'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊紀錄', color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
+            'extPage5':   { sheet: '擴充預留網頁5', name: '時事焦點紀錄', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
+            'extPage6':   { sheet: '擴充預留網頁6', name: '擴充預留網頁6', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
+            'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
+            'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
+            'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' }
+        };
 
         let currentPageName = '美食紀錄';
         let currentDescription = '';
@@ -351,9 +388,15 @@
             document.getElementById('sportDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('noteCol2').value = new Date().toISOString().split('T')[0];
             document.getElementById('genCol2').value = new Date().toISOString().split('T')[0];
-            currentPageName = '美食紀錄';
-            loadData('美食紀錄');
+            switchPage(); // 初始化第一頁與其主題色
         };
+
+        // 🌟 主題套用邏輯 🌟
+        function applyTheme(config) {
+            document.documentElement.style.setProperty('--theme-primary', config.color);
+            document.documentElement.style.setProperty('--theme-light', config.light);
+            document.documentElement.style.setProperty('--theme-dark', config.dark);
+        }
 
         function toggleLoading(show, text = '資料載入與同步中...') { 
             const msg = document.getElementById('loadingMsg');
@@ -365,7 +408,7 @@
             if (checkbox.checked) { table.classList.remove(`hide-col-${colIndex}`); } else { table.classList.add(`hide-col-${colIndex}`); }
         }
 
-        // ================= 🌟 頁面說明區塊功能 (更新為 Modal 彈出視窗) 🌟 =================
+        // ================= 頁面說明區塊功能 =================
         function toggleDescCollapse() {
             isDescCollapsed = !isDescCollapsed;
             document.getElementById('descBody').style.display = isDescCollapsed ? 'none' : 'block';
@@ -373,11 +416,9 @@
         }
         function enableDescEdit() {
             document.getElementById('descModalInput').value = currentDescription; 
-            document.getElementById('descModal').style.display = 'flex'; // 顯示彈出視窗
+            document.getElementById('descModal').style.display = 'flex'; 
         }
-        function closeDescModal() {
-            document.getElementById('descModal').style.display = 'none'; // 隱藏彈出視窗
-        }
+        function closeDescModal() { document.getElementById('descModal').style.display = 'none'; }
         async function saveDescription() {
             const newDesc = document.getElementById('descModalInput').value.trim(); 
             currentDescription = newDesc;
@@ -391,7 +432,7 @@
             saveDescription(); 
         }
 
-        // ================= 🌟 多重排序核心邏輯 🌟 =================
+        // ================= 多重排序核心邏輯 =================
         function updateSortOptions() {
             let options = [{val: '', text: '-- 無 --'}];
             if (currentPageName === '美食紀錄') { options.push({val: 'city', text: '縣市'}, {val: 'district', text: '區域'}, {val: 'address', text: '地址'}, {val: 'storeName', text: '店名'}, {val: 'category', text: '分類'}, {val: 'other', text: '其他'});
@@ -406,34 +447,16 @@
                 if (options.some(opt => opt.val === currentVal)) sel.value = currentVal; else sel.value = '';
             }
         }
-
-        function resetMultiSort() {
-            for(let i=1; i<=5; i++) { document.getElementById(`sortCol${i}`).value = ''; document.getElementById(`sortDir${i}`).value = 'asc'; }
-            applyGlobalMultiSort();
-        }
-
-        function handleHeaderSort(col) {
-            let p1 = document.getElementById('sortCol1'), d1 = document.getElementById('sortDir1');
-            if (p1.value === col) { d1.value = d1.value === 'asc' ? 'desc' : 'asc'; } else { p1.value = col; d1.value = 'asc'; }
-            for(let i=2; i<=5; i++) document.getElementById(`sortCol${i}`).value = '';
-            applyGlobalMultiSort();
-        }
-
+        function resetMultiSort() { for(let i=1; i<=5; i++) { document.getElementById(`sortCol${i}`).value = ''; document.getElementById(`sortDir${i}`).value = 'asc'; } applyGlobalMultiSort(); }
+        function handleHeaderSort(col) { let p1 = document.getElementById('sortCol1'), d1 = document.getElementById('sortDir1'); if (p1.value === col) { d1.value = d1.value === 'asc' ? 'desc' : 'asc'; } else { p1.value = col; d1.value = 'asc'; } for(let i=2; i<=5; i++) document.getElementById(`sortCol${i}`).value = ''; applyGlobalMultiSort(); }
         function applyGlobalMultiSort() {
             let sortConfigs = [];
             for(let i=1; i<=5; i++) { let col = document.getElementById(`sortCol${i}`).value, dir = document.getElementById(`sortDir${i}`).value; if(col) sortConfigs.push({col, dir}); }
-
             let targetList = []; let renderFn = null;
-            if(currentPageName === '美食紀錄') { targetList = foodDataList; renderFn = renderFoodTable; }
-            else if(currentPageName === '運動紀錄') { targetList = sportsDataList; renderFn = renderSportsTable; }
-            else if(currentPageName === '擴充預留網頁1') { targetList = noteDataList; renderFn = renderNoteTable; }
-            else if(currentPageName === '擴充預留網頁7') { targetList = travelDataList; renderFn = renderTravelTable; }
-            else { targetList = genericDataList; renderFn = renderGenericTable; }
-
+            if(currentPageName === '美食紀錄') { targetList = foodDataList; renderFn = renderFoodTable; } else if(currentPageName === '運動紀錄') { targetList = sportsDataList; renderFn = renderSportsTable; } else if(currentPageName === '擴充預留網頁1') { targetList = noteDataList; renderFn = renderNoteTable; } else if(currentPageName === '擴充預留網頁7') { targetList = travelDataList; renderFn = renderTravelTable; } else { targetList = genericDataList; renderFn = renderGenericTable; }
             targetList.sort((a, b) => {
                 for(let config of sortConfigs) {
-                    let valA = safeStr(a[config.col]), valB = safeStr(b[config.col]);
-                    let numA = parseFloat(valA), numB = parseFloat(valB);
+                    let valA = safeStr(a[config.col]), valB = safeStr(b[config.col]); let numA = parseFloat(valA), numB = parseFloat(valB);
                     if(!isNaN(numA) && !isNaN(numB) && valA.trim() !== '' && valB.trim() !== '') { if(numA !== numB) return config.dir === 'asc' ? numA - numB : numB - numA; } 
                     else { if(valA !== valB) { if (valA < valB) return config.dir === 'asc' ? -1 : 1; if (valA > valB) return config.dir === 'asc' ? 1 : -1; } }
                 }
@@ -442,20 +465,26 @@
             renderFn();
         }
 
+        // ================= 頁面切換與資料載入 =================
         function switchPage() {
             const selectedPageId = document.getElementById('pageSelector').value;
+            const config = PAGE_CONFIG[selectedPageId];
+            
             document.querySelectorAll('.app-page').forEach(page => { page.style.display = 'none'; });
             cancelFoodEdit(); cancelSportsEdit(); cancelNoteEdit(); cancelTravelEdit(); cancelGenericEdit();
+            
+            // 套用主題顏色與動態標題
+            applyTheme(config);
+            currentPageName = config.sheet;
 
-            if (selectedPageId === 'foodPage') { document.getElementById('foodPage').style.display = 'block'; currentPageName = '美食紀錄'; } 
-            else if (selectedPageId === 'sportsPage') { document.getElementById('sportsPage').style.display = 'block'; currentPageName = '運動紀錄'; } 
-            else if (selectedPageId === 'notePage') { document.getElementById('notePage').style.display = 'block'; currentPageName = '擴充預留網頁1'; } 
-            else if (selectedPageId === 'travelPage') { document.getElementById('travelPage').style.display = 'block'; currentPageName = '擴充預留網頁7'; }
+            if (selectedPageId === 'foodPage') { document.getElementById('foodPage').style.display = 'block'; } 
+            else if (selectedPageId === 'sportsPage') { document.getElementById('sportsPage').style.display = 'block'; } 
+            else if (selectedPageId === 'notePage') { document.getElementById('notePage').style.display = 'block'; } 
+            else if (selectedPageId === 'travelPage') { document.getElementById('travelPage').style.display = 'block'; }
             else if (selectedPageId.startsWith('extPage')) {
                 document.getElementById('genericPage').style.display = 'block';
-                currentPageName = '擴充預留網頁' + selectedPageId.replace('extPage', '');
-                document.getElementById('genericFormTitle').innerText = `新增 ${currentPageName} 資料`;
-                document.getElementById('genericTableTitle').innerText = `${currentPageName} 總覽`;
+                document.getElementById('genericFormTitle').innerText = `新增 ${config.name} 資料`;
+                document.getElementById('genericTableTitle').innerText = `${config.name} 總覽`;
                 genericFilterKeywords = []; renderGenericKw();
             }
             loadData(currentPageName);
@@ -494,7 +523,7 @@
         function renderTravelBatchRows(count) { document.getElementById('travelBatchTbody').innerHTML = ''; for(let i=0; i<count; i++) addTravelBatchRow(); }
         function addTravelBatchRow() {
             const tbody = document.getElementById('travelBatchTbody'); const tr = document.createElement('tr');
-            tr.innerHTML = `<td style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col1" style="width:100%; padding:6px; box-sizing:border-box;"></td><td style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col2" style="width:100%; min-width:120px; padding:6px; box-sizing:border-box; border:2px solid #ff9800;"></td><td style="padding:4px; border:1px solid #ddd;"><textarea class="b-col3" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col4" style="width:100%; padding:6px; box-sizing:border-box;"></td><td style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col5" style="width:100%; padding:6px; box-sizing:border-box;"></td><td style="padding:4px; border:1px solid #ddd;"><textarea class="b-col6" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td style="padding:4px; border:1px solid #ddd;"><textarea class="b-col7" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td style="padding:4px; border:1px solid #ddd; text-align:center;"><button class="btn-delete" onclick="this.parentElement.parentElement.remove()" style="padding:4px 8px;">移除</button></td>`;
+            tr.innerHTML = `<td data-label="主類別" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col1" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="名稱" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col2" style="width:100%; min-width:120px; padding:6px; box-sizing:border-box; border:2px solid var(--theme-primary);"></td><td data-label="地點" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col3" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td data-label="地理區域" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col4" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="標籤" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col5" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="必訪亮點/筆記" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col6" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td data-label="實用資訊包" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col7" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td style="padding:4px; border:1px solid #ddd; text-align:center;"><button class="btn-delete" onclick="this.parentElement.parentElement.remove()" style="padding:4px 8px;">移除</button></td>`;
             tbody.appendChild(tr);
         }
         async function submitTravelBatchUI() {
@@ -547,9 +576,12 @@
             travelDataList.forEach(data => {
                 if (travelFilterKeywords.length > 0 && !travelFilterKeywords.some(kw => data.fullText.includes(kw))) return;
                 const tr = document.createElement('tr'); let colsHtml = '';
-                for(let i=1; i<=7; i++) { colsHtml += `<td><div class="resizable-cell">${safeStr(data[`col${i}`])}</div></td>`; }
-                const locQuery = `${safeStr(data.col2)} ${safeStr(data.col3)}`.trim(); let mapColHtml = `<td><div class="resizable-cell"></div></td>`;
-                if(locQuery !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}`; mapColHtml = `<td><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 地圖搜尋</a></div></td>`; }
+                
+                const labels = ['主類別', '名稱', '地點', '地理區域', '彈性標籤', '必訪亮點/筆記', '實用資訊包'];
+                for(let i=1; i<=7; i++) { colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${safeStr(data[`col${i}`])}</div></td>`; }
+
+                const locQuery = `${safeStr(data.col2)} ${safeStr(data.col3)}`.trim(); let mapColHtml = `<td data-label="地圖"><div class="resizable-cell"></div></td>`;
+                if(locQuery !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}`; mapColHtml = `<td data-label="地圖"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 地圖搜尋</a></div></td>`; }
                 tr.innerHTML = `${colsHtml}${mapColHtml}<td class="action-cell"><button class="btn-copy" onclick="copyTravelData('${data.id}')">複製</button><button class="btn-edit" onclick="editTravelData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteTravelData('${data.id}')">刪除</button></td>`;
                 tbody.appendChild(tr);
             });
@@ -557,9 +589,9 @@
 
         // ================= 擴充通用網頁 (2~6, 8~10) =================
         async function submitGenericData() { const payload = { sheetName: currentPageName, id: editingGenericId || Date.now(), action: editingGenericId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`genCol${i}`).value; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = { ...payload, fullText }; } else { genericDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelGenericEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
-        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = null; document.getElementById('genericFormTitle').innerText = `新增 ${currentPageName} 資料 (複製現有)`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = id; document.getElementById('genericFormTitle').innerText = `編輯 ${currentPageName} 資料`; document.getElementById('submitGenericBtn').innerText = '儲存修改'; document.getElementById('submitGenericBtn').className = 'btn-edit'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function cancelGenericEdit() { editingGenericId = null; for(let i=1; i<=10; i++) { document.getElementById(`genCol${i}`).value = ''; } document.getElementById('genCol2').value = new Date().toISOString().split('T')[0]; document.getElementById('genericFormTitle').innerText = `新增 ${currentPageName} 資料`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'none'; }
+        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = null; const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name; document.getElementById('genericFormTitle').innerText = `新增 ${configName} 資料 (複製現有)`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = id; const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name; document.getElementById('genericFormTitle').innerText = `編輯 ${configName} 資料`; document.getElementById('submitGenericBtn').innerText = '儲存修改'; document.getElementById('submitGenericBtn').className = 'btn-edit'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function cancelGenericEdit() { editingGenericId = null; for(let i=1; i<=10; i++) { document.getElementById(`genCol${i}`).value = ''; } document.getElementById('genCol2').value = new Date().toISOString().split('T')[0]; const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name; document.getElementById('genericFormTitle').innerText = `新增 ${configName} 資料`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'none'; }
         function deleteGenericData(id) { if (!confirm('確定刪除此筆資料？')) return; genericDataList = genericDataList.filter(d => String(d.id) !== String(id)); renderGenericTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) }); }
         function addGenericFilterKeyword() { const kw = document.getElementById('genericFilterInput').value.trim().toLowerCase(); if (kw && !genericFilterKeywords.includes(kw)) { genericFilterKeywords.push(kw); renderGenericKw(); renderGenericTable(); } document.getElementById('genericFilterInput').value = ''; }
         function removeGenericKeyword(kw) { genericFilterKeywords = genericFilterKeywords.filter(k => k !== kw); renderGenericKw(); renderGenericTable(); }
@@ -571,13 +603,13 @@
                 const tr = document.createElement('tr'); let colsHtml = '';
                 for(let i=1; i<=10; i++) { 
                     let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); 
-                    if (currentPageName === '擴充預留網頁4' && i === 8 && val.trim() !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val.trim())}`; colsHtml += `<td><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 ${val}</a></div></td>`; } else { colsHtml += `<td><div class="resizable-cell">${val}</div></td>`; }
+                    if (currentPageName === '擴充預留網頁4' && i === 8 && val.trim() !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val.trim())}`; colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 ${val}</a></div></td>`; } else { colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell">${val}</div></td>`; }
                 }
                 tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyGenericData('${data.id}')">複製</button><button class="btn-edit" onclick="editGenericData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteGenericData('${data.id}')">刪除</button></td>`; tbody.appendChild(tr);
             });
         }
 
-        // ================= 隨身筆記 / 事件簿功能 (擴充1) =================
+        // ================= 綜合筆記 (擴充1) =================
         async function submitNoteData() { const payload = { sheetName: '擴充預留網頁1', id: editingNoteId || Date.now(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`noteCol${i}`).value; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
         function copyNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`noteCol${i}`).value = val; } editingNoteId = null; document.getElementById('noteFormTitle').innerText = '新增筆記 / 事件 (複製現有)'; document.getElementById('submitNoteBtn').innerText = '儲存筆記'; document.getElementById('submitNoteBtn').className = 'btn-add'; document.getElementById('cancelNoteBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function editNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`noteCol${i}`).value = val; } editingNoteId = id; document.getElementById('noteFormTitle').innerText = '編輯筆記 / 事件'; document.getElementById('submitNoteBtn').innerText = '儲存修改'; document.getElementById('submitNoteBtn').className = 'btn-edit'; document.getElementById('cancelNoteBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -588,10 +620,11 @@
         function renderNoteKw() { const c = document.getElementById('noteKeywordContainer'); c.innerHTML = ''; noteFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeNoteKeyword('${kw}')">✖</span></div>`; }); }
         function renderNoteTable() {
             const tbody = document.getElementById('noteTableBody'); tbody.innerHTML = '';
+            const labels = ['流水號','日期','分類','內容','欄位 5','欄位 6','欄位 7','欄位 8','欄位 9','欄位 10'];
             noteDataList.forEach(data => {
                 if (noteFilterKeywords.length > 0 && !noteFilterKeywords.some(kw => data.fullText.includes(kw))) return;
                 const tr = document.createElement('tr'); let colsHtml = '';
-                for(let i=1; i<=10; i++) { let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); colsHtml += `<td><div class="resizable-cell">${val}</div></td>`; }
+                for(let i=1; i<=10; i++) { let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${val}</div></td>`; }
                 tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyNoteData('${data.id}')">複製</button><button class="btn-edit" onclick="editNoteData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteNoteData('${data.id}')">刪除</button></td>`; tbody.appendChild(tr);
             });
         }
@@ -610,7 +643,7 @@
             foodDataList.forEach(data => {
                 if (filterKeywords.length > 0 && !filterKeywords.some(kw => data.fullText.includes(kw))) return;
                 const query = `${safeStr(data.city)} ${safeStr(data.district)} ${safeStr(data.address)} ${safeStr(data.storeName)}`.trim(); const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-                tbody.innerHTML += `<tr><td><div class="resizable-cell">${safeStr(data.city)}</div></td><td><div class="resizable-cell">${safeStr(data.district)}</div></td><td><div class="resizable-cell">${safeStr(data.address)}</div></td><td><div class="resizable-cell">${safeStr(data.storeName)}</div></td><td><div class="resizable-cell">${safeStr(data.category)}</div></td><td><div class="resizable-cell">${safeStr(data.other)}</div></td><td><div class="resizable-cell" style="resize:none;"><a href="${mapUrl}" target="_blank" class="map-link">搜尋</a></div></td>
+                tbody.innerHTML += `<tr><td data-label="縣市"><div class="resizable-cell">${safeStr(data.city)}</div></td><td data-label="區域"><div class="resizable-cell">${safeStr(data.district)}</div></td><td data-label="地址"><div class="resizable-cell">${safeStr(data.address)}</div></td><td data-label="店名"><div class="resizable-cell">${safeStr(data.storeName)}</div></td><td data-label="分類"><div class="resizable-cell">${safeStr(data.category)}</div></td><td data-label="其他"><div class="resizable-cell">${safeStr(data.other)}</div></td><td data-label="地圖"><div class="resizable-cell" style="resize:none;"><a href="${mapUrl}" target="_blank" class="map-link">📍地圖搜尋</a></div></td>
                 <td class="action-cell"><button class="btn-copy" onclick="copyFoodData('${data.id}')">複製</button><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></td></tr>`;
             });
         }
@@ -625,7 +658,7 @@
             const tbody = document.getElementById('sportsTableBody'); tbody.innerHTML = '';
             sportsDataList.forEach(data => {
                 const dateStr = formatDate(data.date);
-                tbody.innerHTML += `<tr><td><div class="resizable-cell">${dateStr}</div></td><td><div class="resizable-cell">${safeStr(data.type)}</div></td><td><div class="resizable-cell">${safeStr(data.distance)}</div></td><td><div class="resizable-cell">${safeStr(data.notes)}</div></td>
+                tbody.innerHTML += `<tr><td data-label="日期"><div class="resizable-cell">${dateStr}</div></td><td data-label="運動類型"><div class="resizable-cell">${safeStr(data.type)}</div></td><td data-label="距離 (km)"><div class="resizable-cell">${safeStr(data.distance)}</div></td><td data-label="備註"><div class="resizable-cell">${safeStr(data.notes)}</div></td>
                 <td class="action-cell"><button class="btn-copy" onclick="copySportsData('${data.id}')">複製</button><button class="btn-edit" onclick="editSportsData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteSportsData('${data.id}')">刪除</button></td></tr>`;
             });
         }
