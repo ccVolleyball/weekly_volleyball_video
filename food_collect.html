@@ -98,9 +98,25 @@
         }
 
         /* ====================================================
-           🌟 全新設計：時事焦點專屬時間軸 (Timeline) 🌟
+           🌟 時間軸專屬 CSS (News & Ext 8,9,10) 🌟
         ==================================================== */
-        .timeline { position: relative; max-width: 1200px; margin: 0 auto; padding: 20px 0; } /* 寬度加寬至 1200px */
+        .news-layout-wrapper { display: flex; gap: 20px; position: relative; align-items: flex-start; }
+        .news-timeline-section { flex: 1; min-width: 0; }
+        
+        .news-detail-panel {
+            width: 350px; background: #fff; border-radius: 8px; box-shadow: -2px 0 15px rgba(0,0,0,0.15);
+            padding: 20px; display: none; position: sticky; top: 20px;
+            max-height: 90vh; overflow-y: auto; border: 1px solid #ddd;
+        }
+        .detail-close-btn { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: #888; margin-top: -5px; }
+        .detail-close-btn:hover { color: #f00; }
+
+        @media screen and (max-width: 900px) {
+            .news-layout-wrapper { flex-direction: column-reverse; }
+            .news-detail-panel { width: 100%; position: static; max-height: none; margin-bottom: 20px; }
+        }
+
+        .timeline { position: relative; width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px 0; } 
         .timeline::after { content: ''; position: absolute; width: 4px; background-color: #ddd; top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 2px; }
         .timeline-item { padding: 10px 40px; position: relative; background-color: inherit; width: 50%; box-sizing: border-box; }
         .timeline-item.left { left: 0; }
@@ -108,15 +124,25 @@
         .timeline-item::after { content: ''; position: absolute; width: 20px; height: 20px; right: -10px; background-color: white; border: 4px solid var(--cat-color, #607d8b); top: 25px; border-radius: 50%; z-index: 1; box-shadow: 0 0 0 4px rgba(255,255,255,0.8); }
         .timeline-item.right::after { left: -10px; }
         
-        .timeline-content { padding: 20px; background-color: white; position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 5px solid var(--cat-color, #607d8b); }
+        .timeline-content { padding: 20px; background-color: white; position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 5px solid var(--cat-color, #607d8b); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .timeline-content:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        
         .timeline-date { font-weight: bold; color: var(--cat-color, #607d8b); margin-bottom: 8px; font-size: 14px; letter-spacing: 1px; }
         .timeline-title { font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #333; line-height: 1.4; }
-        .timeline-desc { font-size: 15px; color: #555; white-space: pre-wrap; margin-bottom: 15px; line-height: 1.6; }
-        .timeline-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; background-color: var(--cat-color, #607d8b); color: white; margin-right: 10px; font-weight: bold; }
-        .timeline-actions { text-align: right; border-top: 1px dashed #eee; padding-top: 10px; margin-top: 10px; }
         
-        /* 🌟 專屬留言板/心得筆記區塊樣式 🌟 */
-        .timeline-notes { background: #fffde7; border-left: 4px solid #ffb300; padding: 12px; margin-top: 15px; font-size: 14.5px; border-radius: 4px; white-space: pre-wrap; color: #444; line-height: 1.5; box-shadow: inset 0 0 5px rgba(0,0,0,0.02); }
+        .text-clamp {
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; 
+            overflow: hidden; transition: max-height 0.3s ease;
+            font-size: 15px; color: #555; white-space: pre-wrap; line-height: 1.6;
+        }
+        .text-clamp.expanded { -webkit-line-clamp: unset; display: block; }
+        .toggle-text-btn { background: none; border: none; color: #007bff; cursor: pointer; font-size: 13px; padding: 0; margin-top: 5px; font-weight: bold; }
+        .toggle-text-btn:hover { text-decoration: underline; color: #0056b3; filter: none; }
+
+        .timeline-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; background-color: var(--cat-color, #607d8b); color: white; margin-right: 10px; font-weight: bold; }
+        .timeline-actions { text-align: right; border-top: 1px dashed #eee; padding-top: 10px; margin-top: 10px; cursor: default; }
+        
+        .timeline-notes { background: #fffde7; border-left: 4px solid #ffb300; padding: 12px; margin-top: 15px; font-size: 14.5px; border-radius: 4px; color: #444; box-shadow: inset 0 0 5px rgba(0,0,0,0.02); cursor: default; }
         .timeline-notes-title { font-weight: bold; color: #f57c00; margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; }
 
         @media screen and (max-width: 768px) {
@@ -141,14 +167,14 @@
             <option value="extPage3">🔗 網路連結紀錄</option>
             <option value="extPage4">🗼 東京旅遊紀錄</option>
             <option value="extPage6">📄 擴充預留網頁6</option>
-            <option value="extPage8">📄 擴充預留網頁8</option>
-            <option value="extPage9">📄 擴充預留網頁9</option>
-            <option value="extPage10">📄 擴充預留網頁10</option>
+            <option value="extPage8">📰 擴充預留網頁8 (時間軸)</option>
+            <option value="extPage9">📰 擴充預留網頁9 (時間軸)</option>
+            <option value="extPage10">📰 擴充預留網頁10 (時間軸)</option>
         </select>
         <span id="loadingMsg" style="color: var(--theme-primary); font-weight: bold; display: none;">資料載入與同步中...</span>
     </div>
 
-    <!-- 頁面說明區塊 (可摺疊) -->
+    <!-- 頁面說明區塊 -->
     <div class="section theme-box">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <h3 class="desc-header theme-text" style="margin: 0; cursor: pointer;" onclick="toggleDescCollapse()">📖 頁面說明 / 欄位定義 <span id="descToggleIcon">▼</span></h3>
@@ -198,26 +224,22 @@
         </div>
     </div>
 
-    <!-- ================= 📰 時事焦點紀錄 (擴充網頁5 - 進階時間軸版) ================= -->
+    <!-- ================= 📰 共用時間軸紀錄模組 (時事5, 擴充8,9,10) ================= -->
     <div id="newsPage" class="app-page" style="display: none;">
         <div class="section">
-            <h2 id="newsFormTitle" style="border:none; margin-top:0;">新增時事焦點</h2>
+            <h2 id="newsFormTitle" style="border:none; margin-top:0;">新增紀錄</h2>
             <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-                <!-- 左半部：基本資訊 -->
                 <div style="flex: 1; min-width: 300px;">
-                    <div class="form-group"><label>分類 (col1)</label><input type="text" id="newsCol1" placeholder="例如：政治/經濟/國際/體育" style="width: 100%;"></div><br>
+                    <div class="form-group"><label>分類 (col1)</label><input type="text" id="newsCol1" placeholder="填寫分類名稱..." style="width: 100%;"></div><br>
                     <div class="form-group"><label>日期 (col2)</label><input type="date" id="newsCol2" style="width: 100%;"></div><br>
                     <div class="form-group"><label>標題 (col3)</label><input type="text" id="newsCol3" placeholder="事件標題..." style="width: 100%;"></div><br>
-                    <div class="form-group"><label>相關連結/來源 (col5)</label><textarea id="newsCol5" rows="2" style="width: 100%;" placeholder="貼上新聞網址..."></textarea></div>
+                    <div class="form-group"><label>相關連結網址 (col5)</label><textarea id="newsCol5" rows="2" style="width: 100%;" placeholder="貼上網址..."></textarea></div>
                 </div>
-                
-                <!-- 右半部：大型文字區塊 -->
                 <div style="flex: 2; min-width: 300px;">
                     <div class="form-group" style="width: 100%;">
                         <label>詳細內容 (col4)</label>
-                        <textarea id="newsCol4" rows="8" style="width: 100%; max-width: 600px;" placeholder="記錄事件重點..."></textarea>
+                        <textarea id="newsCol4" rows="8" style="width: 100%; max-width: 600px;" placeholder="記錄重點..."></textarea>
                     </div>
-                    
                     <div class="form-group" style="width: 100%;">
                         <label>
                             心得筆記 (col6) 
@@ -227,46 +249,49 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 隱藏 7-10 欄位 -->
             <div style="display:none;">
                 <script>for(let i=7; i<=10; i++) document.write(`<input type="hidden" id="newsCol${i}">`);</script>
             </div>
-            
             <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                <button id="submitNewsBtn" class="btn-add" onclick="submitNewsData()">儲存時事與筆記</button>
+                <button id="submitNewsBtn" class="btn-add" onclick="submitNewsData()">儲存紀錄與筆記</button>
                 <button id="cancelNewsBtn" class="btn-cancel" onclick="cancelNewsEdit()">取消編輯</button>
             </div>
         </div>
 
         <div class="section" style="background-color: #f7f9fc;">
-            <h2>時事時間軸總覽</h2>
+            <h2 id="newsTableTitle">時間軸總覽</h2>
             
-            <!-- 進階篩選器 -->
             <div style="margin-bottom: 15px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; box-shadow: inset 0 0 5px rgba(0,0,0,0.05);">
                 <div style="display:flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px; align-items: flex-end;">
-                    <div><label style="font-size:13px; color:#555;">🔍 關鍵字搜尋：</label><br><input type="text" id="newsFilterInput" placeholder="輸入關鍵字..." onkeypress="if(event.key === 'Enter') renderNewsTimeline()"></div>
+                    <div><label style="font-size:13px; color:#555;">🔍 關鍵字：</label><br><input type="text" id="newsFilterInput" placeholder="輸入關鍵字..." onkeypress="if(event.key === 'Enter') renderNewsTimeline()"></div>
                     <div><label style="font-size:13px; color:#555;">📅 起始日期：</label><br><input type="date" id="newsStartDate" onchange="renderNewsTimeline()"></div>
                     <div><label style="font-size:13px; color:#555;">📅 結束日期：</label><br><input type="date" id="newsEndDate" onchange="renderNewsTimeline()"></div>
                     <div>
                         <button class="btn-filter" style="margin-bottom:0;" onclick="renderNewsTimeline()">套用篩選</button> 
                         <button class="btn-cancel" style="display:inline-block; margin-bottom:0;" onclick="clearNewsFilters()">清除條件</button>
+                        <button id="globalNewsExpandBtn" class="btn-copy" style="margin-bottom:0; background-color:#607d8b;" onclick="toggleGlobalNewsExpand()">全展/全收 ↕</button>
                     </div>
                 </div>
-                
-                <!-- 動態分類 Checkbox 容器 -->
                 <div id="newsCategoryFilters" style="display:flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
-                    <!-- JS 動態生成 -->
                 </div>
             </div>
             
-            <div class="timeline" id="newsTimelineContainer"></div>
+            <div class="news-layout-wrapper">
+                <div class="news-timeline-section">
+                    <div class="timeline" id="newsTimelineContainer"></div>
+                </div>
+                <div class="news-detail-panel" id="newsDetailPanel">
+                    <button class="detail-close-btn" onclick="closeNewsDetail()">✖</button>
+                    <h3 style="margin-top:0; color:var(--theme-primary);">🔍 詳細檢視</h3>
+                    <div id="newsDetailContent"></div>
+                </div>
+            </div>
         </div>
     </div>
 
 
     <!-- ================= 美食頁面 ================= -->
-    <div id="foodPage" class="app-page">
+    <div id="foodPage" class="app-page" style="display: none;">
         <div class="section">
             <h2 id="foodFormTitle">新增美食店家</h2>
             <div class="form-group"><label>縣市</label><input type="text" id="city"></div><div class="form-group"><label>區域</label><input type="text" id="district"></div><div class="form-group"><label>地址</label><textarea id="address" rows="2"></textarea></div><div class="form-group"><label>店名</label><input type="text" id="storeName"></div><div class="form-group"><label>分類</label><input type="text" id="category"></div><div class="form-group"><label>其他</label><textarea id="other" rows="2"></textarea></div>
@@ -411,6 +436,9 @@
         </div>
     </div>
 
+    <!-- ==============================================
+         🌟 絕對純淨版 JavaScript (無任何重複錯誤) 🌟
+    =================================================== -->
     <script>
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
         const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
@@ -425,14 +453,15 @@
             'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
             'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊紀錄', color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
             'extPage6':   { sheet: '擴充預留網頁6', name: '擴充預留網頁6', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
-            'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
-            'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
-            'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' }
+            'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
+            'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
+            'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' }
         };
 
         let currentPageName = '美食紀錄';
         let currentDescription = '';
         let isDescCollapsed = false; 
+        let isGlobalNewsExpanded = false;
 
         let filterKeywords = []; 
         let foodDataList = []; let editingFoodId = null; 
@@ -500,7 +529,7 @@
             } else if (currentPageName === '運動紀錄') { options.push({val: 'date', text: '日期'}, {val: 'type', text: '運動類型'}, {val: 'distance', text: '距離(km)'}, {val: 'notes', text: '備註'});
             } else if (currentPageName === '擴充預留網頁1') { options.push({val: 'col1', text: '流水號'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '分類'}, {val: 'col4', text: '內容'}); for(let i=5; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i});
             } else if (currentPageName === '擴充預留網頁7') { options.push({val: 'col1', text: '主類別'}, {val: 'col2', text: '名稱'}, {val: 'col3', text: '地點'}, {val: 'col4', text: '地理區域'}, {val: 'col5', text: '彈性標籤'}, {val: 'col6', text: '必訪亮點/筆記'}, {val: 'col7', text: '實用資訊包'});
-            } else if (currentPageName === '擴充預留網頁5') { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
+            } else if (['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10'].includes(currentPageName)) { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
             } else { for(let i=1; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i}); }
 
             for(let i=1; i<=5; i++) {
@@ -511,11 +540,13 @@
         }
         function resetMultiSort() { for(let i=1; i<=5; i++) { document.getElementById(`sortCol${i}`).value = ''; document.getElementById(`sortDir${i}`).value = 'asc'; } applyGlobalMultiSort(); }
         function handleHeaderSort(col) { let p1 = document.getElementById('sortCol1'), d1 = document.getElementById('sortDir1'); if (p1.value === col) { d1.value = d1.value === 'asc' ? 'desc' : 'asc'; } else { p1.value = col; d1.value = 'asc'; } for(let i=2; i<=5; i++) document.getElementById(`sortCol${i}`).value = ''; applyGlobalMultiSort(); }
+        
         function applyGlobalMultiSort() {
             let sortConfigs = [];
             for(let i=1; i<=5; i++) { let col = document.getElementById(`sortCol${i}`).value, dir = document.getElementById(`sortDir${i}`).value; if(col) sortConfigs.push({col, dir}); }
             
-            if (currentPageName === '擴充預留網頁5' && sortConfigs.length === 0) {
+            // 🌟 修正：時間軸若無手動排序，預設以日期排序
+            if (['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10'].includes(currentPageName) && sortConfigs.length === 0) {
                 sortConfigs.push({col: 'col2', dir: 'desc'});
             }
 
@@ -524,14 +555,21 @@
             else if(currentPageName === '運動紀錄') { targetList = sportsDataList; renderFn = renderSportsTable; } 
             else if(currentPageName === '擴充預留網頁1') { targetList = noteDataList; renderFn = renderNoteTable; } 
             else if(currentPageName === '擴充預留網頁7') { targetList = travelDataList; renderFn = renderTravelTable; } 
-            else if(currentPageName === '擴充預留網頁5') { targetList = newsDataList; renderFn = renderNewsTimeline; } 
+            else if(['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10'].includes(currentPageName)) { targetList = newsDataList; renderFn = renderNewsTimeline; } 
             else { targetList = genericDataList; renderFn = renderGenericTable; }
 
             targetList.sort((a, b) => {
                 for(let config of sortConfigs) {
-                    let valA = safeStr(a[config.col]), valB = safeStr(b[config.col]); let numA = parseFloat(valA), numB = parseFloat(valB);
-                    if(!isNaN(numA) && !isNaN(numB) && valA.trim() !== '' && valB.trim() !== '') { if(numA !== numB) return config.dir === 'asc' ? numA - numB : numB - numA; } 
-                    else { if(valA !== valB) { if (valA < valB) return config.dir === 'asc' ? -1 : 1; if (valA > valB) return config.dir === 'asc' ? 1 : -1; } }
+                    let valA = safeStr(a[config.col]), valB = safeStr(b[config.col]); 
+                    let numA = Number(valA), numB = Number(valB);
+                    if(!isNaN(numA) && !isNaN(numB) && valA.trim() !== '' && valB.trim() !== '') { 
+                        if(numA !== numB) return config.dir === 'asc' ? numA - numB : numB - numA; 
+                    } else { 
+                        if(valA !== valB) { 
+                            if (valA < valB) return config.dir === 'asc' ? -1 : 1; 
+                            if (valA > valB) return config.dir === 'asc' ? 1 : -1; 
+                        } 
+                    }
                 }
                 return parseFloat(a.id) - parseFloat(b.id); 
             });
@@ -553,7 +591,12 @@
             else if (selectedPageId === 'sportsPage') { document.getElementById('sportsPage').style.display = 'block'; } 
             else if (selectedPageId === 'notePage') { document.getElementById('notePage').style.display = 'block'; } 
             else if (selectedPageId === 'travelPage') { document.getElementById('travelPage').style.display = 'block'; }
-            else if (selectedPageId === 'newsPage') { document.getElementById('newsPage').style.display = 'block'; }
+            else if (['newsPage', 'extPage8', 'extPage9', 'extPage10'].includes(selectedPageId)) { 
+                document.getElementById('newsPage').style.display = 'block'; 
+                document.getElementById('newsFormTitle').innerText = `新增 ${config.name}`;
+                document.getElementById('newsTableTitle').innerText = `${config.name} 時間軸總覽`;
+                document.getElementById('newsFilterInput').value = ''; 
+            }
             else if (selectedPageId.startsWith('extPage')) {
                 document.getElementById('genericPage').style.display = 'block';
                 document.getElementById('genericFormTitle').innerText = `新增 ${config.name} 資料`;
@@ -580,7 +623,7 @@
                 else if (sheetName === '運動紀錄') { sportsDataList = data; } 
                 else if (sheetName === '擴充預留網頁1') { noteDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); } 
                 else if (sheetName === '擴充預留網頁7') { travelDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)}`.toLowerCase() })); } 
-                else if (sheetName === '擴充預留網頁5') { 
+                else if (['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10'].includes(sheetName)) { 
                     newsDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)}`.toLowerCase() })); 
                     updateNewsCategoryCheckboxes();
                 } 
@@ -591,7 +634,7 @@
             finally { toggleLoading(false); }
         }
 
-        // ================= 📰 時事焦點紀錄 (擴充網頁5 - 進階時間軸版) =================
+        // ================= 📰 共用時間軸紀錄模組 =================
         function addTimestampToNewsNote() {
             const noteEl = document.getElementById('newsCol6');
             const now = new Date();
@@ -602,7 +645,7 @@
         }
 
         async function submitNewsData() {
-            const payload = { sheetName: '擴充預留網頁5', id: editingNewsId || Date.now(), action: editingNewsId ? 'edit' : 'add' };
+            const payload = { sheetName: currentPageName, id: editingNewsId || Date.now(), action: editingNewsId ? 'edit' : 'add' };
             for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`newsCol${i}`) ? document.getElementById(`newsCol${i}`).value : ''; }
             const fullText = Object.values(payload).join(' ').toLowerCase();
             if (editingNewsId) { const idx = newsDataList.findIndex(d => String(d.id) === String(editingNewsId)); if (idx > -1) newsDataList[idx] = { ...payload, fullText };
@@ -614,7 +657,8 @@
             fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         }
 
-        function copyNewsData(id) {
+        function copyNewsData(id, event) {
+            if(event) event.stopPropagation();
             const item = newsDataList.find(d => String(d.id) === String(id)); if (!item) return;
             for(let i=1; i<=10; i++) { 
                 if(document.getElementById(`newsCol${i}`)) {
@@ -622,10 +666,17 @@
                     document.getElementById(`newsCol${i}`).value = val; 
                 }
             }
-            editingNewsId = null; document.getElementById('newsFormTitle').innerText = '新增時事焦點 (複製現有)'; document.getElementById('submitNewsBtn').innerText = '儲存時事與筆記'; document.getElementById('submitNewsBtn').className = 'btn-add'; document.getElementById('cancelNewsBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            editingNewsId = null; 
+            const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name;
+            document.getElementById('newsFormTitle').innerText = `新增 ${configName} (複製現有)`; 
+            document.getElementById('submitNewsBtn').innerText = '儲存紀錄與筆記'; 
+            document.getElementById('submitNewsBtn').className = 'btn-add'; 
+            document.getElementById('cancelNewsBtn').style.display = 'inline-block'; 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
-        function editNewsData(id) {
+        function editNewsData(id, event) {
+            if(event) event.stopPropagation();
             const item = newsDataList.find(d => String(d.id) === String(id)); if (!item) return;
             for(let i=1; i<=10; i++) { 
                 if(document.getElementById(`newsCol${i}`)) {
@@ -633,22 +684,33 @@
                     document.getElementById(`newsCol${i}`).value = val; 
                 }
             }
-            editingNewsId = id; document.getElementById('newsFormTitle').innerText = '編輯時事焦點'; document.getElementById('submitNewsBtn').innerText = '儲存修改'; document.getElementById('submitNewsBtn').className = 'btn-edit'; document.getElementById('cancelNewsBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            editingNewsId = id; 
+            const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name;
+            document.getElementById('newsFormTitle').innerText = `編輯 ${configName}`; 
+            document.getElementById('submitNewsBtn').innerText = '儲存修改'; 
+            document.getElementById('submitNewsBtn').className = 'btn-edit'; 
+            document.getElementById('cancelNewsBtn').style.display = 'inline-block'; 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
         function cancelNewsEdit() {
             editingNewsId = null; 
             for(let i=1; i<=10; i++) { if(document.getElementById(`newsCol${i}`)) document.getElementById(`newsCol${i}`).value = ''; }
             document.getElementById('newsCol2').value = new Date().toISOString().split('T')[0];
-            document.getElementById('newsFormTitle').innerText = '新增時事焦點'; document.getElementById('submitNewsBtn').innerText = '儲存時事與筆記'; document.getElementById('submitNewsBtn').className = 'btn-add'; document.getElementById('cancelNewsBtn').style.display = 'none';
+            const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name;
+            document.getElementById('newsFormTitle').innerText = `新增 ${configName}`; 
+            document.getElementById('submitNewsBtn').innerText = '儲存紀錄與筆記'; 
+            document.getElementById('submitNewsBtn').className = 'btn-add'; 
+            document.getElementById('cancelNewsBtn').style.display = 'none';
         }
 
-        function deleteNewsData(id) { 
-            if (!confirm('確定刪除此時事紀錄？')) return; 
+        function deleteNewsData(id, event) { 
+            if(event) event.stopPropagation(); 
+            if (!confirm('確定刪除此紀錄？')) return; 
             newsDataList = newsDataList.filter(d => String(d.id) !== String(id)); 
             updateNewsCategoryCheckboxes();
             renderNewsTimeline(); 
-            fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁5' }) }); 
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) }); 
         }
         
         function clearNewsFilters() {
@@ -662,20 +724,15 @@
         function updateNewsCategoryCheckboxes() {
             const container = document.getElementById('newsCategoryFilters');
             if (!container) return;
-            
             const currentChecked = Array.from(document.querySelectorAll('.news-cat-cb')).filter(cb => cb.checked).map(cb => cb.value);
             const hasExistingCbs = document.querySelectorAll('.news-cat-cb').length > 0;
-
             const categories = [...new Set(newsDataList.map(d => safeStr(d.col1).trim() || '未分類'))].sort();
 
             let html = '<span style="font-size:13px; font-weight:bold; margin-right:5px; align-self:center; color:#555;">🏷️ 分類顯示：</span>';
             categories.forEach(cat => {
                 const color = getCategoryColor(cat);
                 const isChecked = !hasExistingCbs || currentChecked.includes(cat) ? 'checked' : '';
-                html += `
-                <label style="display:flex; align-items:center; cursor:pointer; font-size:13px; background:#f4f4f4; padding:4px 10px; border-radius:15px; border-left:4px solid ${color};">
-                    <input type="checkbox" value="${cat}" class="news-cat-cb" ${isChecked} onchange="renderNewsTimeline()" style="margin-right:5px;"> ${cat}
-                </label>`;
+                html += `<label style="display:flex; align-items:center; cursor:pointer; font-size:13px; background:#f4f4f4; padding:4px 10px; border-radius:15px; border-left:4px solid ${color};"><input type="checkbox" value="${cat}" class="news-cat-cb" ${isChecked} onchange="renderNewsTimeline()" style="margin-right:5px;"> ${cat}</label>`;
             });
             container.innerHTML = html;
         }
@@ -691,6 +748,65 @@
             return '#607d8b'; 
         }
 
+        function toggleNewsClamp(id, event) {
+            if(event) event.stopPropagation(); 
+            const contentDiv = document.getElementById(`clamp-content-${id}`);
+            const noteDiv = document.getElementById(`clamp-note-${id}`);
+            const btn = document.getElementById(`toggle-btn-${id}`);
+            
+            let isExp = contentDiv.classList.contains('expanded');
+            if (isExp) {
+                contentDiv.classList.remove('expanded');
+                if(noteDiv) noteDiv.classList.remove('expanded');
+                btn.innerText = '展開 ▼';
+            } else {
+                contentDiv.classList.add('expanded');
+                if(noteDiv) noteDiv.classList.add('expanded');
+                btn.innerText = '收起 ▲';
+            }
+        }
+
+        function toggleGlobalNewsExpand() {
+            isGlobalNewsExpanded = !isGlobalNewsExpanded;
+            renderNewsTimeline(); 
+        }
+
+        function openNewsDetail(id) {
+            const item = newsDataList.find(d => String(d.id) === String(id));
+            if(!item) return;
+            const panel = document.getElementById('newsDetailPanel');
+            const content = document.getElementById('newsDetailContent');
+            
+            const cat = safeStr(item.col1) || '未分類';
+            const date = formatDate(item.col2);
+            const title = safeStr(item.col3);
+            const desc = safeStr(item.col4);
+            let link = safeStr(item.col5);
+            const notes = safeStr(item.col6);
+            
+            let linkHtml = '無';
+            if (link.trim() !== '') {
+                let href = link.startsWith('http') ? link : 'http://' + link;
+                linkHtml = `<a href="${href}" target="_blank" style="word-break: break-all; color: var(--theme-primary);">${link}</a>`;
+            }
+            
+            content.innerHTML = `
+                <div style="margin-bottom:10px;">
+                    <span style="background:var(--theme-primary); color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${cat}</span> 
+                    <span style="color:#666; font-size:12px;">${date}</span>
+                </div>
+                <h4 style="margin:0 0 10px 0; font-size:18px; color:#333;">${title}</h4>
+                <p style="white-space: pre-wrap; font-size:14px; line-height:1.6; color:#444; border-bottom:1px dashed #ddd; padding-bottom:10px;">${desc}</p>
+                <div style="margin-top:15px; background:#f4f4f4; padding:10px; border-radius:5px;">
+                    <strong style="font-size:13px; color:#555;">🔗 相關連結：</strong><br>
+                    ${linkHtml}
+                </div>
+                ${notes ? `<div style="margin-top:15px; border-left:4px solid #ffb300; padding-left:10px; font-size:14px; white-space:pre-wrap; color:#555;"><strong>💡 心得筆記：</strong><br>${notes}</div>` : ''}
+            `;
+            panel.style.display = 'block';
+        }
+        function closeNewsDetail() { document.getElementById('newsDetailPanel').style.display = 'none'; }
+
         function renderNewsTimeline() {
             const container = document.getElementById('newsTimelineContainer'); container.innerHTML = '';
             
@@ -704,13 +820,16 @@
             else { checkedCats = null; }
 
             let isLeft = true;
+            let expClass = isGlobalNewsExpanded ? 'expanded' : '';
+            let btnText = isGlobalNewsExpanded ? '收起 ▲' : '展開 ▼';
+
             newsDataList.forEach(data => {
                 const fullText = data.fullText;
                 const cat = safeStr(data.col1).trim() || '未分類';
                 const date = formatDate(data.col2);
                 const title = safeStr(data.col3);
                 const content = safeStr(data.col4);
-                const link = safeStr(data.col5);
+                let link = safeStr(data.col5);
                 const notes = safeStr(data.col6);
                 
                 if (keyword && !fullText.includes(keyword)) return;
@@ -726,25 +845,31 @@
 
                 let linkHtml = '';
                 if(link.trim() !== '') {
-                    linkHtml = `<a href="${link}" target="_blank" style="display:inline-block; font-size:13px; color:${catColor}; font-weight:bold; margin-bottom:10px;">🔗 相關連結/來源</a>`;
+                    let href = link.startsWith('http') ? link : 'http://' + link;
+                    linkHtml = `<div style="margin-bottom:10px; font-size:13px; font-weight:bold;">🔗 <a href="${href}" target="_blank" style="color:${catColor}; word-break: break-all;" onclick="event.stopPropagation()">${link}</a></div>`;
                 }
 
                 let notesHtml = '';
                 if(notes.trim() !== '') {
-                    notesHtml = `<div class="timeline-notes"><div class="timeline-notes-title">💡 追蹤與心得筆記：</div>${notes}</div>`;
+                    notesHtml = `<div class="timeline-notes" onclick="event.stopPropagation()">
+                        <div class="timeline-notes-title">💡 心得筆記：</div>
+                        <div class="text-clamp ${expClass}" id="clamp-note-${data.id}">${notes}</div>
+                    </div>`;
                 }
 
                 itemDiv.innerHTML = `
-                    <div class="timeline-content">
+                    <div class="timeline-content" onclick="openNewsDetail('${data.id}')">
                         <div class="timeline-date">${date}</div>
                         <h3 class="timeline-title"><span class="timeline-badge">${cat}</span>${title}</h3>
-                        <div class="timeline-desc">${content}</div>
                         ${linkHtml}
+                        <div class="text-clamp ${expClass}" id="clamp-content-${data.id}" onclick="event.stopPropagation()">${content}</div>
                         ${notesHtml}
-                        <div class="timeline-actions">
-                            <button class="btn-copy" onclick="copyNewsData('${data.id}')">複製</button>
-                            <button class="btn-edit" onclick="editNewsData('${data.id}')">編輯</button>
-                            <button class="btn-delete" onclick="deleteNewsData('${data.id}')">刪除</button>
+                        <button class="toggle-text-btn" id="toggle-btn-${data.id}" onclick="toggleNewsClamp('${data.id}', event)">${btnText}</button>
+                        
+                        <div class="timeline-actions" onclick="event.stopPropagation()">
+                            <button class="btn-copy" onclick="copyNewsData('${data.id}', event)">複製</button>
+                            <button class="btn-edit" style="background-color: #ffb300; color:white;" onclick="editNewsData('${data.id}', event)">編輯</button>
+                            <button class="btn-delete" style="background-color: #e53935;" onclick="deleteNewsData('${data.id}', event)">刪除</button>
                         </div>
                     </div>
                 `;
@@ -752,7 +877,6 @@
                 isLeft = !isLeft; 
             });
         }
-
 
         // ================= 美食功能 =================
         async function submitFoodData() { const city = document.getElementById('city').value, district = document.getElementById('district').value, address = document.getElementById('address').value, storeName = document.getElementById('storeName').value, category = document.getElementById('category').value, other = document.getElementById('other').value; if (!storeName.trim()) return alert('店名為必填！'); const payload = { sheetName: '美食紀錄', id: editingFoodId || Date.now(), action: editingFoodId ? 'edit' : 'add', city, district, address, storeName, category, other }; const fullText = `${city} ${district} ${address} ${storeName} ${category} ${other}`.toLowerCase(); if (editingFoodId) { const idx = foodDataList.findIndex(d => String(d.id) === String(editingFoodId)); if (idx > -1) foodDataList[idx] = { ...payload, fullText }; } else { foodDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelFoodEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
@@ -880,7 +1004,7 @@
             });
         }
 
-        // ================= 擴充通用網頁 (2,3,4,6,8,9,10) =================
+        // ================= 客製化動態通用網頁 (擴充 2,3,4,6) =================
         async function submitGenericData() { const payload = { sheetName: currentPageName, id: editingGenericId || Date.now(), action: editingGenericId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`genCol${i}`).value; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = { ...payload, fullText }; } else { genericDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelGenericEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
         function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = null; const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name; document.getElementById('genericFormTitle').innerText = `新增 ${configName} 資料 (複製現有)`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = id; const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name; document.getElementById('genericFormTitle').innerText = `編輯 ${configName} 資料`; document.getElementById('submitGenericBtn').innerText = '儲存修改'; document.getElementById('submitGenericBtn').className = 'btn-edit'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
