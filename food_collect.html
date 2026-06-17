@@ -19,6 +19,22 @@
         .theme-box { border-left: 5px solid var(--theme-primary); background-color: var(--theme-light); padding: 15px; }
         .theme-text { color: var(--theme-dark) !important; }
 
+        /* ====================================================
+           🌟 全新導覽列按鈕樣式 (Nav Buttons) 🌟
+        ==================================================== */
+        .nav-container { margin-bottom: 20px; padding: 15px; background-color: var(--theme-light); border: 1px solid var(--theme-primary); border-radius: 8px; transition: all 0.3s; }
+        .nav-buttons-wrapper { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .nav-btn {
+            padding: 8px 14px; border: 1px solid #ccc; border-radius: 20px; background: #fff; 
+            color: #555; cursor: pointer; font-size: 14px; font-weight: bold; 
+            transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .nav-btn:hover { background: #f1f1f1; transform: translateY(-1px); }
+        .nav-btn.active {
+            background: var(--theme-primary); color: #fff; border-color: var(--theme-dark);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2); transform: scale(1.02);
+        }
+
         .form-group { display: inline-block; margin-right: 15px; margin-bottom: 15px; vertical-align: top; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #555; }
         input[type="text"], input[type="date"], select, textarea { padding: 8px; width: 160px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; box-sizing: border-box; transition: border-color 0.3s; }
@@ -98,7 +114,7 @@
         }
 
         /* ====================================================
-           🌟 時間軸專屬 CSS (News & Ext 8,9,10) 🌟
+           🌟 時間軸專屬 CSS (News & Ext 8~20) 🌟
         ==================================================== */
         .news-layout-wrapper { display: flex; gap: 20px; position: relative; align-items: flex-start; }
         .news-timeline-section { flex: 1; min-width: 0; }
@@ -155,26 +171,14 @@
 </head>
 <body>
 
-    <div style="margin-bottom: 20px; padding: 15px; background-color: var(--theme-light); border: 1px solid var(--theme-primary); border-radius: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; transition: all 0.3s;">
-        <label for="pageSelector" style="font-size: 16px; margin-bottom: 0; font-weight: bold; color: var(--theme-dark);">切換資料庫：</label>
-        <select id="pageSelector" onchange="switchPage()" style="padding: 8px; font-size: 16px; width: auto; font-weight: bold;">
-            <option value="foodPage">🍔 美食店家地圖</option>
-            <option value="sportsPage">🏃‍♂️ 運動訓練紀錄</option>
-            <option value="travelPage">✈️ 旅遊行程筆記 (擴充7)</option>
-            <option value="newsPage">📰 時事焦點紀錄 (擴充5)</option>
-            <option value="notePage">📝 隨身綜合筆記 (擴充1)</option>
-            <option value="extPage2">🍽️ 飲食日常紀錄</option>
-            <option value="extPage3">🔗 網路連結紀錄</option>
-            <option value="extPage4">🗼 東京旅遊紀錄</option>
-            <option value="extPage6">📄 擴充預留網頁6</option>
-            <option value="extPage8">📰 擴充預留網頁8 (時間軸)</option>
-            <option value="extPage9">📰 擴充預留網頁9 (時間軸)</option>
-            <option value="extPage10">📰 擴充預留網頁10 (時間軸)</option>
-        </select>
-        <span id="loadingMsg" style="color: var(--theme-primary); font-weight: bold; display: none;">資料載入與同步中...</span>
+    <div class="nav-container theme-box">
+        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold; color: var(--theme-dark); display: flex; justify-content: space-between; align-items: center;">
+            <span>切換資料庫分頁：</span>
+            <span id="loadingMsg" style="color: var(--theme-primary); font-size: 14px; display: none;">⏳ 資料載入與同步中...</span>
+        </div>
+        <div id="navButtonsWrapper" class="nav-buttons-wrapper"></div>
     </div>
 
-    <!-- 頁面說明區塊 -->
     <div class="section theme-box">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <h3 class="desc-header theme-text" style="margin: 0; cursor: pointer;" onclick="toggleDescCollapse()">📖 頁面說明 / 欄位定義 <span id="descToggleIcon">▼</span></h3>
@@ -199,7 +203,6 @@
         </div>
     </div>
 
-    <!-- 多重排序區塊 -->
     <div class="section theme-box" style="opacity: 0.95;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <h3 class="theme-text" style="margin: 0 0 5px 0;">🔃 多重優先權排序</h3>
@@ -224,7 +227,6 @@
         </div>
     </div>
 
-    <!-- ================= 📰 共用時間軸紀錄模組 (時事5, 擴充8,9,10) ================= -->
     <div id="newsPage" class="app-page" style="display: none;">
         <div class="section">
             <h2 id="newsFormTitle" style="border:none; margin-top:0;">新增紀錄</h2>
@@ -235,11 +237,13 @@
                     <div class="form-group"><label>標題 (col3)</label><input type="text" id="newsCol3" placeholder="事件標題..." style="width: 100%;"></div><br>
                     <div class="form-group"><label>相關連結網址 (col5)</label><textarea id="newsCol5" rows="2" style="width: 100%;" placeholder="貼上網址..."></textarea></div>
                 </div>
+                
                 <div style="flex: 2; min-width: 300px;">
                     <div class="form-group" style="width: 100%;">
                         <label>詳細內容 (col4)</label>
                         <textarea id="newsCol4" rows="8" style="width: 100%; max-width: 600px;" placeholder="記錄重點..."></textarea>
                     </div>
+                    
                     <div class="form-group" style="width: 100%;">
                         <label>
                             心得筆記 (col6) 
@@ -249,9 +253,11 @@
                     </div>
                 </div>
             </div>
+
             <div style="display:none;">
                 <script>for(let i=7; i<=10; i++) document.write(`<input type="hidden" id="newsCol${i}">`);</script>
             </div>
+            
             <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
                 <button id="submitNewsBtn" class="btn-add" onclick="submitNewsData()">儲存紀錄與筆記</button>
                 <button id="cancelNewsBtn" class="btn-cancel" onclick="cancelNewsEdit()">取消編輯</button>
@@ -272,8 +278,9 @@
                         <button id="globalNewsExpandBtn" class="btn-copy" style="margin-bottom:0; background-color:#607d8b;" onclick="toggleGlobalNewsExpand()">全展/全收 ↕</button>
                     </div>
                 </div>
+                
                 <div id="newsCategoryFilters" style="display:flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
-                </div>
+                    </div>
             </div>
             
             <div class="news-layout-wrapper">
@@ -286,12 +293,12 @@
                     <div id="newsDetailContent"></div>
                 </div>
             </div>
+
         </div>
     </div>
 
 
-    <!-- ================= 美食頁面 ================= -->
-    <div id="foodPage" class="app-page" style="display: none;">
+    <div id="foodPage" class="app-page">
         <div class="section">
             <h2 id="foodFormTitle">新增美食店家</h2>
             <div class="form-group"><label>縣市</label><input type="text" id="city"></div><div class="form-group"><label>區域</label><input type="text" id="district"></div><div class="form-group"><label>地址</label><textarea id="address" rows="2"></textarea></div><div class="form-group"><label>店名</label><input type="text" id="storeName"></div><div class="form-group"><label>分類</label><input type="text" id="category"></div><div class="form-group"><label>其他</label><textarea id="other" rows="2"></textarea></div>
@@ -313,7 +320,6 @@
         </div>
     </div>
 
-    <!-- ================= 運動頁面 ================= -->
     <div id="sportsPage" class="app-page" style="display: none;">
         <div class="section">
             <h2 id="sportsFormTitle">新增運動紀錄</h2>
@@ -335,7 +341,6 @@
         </div>
     </div>
 
-    <!-- ================= ✈️ 旅遊筆記 (擴充網頁7) ================= -->
     <div id="travelPage" class="app-page" style="display: none;">
         <div class="section">
             <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">
@@ -381,7 +386,6 @@
         </div>
     </div>
 
-    <!-- ================= 綜合筆記 (擴充1) ================= -->
     <div id="notePage" class="app-page" style="display: none;">
         <div class="section">
             <h2 id="noteFormTitle">新增筆記 / 事件</h2>
@@ -406,7 +410,6 @@
         </div>
     </div>
 
-    <!-- ================= 客製化動態通用網頁 ================= -->
     <div id="genericPage" class="app-page" style="display: none;">
         <div class="section">
             <h2 id="genericFormTitle">新增擴充資料</h2>
@@ -436,28 +439,40 @@
         </div>
     </div>
 
-    <!-- ==============================================
-         🌟 絕對純淨版 JavaScript (無任何重複錯誤) 🌟
-    =================================================== -->
     <script>
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
         const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
 
+        // 🌟 網頁配置字典：包含標題、標籤按鈕名稱、與獨立的主題顏色 🌟
         const PAGE_CONFIG = {
-            'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
-            'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
-            'travelPage': { sheet: '擴充預留網頁7', name: '旅遊行程筆記', color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
-            'newsPage':   { sheet: '擴充預留網頁5', name: '時事焦點紀錄', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
-            'notePage':   { sheet: '擴充預留網頁1', name: '隨身綜合筆記', color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
-            'extPage2':   { sheet: '擴充預留網頁2', name: '飲食日常紀錄', color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
-            'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
-            'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊紀錄', color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
-            'extPage6':   { sheet: '擴充預留網頁6', name: '擴充預留網頁6', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
-            'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
-            'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
-            'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' }
+            'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', label: '🍔 美食紀錄', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
+            'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', label: '🏃‍♂️ 運動紀錄', color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
+            'travelPage': { sheet: '擴充預留網頁7', name: '旅遊行程筆記', label: '✈️ 旅遊(7)', color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
+            'newsPage':   { sheet: '擴充預留網頁5', name: '時事焦點紀錄', label: '📰 時事(5)', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
+            'notePage':   { sheet: '擴充預留網頁1', name: '隨身綜合筆記', label: '📝 筆記(1)', color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
+            'extPage2':   { sheet: '擴充預留網頁2', name: '飲食日常紀錄', label: '🍽️ 飲食(2)', color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
+            'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', label: '🔗 連結(3)', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊紀錄', label: '🗼 東京旅遊(4)', color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
+            'extPage6':   { sheet: '擴充預留網頁6', name: '擴充預留網頁6', label: '📄 網頁6', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
+            'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', label: '📰 網頁8', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
+            'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', label: '📰 網頁9', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
+            'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', label: '📰 網頁10', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage11':  { sheet: '擴充預留網頁11', name: '擴充預留網頁11', label: '📰 網頁11', color: '#8e24aa', light: '#f3e5f5', dark: '#4a148c' },
+            'extPage12':  { sheet: '擴充預留網頁12', name: '擴充預留網頁12', label: '📰 網頁12', color: '#e53935', light: '#ffebee', dark: '#b71c1c' },
+            'extPage13':  { sheet: '擴充預留網頁13', name: '擴充預留網頁13', label: '📰 網頁13', color: '#d81b60', light: '#fce4ec', dark: '#880e4f' },
+            'extPage14':  { sheet: '擴充預留網頁14', name: '擴充預留網頁14', label: '📰 網頁14', color: '#3949ab', light: '#e8eaf6', dark: '#1a237e' },
+            'extPage15':  { sheet: '擴充預留網頁15', name: '擴充預留網頁15', label: '📰 網頁15', color: '#039be5', light: '#e0f7fa', dark: '#01579b' },
+            'extPage16':  { sheet: '擴充預留網頁16', name: '擴充預留網頁16', label: '📰 網頁16', color: '#00897b', light: '#e0f2f1', dark: '#004d40' },
+            'extPage17':  { sheet: '擴充預留網頁17', name: '擴充預留網頁17', label: '📰 網頁17', color: '#7cb342', light: '#f1f8e9', dark: '#33691e' },
+            'extPage18':  { sheet: '擴充預留網頁18', name: '擴充預留網頁18', label: '📰 網頁18', color: '#fdd835', light: '#fffde7', dark: '#f57f17' },
+            'extPage19':  { sheet: '擴充預留網頁19', name: '擴充預留網頁19', label: '📰 網頁19', color: '#fb8c00', light: '#fff3e0', dark: '#e65100' },
+            'extPage20':  { sheet: '擴充預留網頁20', name: '擴充預留網頁20', label: '📰 網頁20', color: '#6d4c41', light: '#efebe9', dark: '#3e2723' }
         };
 
+        // 🌟 核心引擎：所有要套用時間軸版面的 Sheet Name 都統一放在這裡 🌟
+        const TIMELINE_PAGES = ['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10', '擴充預留網頁11', '擴充預留網頁12', '擴充預留網頁13', '擴充預留網頁14', '擴充預留網頁15', '擴充預留網頁16', '擴充預留網頁17', '擴充預留網頁18', '擴充預留網頁19', '擴充預留網頁20'];
+
+        let currentPageId = 'foodPage';
         let currentPageName = '美食紀錄';
         let currentDescription = '';
         let isDescCollapsed = false; 
@@ -479,8 +494,18 @@
             document.getElementById('noteCol2').value = new Date().toISOString().split('T')[0];
             document.getElementById('genCol2').value = new Date().toISOString().split('T')[0];
             document.getElementById('newsCol2').value = new Date().toISOString().split('T')[0];
-            switchPage(); 
+            
+            renderNavButtons();
+            switchPage('foodPage'); // 初始化載入第一頁
         };
+
+        function renderNavButtons() {
+            let html = '';
+            for(let key in PAGE_CONFIG) {
+                html += `<button id="navBtn_${key}" class="nav-btn" onclick="switchPage('${key}')">${PAGE_CONFIG[key].label}</button>`;
+            }
+            document.getElementById('navButtonsWrapper').innerHTML = html;
+        }
 
         function applyTheme(config) {
             document.documentElement.style.setProperty('--theme-primary', config.color);
@@ -488,7 +513,7 @@
             document.documentElement.style.setProperty('--theme-dark', config.dark);
         }
 
-        function toggleLoading(show, text = '資料載入與同步中...') { 
+        function toggleLoading(show, text = '⏳ 資料載入與同步中...') { 
             const msg = document.getElementById('loadingMsg');
             msg.innerText = text; msg.style.display = show ? 'inline' : 'none'; 
         }
@@ -529,7 +554,7 @@
             } else if (currentPageName === '運動紀錄') { options.push({val: 'date', text: '日期'}, {val: 'type', text: '運動類型'}, {val: 'distance', text: '距離(km)'}, {val: 'notes', text: '備註'});
             } else if (currentPageName === '擴充預留網頁1') { options.push({val: 'col1', text: '流水號'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '分類'}, {val: 'col4', text: '內容'}); for(let i=5; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i});
             } else if (currentPageName === '擴充預留網頁7') { options.push({val: 'col1', text: '主類別'}, {val: 'col2', text: '名稱'}, {val: 'col3', text: '地點'}, {val: 'col4', text: '地理區域'}, {val: 'col5', text: '彈性標籤'}, {val: 'col6', text: '必訪亮點/筆記'}, {val: 'col7', text: '實用資訊包'});
-            } else if (['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10'].includes(currentPageName)) { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
+            } else if (TIMELINE_PAGES.includes(currentPageName)) { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
             } else { for(let i=1; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i}); }
 
             for(let i=1; i<=5; i++) {
@@ -545,8 +570,8 @@
             let sortConfigs = [];
             for(let i=1; i<=5; i++) { let col = document.getElementById(`sortCol${i}`).value, dir = document.getElementById(`sortDir${i}`).value; if(col) sortConfigs.push({col, dir}); }
             
-            // 🌟 修正：時間軸若無手動排序，預設以日期排序
-            if (['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10'].includes(currentPageName) && sortConfigs.length === 0) {
+            // 時間軸若無手動排序，預設以日期降冪
+            if (TIMELINE_PAGES.includes(currentPageName) && sortConfigs.length === 0) {
                 sortConfigs.push({col: 'col2', dir: 'desc'});
             }
 
@@ -555,7 +580,7 @@
             else if(currentPageName === '運動紀錄') { targetList = sportsDataList; renderFn = renderSportsTable; } 
             else if(currentPageName === '擴充預留網頁1') { targetList = noteDataList; renderFn = renderNoteTable; } 
             else if(currentPageName === '擴充預留網頁7') { targetList = travelDataList; renderFn = renderTravelTable; } 
-            else if(['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10'].includes(currentPageName)) { targetList = newsDataList; renderFn = renderNewsTimeline; } 
+            else if(TIMELINE_PAGES.includes(currentPageName)) { targetList = newsDataList; renderFn = renderNewsTimeline; } 
             else { targetList = genericDataList; renderFn = renderGenericTable; }
 
             targetList.sort((a, b) => {
@@ -577,10 +602,15 @@
         }
 
         // ================= 頁面切換與資料載入 =================
-        function switchPage() {
-            const selectedPageId = document.getElementById('pageSelector').value;
+        function switchPage(selectedPageId) {
+            currentPageId = selectedPageId;
             const config = PAGE_CONFIG[selectedPageId];
             
+            // 按鈕選取狀態
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`navBtn_${selectedPageId}`);
+            if(activeBtn) activeBtn.classList.add('active');
+
             document.querySelectorAll('.app-page').forEach(page => { page.style.display = 'none'; });
             cancelFoodEdit(); cancelSportsEdit(); cancelNoteEdit(); cancelTravelEdit(); cancelNewsEdit(); cancelGenericEdit();
             
@@ -591,13 +621,13 @@
             else if (selectedPageId === 'sportsPage') { document.getElementById('sportsPage').style.display = 'block'; } 
             else if (selectedPageId === 'notePage') { document.getElementById('notePage').style.display = 'block'; } 
             else if (selectedPageId === 'travelPage') { document.getElementById('travelPage').style.display = 'block'; }
-            else if (['newsPage', 'extPage8', 'extPage9', 'extPage10'].includes(selectedPageId)) { 
+            else if (TIMELINE_PAGES.includes(config.sheet)) { 
                 document.getElementById('newsPage').style.display = 'block'; 
                 document.getElementById('newsFormTitle').innerText = `新增 ${config.name}`;
                 document.getElementById('newsTableTitle').innerText = `${config.name} 時間軸總覽`;
                 document.getElementById('newsFilterInput').value = ''; 
             }
-            else if (selectedPageId.startsWith('extPage')) {
+            else {
                 document.getElementById('genericPage').style.display = 'block';
                 document.getElementById('genericFormTitle').innerText = `新增 ${config.name} 資料`;
                 document.getElementById('genericTableTitle').innerText = `${config.name} 總覽`;
@@ -607,7 +637,7 @@
         }
 
         async function loadData(sheetName) {
-            toggleLoading(true, '資料載入與同步中...');
+            toggleLoading(true, '⏳ 資料載入與同步中...');
             try {
                 const response = await fetch(`${API_URL}?sheetName=${encodeURIComponent(sheetName)}`);
                 const json = await response.json();
@@ -623,18 +653,18 @@
                 else if (sheetName === '運動紀錄') { sportsDataList = data; } 
                 else if (sheetName === '擴充預留網頁1') { noteDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); } 
                 else if (sheetName === '擴充預留網頁7') { travelDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)}`.toLowerCase() })); } 
-                else if (['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10'].includes(sheetName)) { 
+                else if (TIMELINE_PAGES.includes(sheetName)) { 
                     newsDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)}`.toLowerCase() })); 
                     updateNewsCategoryCheckboxes();
                 } 
-                else if (sheetName.startsWith('擴充預留網頁')) { genericDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); }
+                else { genericDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); }
                 
                 applyGlobalMultiSort(); 
             } catch (error) { alert("資料讀取失敗！請確認 API 是否已更新。"); } 
             finally { toggleLoading(false); }
         }
 
-        // ================= 📰 共用時間軸紀錄模組 =================
+        // ================= 📰 時間軸紀錄模組 (時事5, 擴充8~20) =================
         function addTimestampToNewsNote() {
             const noteEl = document.getElementById('newsCol6');
             const now = new Date();
@@ -667,7 +697,7 @@
                 }
             }
             editingNewsId = null; 
-            const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name;
+            const configName = PAGE_CONFIG[currentPageId].name;
             document.getElementById('newsFormTitle').innerText = `新增 ${configName} (複製現有)`; 
             document.getElementById('submitNewsBtn').innerText = '儲存紀錄與筆記'; 
             document.getElementById('submitNewsBtn').className = 'btn-add'; 
@@ -685,7 +715,7 @@
                 }
             }
             editingNewsId = id; 
-            const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name;
+            const configName = PAGE_CONFIG[currentPageId].name;
             document.getElementById('newsFormTitle').innerText = `編輯 ${configName}`; 
             document.getElementById('submitNewsBtn').innerText = '儲存修改'; 
             document.getElementById('submitNewsBtn').className = 'btn-edit'; 
@@ -697,7 +727,7 @@
             editingNewsId = null; 
             for(let i=1; i<=10; i++) { if(document.getElementById(`newsCol${i}`)) document.getElementById(`newsCol${i}`).value = ''; }
             document.getElementById('newsCol2').value = new Date().toISOString().split('T')[0];
-            const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name;
+            const configName = PAGE_CONFIG[currentPageId].name;
             document.getElementById('newsFormTitle').innerText = `新增 ${configName}`; 
             document.getElementById('submitNewsBtn').innerText = '儲存紀錄與筆記'; 
             document.getElementById('submitNewsBtn').className = 'btn-add'; 
@@ -878,137 +908,11 @@
             });
         }
 
-        // ================= 美食功能 =================
-        async function submitFoodData() { const city = document.getElementById('city').value, district = document.getElementById('district').value, address = document.getElementById('address').value, storeName = document.getElementById('storeName').value, category = document.getElementById('category').value, other = document.getElementById('other').value; if (!storeName.trim()) return alert('店名為必填！'); const payload = { sheetName: '美食紀錄', id: editingFoodId || Date.now(), action: editingFoodId ? 'edit' : 'add', city, district, address, storeName, category, other }; const fullText = `${city} ${district} ${address} ${storeName} ${category} ${other}`.toLowerCase(); if (editingFoodId) { const idx = foodDataList.findIndex(d => String(d.id) === String(editingFoodId)); if (idx > -1) foodDataList[idx] = { ...payload, fullText }; } else { foodDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelFoodEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
-        function copyFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; document.getElementById('city').value = safeStr(item.city); document.getElementById('district').value = safeStr(item.district); document.getElementById('address').value = safeStr(item.address); document.getElementById('storeName').value = safeStr(item.storeName); document.getElementById('category').value = safeStr(item.category); document.getElementById('other').value = safeStr(item.other); editingFoodId = null; document.getElementById('foodFormTitle').innerText = '新增美食店家 (複製現有)'; document.getElementById('submitFoodBtn').innerText = '新增資料'; document.getElementById('submitFoodBtn').className = 'btn-add'; document.getElementById('cancelFoodBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; document.getElementById('city').value = safeStr(item.city); document.getElementById('district').value = safeStr(item.district); document.getElementById('address').value = safeStr(item.address); document.getElementById('storeName').value = safeStr(item.storeName); document.getElementById('category').value = safeStr(item.category); document.getElementById('other').value = safeStr(item.other); editingFoodId = id; document.getElementById('foodFormTitle').innerText = '編輯美食資料'; document.getElementById('submitFoodBtn').innerText = '儲存修改'; document.getElementById('submitFoodBtn').className = 'btn-edit'; document.getElementById('cancelFoodBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function cancelFoodEdit() { editingFoodId = null; document.querySelectorAll('#foodPage .form-group input, #foodPage .form-group textarea').forEach(el => el.value = ''); document.getElementById('foodFormTitle').innerText = '新增美食店家'; document.getElementById('submitFoodBtn').innerText = '新增資料'; document.getElementById('submitFoodBtn').className = 'btn-add'; document.getElementById('cancelFoodBtn').style.display = 'none'; }
-        function deleteFoodData(id) { if (!confirm('確定刪除此美食紀錄？')) return; foodDataList = foodDataList.filter(d => String(d.id) !== String(id)); renderFoodTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '美食紀錄' }) }); }
-        function addFilterKeyword() { const kw = document.getElementById('filterInput').value.trim().toLowerCase(); if (kw && !filterKeywords.includes(kw)) { filterKeywords.push(kw); renderKw(); renderFoodTable(); } document.getElementById('filterInput').value = ''; }
-        function removeKeyword(kw) { filterKeywords = filterKeywords.filter(k => k !== kw); renderKw(); renderFoodTable(); }
-        function renderKw() { const c = document.getElementById('keywordContainer'); c.innerHTML = ''; filterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeKeyword('${kw}')">✖</span></div>`; }); }
-        function renderFoodTable() {
-            const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
-            foodDataList.forEach(data => {
-                if (filterKeywords.length > 0 && !filterKeywords.some(kw => data.fullText.includes(kw))) return;
-                const query = `${safeStr(data.city)} ${safeStr(data.district)} ${safeStr(data.address)} ${safeStr(data.storeName)}`.trim(); const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-                tbody.innerHTML += `<tr><td data-label="縣市"><div class="resizable-cell">${safeStr(data.city)}</div></td><td data-label="區域"><div class="resizable-cell">${safeStr(data.district)}</div></td><td data-label="地址"><div class="resizable-cell">${safeStr(data.address)}</div></td><td data-label="店名"><div class="resizable-cell">${safeStr(data.storeName)}</div></td><td data-label="分類"><div class="resizable-cell">${safeStr(data.category)}</div></td><td data-label="其他"><div class="resizable-cell">${safeStr(data.other)}</div></td><td data-label="地圖"><div class="resizable-cell" style="resize:none;"><a href="${mapUrl}" target="_blank" class="map-link">📍地圖搜尋</a></div></td>
-                <td class="action-cell"><button class="btn-copy" onclick="copyFoodData('${data.id}')">複製</button><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></td></tr>`;
-            });
-        }
-
-        // ================= 運動功能 =================
-        async function submitSportsData() { const date = document.getElementById('sportDate').value, type = document.getElementById('sportType').value, distance = document.getElementById('sportDistance').value, notes = document.getElementById('sportNotes').value; if (!date) return alert('請選擇日期！'); const payload = { sheetName: '運動紀錄', id: editingSportsId || Date.now(), action: editingSportsId ? 'edit' : 'add', date, type, distance: distance || '-', notes: notes || '-' }; if (editingSportsId) { const idx = sportsDataList.findIndex(d => String(d.id) === String(editingSportsId)); if (idx > -1) sportsDataList[idx] = payload; } else { sportsDataList.push(payload); } applyGlobalMultiSort(); cancelSportsEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
-        function copySportsData(id) { const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return; document.getElementById('sportDate').value = formatDate(item.date); document.getElementById('sportType').value = item.type || '跑步'; document.getElementById('sportDistance').value = item.distance === '-' ? '' : item.distance; document.getElementById('sportNotes').value = item.notes === '-' ? '' : item.notes; editingSportsId = null; document.getElementById('sportsFormTitle').innerText = '新增運動紀錄 (複製現有)'; document.getElementById('submitSportsBtn').innerText = '新增紀錄'; document.getElementById('submitSportsBtn').className = 'btn-add'; document.getElementById('cancelSportsBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editSportsData(id) { const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return; document.getElementById('sportDate').value = formatDate(item.date); document.getElementById('sportType').value = item.type || '跑步'; document.getElementById('sportDistance').value = item.distance === '-' ? '' : item.distance; document.getElementById('sportNotes').value = item.notes === '-' ? '' : item.notes; editingSportsId = id; document.getElementById('sportsFormTitle').innerText = '編輯運動紀錄'; document.getElementById('submitSportsBtn').innerText = '儲存修改'; document.getElementById('submitSportsBtn').className = 'btn-edit'; document.getElementById('cancelSportsBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function cancelSportsEdit() { editingSportsId = null; document.getElementById('sportDate').value = new Date().toISOString().split('T')[0]; document.getElementById('sportType').value = '跑步'; document.getElementById('sportDistance').value = ''; document.getElementById('sportNotes').value = ''; document.getElementById('sportsFormTitle').innerText = '新增運動紀錄'; document.getElementById('submitSportsBtn').innerText = '新增紀錄'; document.getElementById('submitSportsBtn').className = 'btn-add'; document.getElementById('cancelSportsBtn').style.display = 'none'; }
-        function deleteSportsData(id) { if (!confirm('確定刪除此運動紀錄？')) return; sportsDataList = sportsDataList.filter(d => String(d.id) !== String(id)); renderSportsTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '運動紀錄' }) }); }
-        function renderSportsTable() {
-            const tbody = document.getElementById('sportsTableBody'); tbody.innerHTML = '';
-            sportsDataList.forEach(data => {
-                const dateStr = formatDate(data.date);
-                tbody.innerHTML += `<tr><td data-label="日期"><div class="resizable-cell">${dateStr}</div></td><td data-label="運動類型"><div class="resizable-cell">${safeStr(data.type)}</div></td><td data-label="距離 (km)"><div class="resizable-cell">${safeStr(data.distance)}</div></td><td data-label="備註"><div class="resizable-cell">${safeStr(data.notes)}</div></td>
-                <td class="action-cell"><button class="btn-copy" onclick="copySportsData('${data.id}')">複製</button><button class="btn-edit" onclick="editSportsData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteSportsData('${data.id}')">刪除</button></td></tr>`;
-            });
-        }
-
-        // ================= ✈️ 旅遊筆記 (擴充網頁7) =================
-        function toggleTravelAddMode() {
-            const mode = document.querySelector('input[name="travelAddMode"]:checked').value;
-            if (mode === 'single') { document.getElementById('travelSingleForm').style.display = 'block'; document.getElementById('travelBatchForm').style.display = 'none'; } 
-            else { document.getElementById('travelSingleForm').style.display = 'none'; document.getElementById('travelBatchForm').style.display = 'block'; if (document.getElementById('travelBatchTbody').children.length === 0) { renderTravelBatchRows(3); } }
-        }
-        function renderTravelBatchRows(count) { document.getElementById('travelBatchTbody').innerHTML = ''; for(let i=0; i<count; i++) addTravelBatchRow(); }
-        function addTravelBatchRow() {
-            const tbody = document.getElementById('travelBatchTbody'); const tr = document.createElement('tr');
-            tr.innerHTML = `<td data-label="主類別" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col1" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="名稱" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col2" style="width:100%; min-width:120px; padding:6px; box-sizing:border-box; border:2px solid var(--theme-primary);"></td><td data-label="地點" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col3" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td data-label="地理區域" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col4" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="標籤" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col5" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="必訪亮點/筆記" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col6" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td data-label="實用資訊包" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col7" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td style="padding:4px; border:1px solid #ddd; text-align:center;"><button class="btn-delete" onclick="this.parentElement.parentElement.remove()" style="padding:4px 8px;">移除</button></td>`;
-            tbody.appendChild(tr);
-        }
-        async function submitTravelBatchUI() {
-            const rows = document.querySelectorAll('#travelBatchTbody tr'); const newItems = [];
-            rows.forEach(tr => {
-                const cols = [tr.querySelector('.b-col1').value, tr.querySelector('.b-col2').value.trim(), tr.querySelector('.b-col3').value, tr.querySelector('.b-col4').value, tr.querySelector('.b-col5').value, tr.querySelector('.b-col6').value, tr.querySelector('.b-col7').value];
-                if (cols[1]) {
-                    let existingItem = travelDataList.find(d => String(d.col2).trim() === cols[1]);
-                    let item = { sheetName: '擴充預留網頁7', id: existingItem ? existingItem.id : (Date.now() + Math.floor(Math.random() * 10000)), action: existingItem ? 'edit' : 'add', col8: '', col9: '', col10: '' };
-                    for(let i=1; i<=7; i++) { let pasteVal = cols[i-1]; if (existingItem && pasteVal.trim() === '') { item[`col${i}`] = existingItem[`col${i}`]; } else { item[`col${i}`] = pasteVal; } }
-                    newItems.push(item);
-                }
-            });
-            if (newItems.length === 0) return alert("請至少填寫一筆包含「名稱(必填)」的資料！");
-            if (!confirm(`系統即將處理(新增/合併)畫面上 ${newItems.length} 筆資料？\n請勿關閉視窗。`)) return;
-            toggleLoading(true, `多筆處理中... (0/${newItems.length})`);
-            let successCount = 0;
-            for (let i = 0; i < newItems.length; i++) {
-                const item = newItems[i];
-                try {
-                    const fullText = Object.values(item).join(' ').toLowerCase(); const idx = travelDataList.findIndex(d => String(d.id) === String(item.id));
-                    if (idx > -1) travelDataList[idx] = { ...item, fullText }; else travelDataList.push({ ...item, fullText });
-                    await fetch(API_URL, { method: 'POST', body: JSON.stringify(item) }); successCount++; toggleLoading(true, `多筆處理中... (${successCount}/${newItems.length})`);
-                } catch (e) { console.error(e); }
-            }
-            renderTravelBatchRows(3); toggleLoading(false); document.querySelector('input[name="travelAddMode"][value="single"]').checked = true; toggleTravelAddMode(); applyGlobalMultiSort(); alert(`處理完成！成功新增/合併 ${successCount} 筆資料。`);
-        }
-        async function submitTravelData() {
-            let nameInput = document.getElementById(`travelCol2`).value.trim();
-            if (!nameInput) return alert('名稱 (col2) 為必填，才能進行儲存或合併！');
-            let isEdit = editingTravelId !== null; let targetId = editingTravelId; let existingItem = null;
-            if (!isEdit) { existingItem = travelDataList.find(d => String(d.col2).trim() === nameInput); if (existingItem) { targetId = existingItem.id; isEdit = true; }
-            } else { existingItem = travelDataList.find(d => String(d.id) === String(targetId)); }
-            const payload = { sheetName: '擴充預留網頁7', id: targetId || Date.now(), action: isEdit ? 'edit' : 'add', col8: '', col9: '', col10: '' };
-            for(let i=1; i<=7; i++) { let formVal = document.getElementById(`travelCol${i}`).value; if (!editingTravelId && existingItem && formVal.trim() === '') { payload[`col${i}`] = existingItem[`col${i}`]; } else { payload[`col${i}`] = formVal; } }
-            const fullText = Object.values(payload).join(' ').toLowerCase();
-            if (isEdit) { const idx = travelDataList.findIndex(d => String(d.id) === String(targetId)); if (idx > -1) travelDataList[idx] = { ...payload, fullText }; } else { travelDataList.push({ ...payload, fullText }); }
-            applyGlobalMultiSort(); cancelTravelEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-        }
-        function copyTravelData(id) { const item = travelDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=7; i++) { document.getElementById(`travelCol${i}`).value = safeStr(item[`col${i}`]); } editingTravelId = null; document.getElementById('travelFormTitle').innerText = '新增旅遊筆記 (複製現有)'; document.getElementById('submitTravelBtn').innerText = '儲存/合併筆記'; document.getElementById('submitTravelBtn').className = 'btn-add'; document.getElementById('cancelTravelBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editTravelData(id) { const item = travelDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=7; i++) { document.getElementById(`travelCol${i}`).value = safeStr(item[`col${i}`]); } editingTravelId = id; document.getElementById('travelFormTitle').innerText = '編輯旅遊筆記'; document.getElementById('submitTravelBtn').innerText = '儲存修改'; document.getElementById('submitTravelBtn').className = 'btn-edit'; document.getElementById('cancelTravelBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function cancelTravelEdit() { editingTravelId = null; for(let i=1; i<=7; i++) { document.getElementById(`travelCol${i}`).value = ''; } document.getElementById('travelFormTitle').innerText = '新增旅遊筆記'; document.getElementById('submitTravelBtn').innerText = '儲存/合併筆記'; document.getElementById('submitTravelBtn').className = 'btn-add'; document.getElementById('cancelTravelBtn').style.display = 'none'; }
-        function deleteTravelData(id) { if (!confirm('確定刪除此筆記？')) return; travelDataList = travelDataList.filter(d => String(d.id) !== String(id)); renderTravelTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁7' }) }); }
-        function addTravelFilterKeyword() { const kw = document.getElementById('travelFilterInput').value.trim().toLowerCase(); if (kw && !travelFilterKeywords.includes(kw)) { travelFilterKeywords.push(kw); renderTravelKw(); renderTravelTable(); } document.getElementById('travelFilterInput').value = ''; }
-        function removeTravelKeyword(kw) { travelFilterKeywords = travelFilterKeywords.filter(k => k !== kw); renderTravelKw(); renderTravelTable(); }
-        function renderTravelKw() { const c = document.getElementById('travelKeywordContainer'); c.innerHTML = ''; travelFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeTravelKeyword('${kw}')">✖</span></div>`; }); }
-        function renderTravelTable() {
-            const tbody = document.getElementById('travelTableBody'); tbody.innerHTML = '';
-            travelDataList.forEach(data => {
-                if (travelFilterKeywords.length > 0 && !travelFilterKeywords.some(kw => data.fullText.includes(kw))) return;
-                const tr = document.createElement('tr'); let colsHtml = '';
-                
-                const labels = ['主類別', '名稱', '地點', '地理區域', '彈性標籤', '必訪亮點/筆記', '實用資訊包'];
-                for(let i=1; i<=7; i++) { colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${safeStr(data[`col${i}`])}</div></td>`; }
-
-                const locQuery = `${safeStr(data.col2)} ${safeStr(data.col3)}`.trim(); let mapColHtml = `<td data-label="地圖"><div class="resizable-cell"></div></td>`;
-                if(locQuery !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}`; mapColHtml = `<td data-label="地圖"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 地圖搜尋</a></div></td>`; }
-                tr.innerHTML = `${colsHtml}${mapColHtml}<td class="action-cell"><button class="btn-copy" onclick="copyTravelData('${data.id}')">複製</button><button class="btn-edit" onclick="editTravelData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteTravelData('${data.id}')">刪除</button></td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // ================= 綜合筆記 (擴充1) =================
-        async function submitNoteData() { const payload = { sheetName: '擴充預留網頁1', id: editingNoteId || Date.now(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`noteCol${i}`).value; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
-        function copyNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`noteCol${i}`).value = val; } editingNoteId = null; document.getElementById('noteFormTitle').innerText = '新增筆記 / 事件 (複製現有)'; document.getElementById('submitNoteBtn').innerText = '儲存筆記'; document.getElementById('submitNoteBtn').className = 'btn-add'; document.getElementById('cancelNoteBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`noteCol${i}`).value = val; } editingNoteId = id; document.getElementById('noteFormTitle').innerText = '編輯筆記 / 事件'; document.getElementById('submitNoteBtn').innerText = '儲存修改'; document.getElementById('submitNoteBtn').className = 'btn-edit'; document.getElementById('cancelNoteBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function cancelNoteEdit() { editingNoteId = null; for(let i=1; i<=10; i++) { document.getElementById(`noteCol${i}`).value = ''; } document.getElementById('noteCol2').value = new Date().toISOString().split('T')[0]; document.getElementById('noteFormTitle').innerText = '新增筆記 / 事件'; document.getElementById('submitNoteBtn').innerText = '儲存筆記'; document.getElementById('submitNoteBtn').className = 'btn-add'; document.getElementById('cancelNoteBtn').style.display = 'none'; }
-        function deleteNoteData(id) { if (!confirm('確定刪除此筆記？')) return; noteDataList = noteDataList.filter(d => String(d.id) !== String(id)); renderNoteTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁1' }) }); }
-        function addNoteFilterKeyword() { const kw = document.getElementById('noteFilterInput').value.trim().toLowerCase(); if (kw && !noteFilterKeywords.includes(kw)) { noteFilterKeywords.push(kw); renderNoteKw(); renderNoteTable(); } document.getElementById('noteFilterInput').value = ''; }
-        function removeNoteKeyword(kw) { noteFilterKeywords = noteFilterKeywords.filter(k => k !== kw); renderNoteKw(); renderNoteTable(); }
-        function renderNoteKw() { const c = document.getElementById('noteKeywordContainer'); c.innerHTML = ''; noteFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeNoteKeyword('${kw}')">✖</span></div>`; }); }
-        function renderNoteTable() {
-            const tbody = document.getElementById('noteTableBody'); tbody.innerHTML = '';
-            const labels = ['流水號','日期','分類','內容','欄位 5','欄位 6','欄位 7','欄位 8','欄位 9','欄位 10'];
-            noteDataList.forEach(data => {
-                if (noteFilterKeywords.length > 0 && !noteFilterKeywords.some(kw => data.fullText.includes(kw))) return;
-                const tr = document.createElement('tr'); let colsHtml = '';
-                for(let i=1; i<=10; i++) { let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${val}</div></td>`; }
-                tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyNoteData('${data.id}')">複製</button><button class="btn-edit" onclick="editNoteData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteNoteData('${data.id}')">刪除</button></td>`; tbody.appendChild(tr);
-            });
-        }
-
-        // ================= 客製化動態通用網頁 (擴充 2,3,4,6) =================
+        // ================= 一般表格紀錄模組 (擴充 2,3,4,6) =================
         async function submitGenericData() { const payload = { sheetName: currentPageName, id: editingGenericId || Date.now(), action: editingGenericId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { payload[`col${i}`] = document.getElementById(`genCol${i}`).value; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = { ...payload, fullText }; } else { genericDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelGenericEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
-        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = null; const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name; document.getElementById('genericFormTitle').innerText = `新增 ${configName} 資料 (複製現有)`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = id; const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name; document.getElementById('genericFormTitle').innerText = `編輯 ${configName} 資料`; document.getElementById('submitGenericBtn').innerText = '儲存修改'; document.getElementById('submitGenericBtn').className = 'btn-edit'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function cancelGenericEdit() { editingGenericId = null; for(let i=1; i<=10; i++) { document.getElementById(`genCol${i}`).value = ''; } document.getElementById('genCol2').value = new Date().toISOString().split('T')[0]; const configName = PAGE_CONFIG[document.getElementById('pageSelector').value].name; document.getElementById('genericFormTitle').innerText = `新增 ${configName} 資料`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'none'; }
+        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = null; const configName = PAGE_CONFIG[currentPageId].name; document.getElementById('genericFormTitle').innerText = `新增 ${configName} 資料 (複製現有)`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); document.getElementById(`genCol${i}`).value = val; } editingGenericId = id; const configName = PAGE_CONFIG[currentPageId].name; document.getElementById('genericFormTitle').innerText = `編輯 ${configName} 資料`; document.getElementById('submitGenericBtn').innerText = '儲存修改'; document.getElementById('submitGenericBtn').className = 'btn-edit'; document.getElementById('cancelGenericBtn').style.display = 'inline-block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function cancelGenericEdit() { editingGenericId = null; for(let i=1; i<=10; i++) { document.getElementById(`genCol${i}`).value = ''; } document.getElementById('genCol2').value = new Date().toISOString().split('T')[0]; const configName = PAGE_CONFIG[currentPageId].name; document.getElementById('genericFormTitle').innerText = `新增 ${configName} 資料`; document.getElementById('submitGenericBtn').innerText = '新增資料'; document.getElementById('submitGenericBtn').className = 'btn-add'; document.getElementById('cancelGenericBtn').style.display = 'none'; }
         function deleteGenericData(id) { if (!confirm('確定刪除此筆資料？')) return; genericDataList = genericDataList.filter(d => String(d.id) !== String(id)); renderGenericTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) }); }
         function addGenericFilterKeyword() { const kw = document.getElementById('genericFilterInput').value.trim().toLowerCase(); if (kw && !genericFilterKeywords.includes(kw)) { genericFilterKeywords.push(kw); renderGenericKw(); renderGenericTable(); } document.getElementById('genericFilterInput').value = ''; }
         function removeGenericKeyword(kw) { genericFilterKeywords = genericFilterKeywords.filter(k => k !== kw); renderGenericKw(); renderGenericTable(); }
