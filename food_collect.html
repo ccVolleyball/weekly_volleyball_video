@@ -443,7 +443,6 @@
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
         const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
 
-        // 🌟 網頁配置字典：包含標題、標籤按鈕名稱、與獨立的主題顏色 🌟
         const PAGE_CONFIG = {
             'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', label: '🍔 美食紀錄', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
             'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', label: '🏃‍♂️ 運動紀錄', color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
@@ -469,7 +468,6 @@
             'extPage20':  { sheet: '擴充預留網頁20', name: '擴充預留網頁20', label: '📰 網頁20', color: '#6d4c41', light: '#efebe9', dark: '#3e2723' }
         };
 
-        // 🌟 核心引擎：所有要套用時間軸版面的 Sheet Name 都統一放在這裡 🌟
         const TIMELINE_PAGES = ['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10', '擴充預留網頁11', '擴充預留網頁12', '擴充預留網頁13', '擴充預留網頁14', '擴充預留網頁15', '擴充預留網頁16', '擴充預留網頁17', '擴充預留網頁18', '擴充預留網頁19', '擴充預留網頁20'];
 
         let currentPageId = 'foodPage';
@@ -496,7 +494,7 @@
             document.getElementById('newsCol2').value = new Date().toISOString().split('T')[0];
             
             renderNavButtons();
-            switchPage('foodPage'); // 初始化載入第一頁
+            switchPage('foodPage'); 
         };
 
         function renderNavButtons() {
@@ -586,14 +584,22 @@
             targetList.sort((a, b) => {
                 for(let config of sortConfigs) {
                     let valA = safeStr(a[config.col]), valB = safeStr(b[config.col]); 
-                    let numA = Number(valA), numB = Number(valB);
-                    if(!isNaN(numA) && !isNaN(numB) && valA.trim() !== '' && valB.trim() !== '') { 
-                        if(numA !== numB) return config.dir === 'asc' ? numA - numB : numB - numA; 
-                    } else { 
-                        if(valA !== valB) { 
-                            if (valA < valB) return config.dir === 'asc' ? -1 : 1; 
-                            if (valA > valB) return config.dir === 'asc' ? 1 : -1; 
-                        } 
+                    // 🌟 修正：精準的日期或數字比對邏輯 🌟
+                    if (config.col === 'col2' || config.col === 'date') {
+                        if (valA !== valB) {
+                            if (valA < valB) return config.dir === 'asc' ? -1 : 1;
+                            if (valA > valB) return config.dir === 'asc' ? 1 : -1;
+                        }
+                    } else {
+                        let numA = Number(valA), numB = Number(valB);
+                        if(!isNaN(numA) && !isNaN(numB) && valA.trim() !== '' && valB.trim() !== '') { 
+                            if(numA !== numB) return config.dir === 'asc' ? numA - numB : numB - numA; 
+                        } else { 
+                            if(valA !== valB) { 
+                                if (valA < valB) return config.dir === 'asc' ? -1 : 1; 
+                                if (valA > valB) return config.dir === 'asc' ? 1 : -1; 
+                            } 
+                        }
                     }
                 }
                 return parseFloat(a.id) - parseFloat(b.id); 
@@ -604,11 +610,11 @@
         // ================= 頁面切換與資料載入 =================
         function switchPage(selectedPageId) {
             currentPageId = selectedPageId;
-            const config = PAGE_CONFIG[selectedPageId];
+            const config = PAGE_CONFIG[currentPageId];
             
-            // 按鈕選取狀態
+            // 按鈕高亮切換
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById(`navBtn_${selectedPageId}`);
+            const activeBtn = document.getElementById(`navBtn_${currentPageId}`);
             if(activeBtn) activeBtn.classList.add('active');
 
             document.querySelectorAll('.app-page').forEach(page => { page.style.display = 'none'; });
