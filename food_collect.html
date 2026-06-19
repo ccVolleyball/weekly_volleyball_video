@@ -112,18 +112,17 @@
         }
 
         /* ====================================================
-           🌟 時間軸專屬 CSS (News & Ext 8~20) 🌟
+           🌟 時間軸與側邊留言面板專屬 CSS 🌟
         ==================================================== */
         .news-layout-wrapper { display: flex; gap: 20px; position: relative; align-items: flex-start; }
         .news-timeline-section { flex: 1; min-width: 0; }
         
-        /* 🌟 升級：側邊面板加入 resize，支援左右拖拉放大縮小 🌟 */
         .news-detail-panel {
-            width: 380px; min-width: 250px; max-width: 50vw;
+            width: 380px; min-width: 280px; max-width: 60vw;
             background: #fff; border-radius: 8px; box-shadow: -2px 0 15px rgba(0,0,0,0.15);
             padding: 20px; display: none; position: sticky; top: 20px;
             max-height: 90vh; overflow: auto; border: 1px solid #ddd;
-            resize: horizontal; /* 允許拖拉改變寬度 */
+            resize: horizontal; 
         }
         .detail-close-btn { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: #888; margin-top: -5px; }
         .detail-close-btn:hover { color: #f00; }
@@ -147,6 +146,7 @@
         .timeline-date { font-weight: bold; color: var(--cat-color, #607d8b); margin-bottom: 8px; font-size: 14px; letter-spacing: 1px; }
         .timeline-title { font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #333; line-height: 1.4; }
         
+        /* 限制 3 行 CSS */
         .text-clamp {
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; 
             overflow: hidden; transition: max-height 0.3s ease;
@@ -161,6 +161,14 @@
         
         .timeline-notes { background: #fffde7; border-left: 4px solid #ffb300; padding: 12px; margin-top: 15px; font-size: 14.5px; border-radius: 4px; color: #444; box-shadow: inset 0 0 5px rgba(0,0,0,0.02); cursor: default; }
         .timeline-notes-title { font-weight: bold; color: #f57c00; margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; }
+
+        /* 留言板 Chat CSS */
+        .chat-container { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; max-height: 40vh; overflow-y: auto; padding-right: 5px; }
+        .chat-bubble { background: #f8f9fa; padding: 12px 16px; border-radius: 18px; border-top-left-radius: 4px; font-size: 14.5px; color: #333; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-left: 4px solid var(--theme-primary); }
+        .chat-time { font-size: 12px; color: #888; margin-bottom: 6px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .chat-input-area { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
+        .chat-input-area textarea { width: 100%; border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; resize: vertical; min-height: 70px; box-sizing: border-box; font-family: inherit; transition: border-color 0.3s; }
+        .chat-input-area textarea:focus { border-color: var(--theme-primary); outline: none; }
 
         @media screen and (max-width: 768px) {
             .timeline::after { left: 20px; }
@@ -210,8 +218,7 @@
             <button class="btn-cancel" style="display: inline-block; padding: 4px 8px; font-size: 12px;" onclick="resetMultiSort()">清除所有排序設定</button>
         </div>
         <div style="font-size: 13px; color: #666; margin-bottom: 10px;">設定最多 5 層優先權，新資料輸入後會自動排入正確順序。</div>
-        <div id="multiSortContainer" style="display: flex; flex-wrap: wrap; gap: 10px;">
-            </div>
+        <div id="multiSortContainer" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
     </div>
 
 
@@ -232,10 +239,10 @@
                     </div>
                     <div class="form-group" style="width: 100%;">
                         <label>
-                            心得筆記 (col6) 
+                            初始筆記 (col6) 
                             <button type="button" style="padding:2px 8px; font-size:12px; margin-left:10px; background-color: #ff9800;" onclick="addTimestampToNewsNote()">➕ 加入當前時間</button>
                         </label>
-                        <textarea id="newsCol6" rows="6" style="width: 100%; max-width: 600px;" placeholder="在此記錄您的觀點或後續追蹤..."></textarea>
+                        <textarea id="newsCol6" rows="4" style="width: 100%; max-width: 600px;" placeholder="在此記錄您的初始觀點... (後續請使用留言板追蹤)"></textarea>
                     </div>
                 </div>
             </div>
@@ -244,7 +251,7 @@
                 <input type="hidden" id="newsCol9"><input type="hidden" id="newsCol10">
             </div>
             <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                <button id="submitNewsBtn" class="btn-add" onclick="submitNewsData()">儲存紀錄與筆記</button>
+                <button id="submitNewsBtn" class="btn-add" onclick="submitNewsData()">儲存紀錄</button>
                 <button id="cancelNewsBtn" class="btn-cancel" onclick="cancelNewsEdit()">取消編輯</button>
             </div>
         </div>
@@ -274,7 +281,7 @@
                 </div>
                 <div class="news-detail-panel" id="newsDetailPanel">
                     <button class="detail-close-btn" onclick="closeNewsDetail()">✖</button>
-                    <h3 style="margin-top:0; color:var(--theme-primary);">🔍 詳細檢視</h3>
+                    <h3 style="margin-top:0; color:var(--theme-primary);">🔍 詳細檢視與留言</h3>
                     <div id="newsDetailContent"></div>
                 </div>
             </div>
@@ -473,7 +480,6 @@
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
         let newsDataList = []; let editingNewsId = null; 
 
-        // 安全賦值與讀取 Helper
         const safeStr = (val) => val != null ? String(val) : '';
         const formatDate = (val) => { let str = safeStr(val); return str.includes('T') ? str.split('T')[0] : str; };
         const safeSet = (id, val) => { let el = document.getElementById(id); if(el) el.value = val; };
@@ -481,8 +487,20 @@
         const safeClass = (id, cls) => { let el = document.getElementById(id); if(el) el.className = cls; };
         const safeDisplay = (id, disp) => { let el = document.getElementById(id); if(el) el.style.display = disp; };
 
+        // 🌟 新增：Auto-linking 網址轉換函數 🌟
+        function linkify(text) {
+            if (!text) return '';
+            let escaped = String(text).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return escaped.replace(urlRegex, function(url) {
+                return `<a href="${url}" target="_blank" style="color: var(--theme-primary); text-decoration: underline; font-weight: bold; word-break: break-all;" onclick="event.stopPropagation()">${url}</a>`;
+            });
+        }
+
         window.onload = function() {
+            renderSortOptionsUI(); 
             renderNavButtons();
+            
             const today = new Date().toISOString().split('T')[0];
             safeSet('sportDate', today); safeSet('noteCol2', today); safeSet('genCol2', today); safeSet('newsCol2', today);
             switchPage('foodPage'); 
@@ -495,6 +513,23 @@
             }
             const wrapper = document.getElementById('navButtonsWrapper');
             if(wrapper) wrapper.innerHTML = html;
+        }
+
+        function renderSortOptionsUI() {
+            let html = '';
+            for(let i=1; i<=5; i++) {
+                html += `
+                    <div style="background: rgba(255,255,255,0.6); padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                        <span class="theme-text" style="font-weight:bold; font-size: 13px;">優先順序 ${i}</span><br>
+                        <select id="sortCol${i}" onchange="applyGlobalMultiSort()" style="margin-top: 5px; width: 120px; padding: 4px; font-size: 13px;"></select>
+                        <select id="sortDir${i}" onchange="applyGlobalMultiSort()" style="margin-top: 5px; width: 85px; padding: 4px; font-size: 13px;">
+                            <option value="asc">升冪 ▴</option>
+                            <option value="desc">降冪 ▾</option>
+                        </select>
+                    </div>`;
+            }
+            const container = document.getElementById('multiSortContainer');
+            if (container) container.innerHTML = html;
         }
 
         function applyTheme(config) {
@@ -514,17 +549,13 @@
             if (checkbox.checked) { table.classList.remove(`hide-col-${colIndex}`); } else { table.classList.add(`hide-col-${colIndex}`); }
         }
 
-        // ================= 頁面說明區塊功能 =================
         function toggleDescCollapse() {
             isDescCollapsed = !isDescCollapsed;
             safeDisplay('descBody', isDescCollapsed ? 'none' : 'block');
             const header = document.querySelector('.desc-header');
             if(header) header.classList.toggle('collapsed', isDescCollapsed);
         }
-        function enableDescEdit() {
-            safeSet('descModalInput', currentDescription);
-            safeDisplay('descModal', 'flex');
-        }
+        function enableDescEdit() { safeSet('descModalInput', currentDescription); safeDisplay('descModal', 'flex'); }
         function closeDescModal() { safeDisplay('descModal', 'none'); }
         async function saveDescription() {
             const el = document.getElementById('descModalInput');
@@ -535,13 +566,8 @@
             closeDescModal();
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ sheetName: currentPageName, action: 'update_desc', description: newDesc }) }); } catch(e) {}
         }
-        async function deleteDescription() { 
-            if(!confirm('確定要清除此頁面的說明嗎？')) return; 
-            safeSet('descModalInput', '');
-            saveDescription(); 
-        }
+        async function deleteDescription() { if(!confirm('確定要清除此頁面的說明嗎？')) return; safeSet('descModalInput', ''); saveDescription(); }
 
-        // ================= 多重排序核心邏輯 =================
         function updateSortOptions() {
             let options = [{val: '', text: '-- 無 --'}];
             if (currentPageName === '美食紀錄') { options.push({val: 'city', text: '縣市'}, {val: 'district', text: '區域'}, {val: 'address', text: '地址'}, {val: 'storeName', text: '店名'}, {val: 'category', text: '分類'}, {val: 'other', text: '其他'});
@@ -559,13 +585,9 @@
                 if (options.some(opt => opt.val === currentVal)) sel.value = currentVal; else sel.value = '';
             }
         }
-        function resetMultiSort() { 
-            for(let i=1; i<=5; i++) { safeSet(`sortCol${i}`, ''); safeSet(`sortDir${i}`, 'asc'); } 
-            applyGlobalMultiSort(); 
-        }
+        function resetMultiSort() { for(let i=1; i<=5; i++) { safeSet(`sortCol${i}`, ''); safeSet(`sortDir${i}`, 'asc'); } applyGlobalMultiSort(); }
         function handleHeaderSort(col) { 
-            let p1 = document.getElementById('sortCol1');
-            let d1 = document.getElementById('sortDir1'); 
+            let p1 = document.getElementById('sortCol1'); let d1 = document.getElementById('sortDir1'); 
             if(!p1 || !d1) return;
             if (p1.value === col) { d1.value = d1.value === 'asc' ? 'desc' : 'asc'; } else { p1.value = col; d1.value = 'asc'; } 
             for(let i=2; i<=5; i++) { safeSet(`sortCol${i}`, ''); }
@@ -575,14 +597,10 @@
         function applyGlobalMultiSort() {
             let sortConfigs = [];
             for(let i=1; i<=5; i++) { 
-                let colEl = document.getElementById(`sortCol${i}`);
-                let dirEl = document.getElementById(`sortDir${i}`); 
+                let colEl = document.getElementById(`sortCol${i}`); let dirEl = document.getElementById(`sortDir${i}`); 
                 if(colEl && dirEl && colEl.value) sortConfigs.push({col: colEl.value, dir: dirEl.value}); 
             }
-            
-            if (TIMELINE_PAGES.includes(currentPageName) && sortConfigs.length === 0) {
-                sortConfigs.push({col: 'col2', dir: 'desc'});
-            }
+            if (TIMELINE_PAGES.includes(currentPageName) && sortConfigs.length === 0) { sortConfigs.push({col: 'col2', dir: 'desc'}); }
 
             let targetList = []; let renderFn = null;
             if(currentPageName === '美食紀錄') { targetList = foodDataList; renderFn = renderFoodTable; } 
@@ -611,48 +629,32 @@
             if(renderFn) renderFn();
         }
 
-        // ================= 安全表單還原邏輯 =================
+        // ================= 安全的表單還原邏輯 =================
         function cancelFoodEdit() {
-            editingFoodId = null;
-            ['city','district','address','storeName','category','other'].forEach(id => safeSet(id, ''));
-            safeText('foodFormTitle', '新增美食店家'); safeText('submitFoodBtn', '新增資料');
-            safeClass('submitFoodBtn', 'btn-add'); safeDisplay('cancelFoodBtn', 'none');
+            editingFoodId = null; ['city','district','address','storeName','category','other'].forEach(id => safeSet(id, ''));
+            safeText('foodFormTitle', '新增美食店家'); safeText('submitFoodBtn', '新增資料'); safeClass('submitFoodBtn', 'btn-add'); safeDisplay('cancelFoodBtn', 'none');
         }
         function cancelSportsEdit() {
-            editingSportsId = null;
-            safeSet('sportDate', new Date().toISOString().split('T')[0]);
-            safeSet('sportType', '跑步'); safeSet('sportDistance', ''); safeSet('sportNotes', '');
-            safeText('sportsFormTitle', '新增運動紀錄'); safeText('submitSportsBtn', '新增紀錄');
-            safeClass('submitSportsBtn', 'btn-add'); safeDisplay('cancelSportsBtn', 'none');
+            editingSportsId = null; safeSet('sportDate', new Date().toISOString().split('T')[0]); safeSet('sportType', '跑步'); safeSet('sportDistance', ''); safeSet('sportNotes', '');
+            safeText('sportsFormTitle', '新增運動紀錄'); safeText('submitSportsBtn', '新增紀錄'); safeClass('submitSportsBtn', 'btn-add'); safeDisplay('cancelSportsBtn', 'none');
         }
         function cancelNoteEdit() {
-            editingNoteId = null;
-            for(let i=1; i<=10; i++) safeSet(`noteCol${i}`, '');
-            safeSet('noteCol2', new Date().toISOString().split('T')[0]);
-            safeText('noteFormTitle', '新增筆記 / 事件'); safeText('submitNoteBtn', '儲存筆記');
-            safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'none');
+            editingNoteId = null; for(let i=1; i<=10; i++) safeSet(`noteCol${i}`, ''); safeSet('noteCol2', new Date().toISOString().split('T')[0]);
+            safeText('noteFormTitle', '新增筆記 / 事件'); safeText('submitNoteBtn', '儲存筆記'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'none');
         }
         function cancelTravelEdit() {
-            editingTravelId = null;
-            for(let i=1; i<=7; i++) safeSet(`travelCol${i}`, '');
-            safeText('travelFormTitle', '新增旅遊筆記'); safeText('submitTravelBtn', '儲存/合併筆記');
-            safeClass('submitTravelBtn', 'btn-add'); safeDisplay('cancelTravelBtn', 'none');
+            editingTravelId = null; for(let i=1; i<=7; i++) safeSet(`travelCol${i}`, '');
+            safeText('travelFormTitle', '新增旅遊筆記'); safeText('submitTravelBtn', '儲存/合併筆記'); safeClass('submitTravelBtn', 'btn-add'); safeDisplay('cancelTravelBtn', 'none');
         }
         function cancelNewsEdit() {
-            editingNewsId = null; 
-            for(let i=1; i<=10; i++) safeSet(`newsCol${i}`, '');
-            safeSet('newsCol2', new Date().toISOString().split('T')[0]);
+            editingNewsId = null; for(let i=1; i<=10; i++) safeSet(`newsCol${i}`, ''); safeSet('newsCol2', new Date().toISOString().split('T')[0]);
             const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '紀錄';
-            safeText('newsFormTitle', `新增 ${configName}`); safeText('submitNewsBtn', '儲存紀錄與筆記');
-            safeClass('submitNewsBtn', 'btn-add'); safeDisplay('cancelNewsBtn', 'none');
+            safeText('newsFormTitle', `新增 ${configName}`); safeText('submitNewsBtn', '儲存紀錄'); safeClass('submitNewsBtn', 'btn-add'); safeDisplay('cancelNewsBtn', 'none');
         }
         function cancelGenericEdit() {
-            editingGenericId = null; 
-            for(let i=1; i<=10; i++) safeSet(`genCol${i}`, '');
-            safeSet('genCol2', new Date().toISOString().split('T')[0]);
+            editingGenericId = null; for(let i=1; i<=10; i++) safeSet(`genCol${i}`, ''); safeSet('genCol2', new Date().toISOString().split('T')[0]);
             const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料';
-            safeText('genericFormTitle', `新增 ${configName} 資料`); safeText('submitGenericBtn', '新增資料');
-            safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'none');
+            safeText('genericFormTitle', `新增 ${configName} 資料`); safeText('submitGenericBtn', '新增資料'); safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'none');
         }
 
         // ================= 頁面切換與資料載入 =================
@@ -673,6 +675,9 @@
             applyTheme(config);
             currentPageName = config.sheet;
 
+            const newsCatFilters = document.getElementById('newsCategoryFilters');
+            if(newsCatFilters) newsCatFilters.innerHTML = '';
+
             if (selectedPageId === 'foodPage') { safeDisplay('foodPage', 'block'); } 
             else if (selectedPageId === 'sportsPage') { safeDisplay('sportsPage', 'block'); } 
             else if (selectedPageId === 'notePage') { safeDisplay('notePage', 'block'); } 
@@ -681,7 +686,8 @@
                 safeDisplay('newsPage', 'block'); 
                 safeText('newsFormTitle', `新增 ${config.name}`);
                 safeText('newsTableTitle', `${config.name} 時間軸總覽`);
-                safeSet('newsFilterInput', ''); 
+                safeSet('newsFilterInput', ''); safeSet('newsStartDate', ''); safeSet('newsEndDate', '');
+                isGlobalNewsExpanded = false;
             }
             else {
                 safeDisplay('genericPage', 'block');
@@ -710,7 +716,11 @@
                 else if (sheetName === '擴充預留網頁1') { noteDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); } 
                 else if (sheetName === '擴充預留網頁7') { travelDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)}`.toLowerCase() })); } 
                 else if (TIMELINE_PAGES.includes(sheetName)) { 
-                    newsDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)}`.toLowerCase() })); 
+                    newsDataList = data.map(item => {
+                        let commentsText = '';
+                        try { let cArr = JSON.parse(safeStr(item.col10) || '[]'); commentsText = cArr.map(c => c.text).join(' '); } catch(e){}
+                        return { ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${commentsText}`.toLowerCase() };
+                    }); 
                     updateNewsCategoryCheckboxes();
                 } 
                 else { genericDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); }
@@ -720,79 +730,78 @@
             finally { toggleLoading(false); }
         }
 
-        // ================= 🌟 共用過濾邏輯 (支援多關鍵字) 🌟 =================
+        // ================= 🌟 共用過濾邏輯 🌟 =================
         function handleFilterInput(inputId, arr, renderFn, renderKwFn) {
             const el = document.getElementById(inputId);
             if(!el) return;
             const inputVal = el.value.trim().toLowerCase();
             if (!inputVal) return;
             
-            // 🌟 升級：用空白分隔多個關鍵字 🌟
             const kws = inputVal.split(/\s+/);
-            kws.forEach(kw => {
-                if (kw && !arr.includes(kw)) arr.push(kw);
-            });
-            el.value = '';
-            renderKwFn();
-            renderFn();
+            kws.forEach(kw => { if (kw && !arr.includes(kw)) arr.push(kw); });
+            el.value = ''; renderKwFn(); renderFn();
         }
 
-        // ================= 📰 共用時間軸紀錄模組 (時事5, 擴充8~20) =================
+        // ================= 📰 時間軸與留言板模組 (時事5, 擴充8~20) =================
         function addTimestampToNewsNote() {
-            const noteEl = document.getElementById('newsCol6');
-            if(!noteEl) return;
-            const now = new Date();
-            const pad = n => n.toString().padStart(2, '0');
+            const noteEl = document.getElementById('newsCol6'); if(!noteEl) return;
+            const now = new Date(); const pad = n => n.toString().padStart(2, '0');
             const timeStr = `\n[${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}] `;
-            noteEl.value = (noteEl.value + timeStr).trimStart();
-            noteEl.focus();
+            noteEl.value = (noteEl.value + timeStr).trimStart(); noteEl.focus();
         }
 
         async function submitNewsData() {
             const payload = { sheetName: currentPageName, id: editingNewsId || Date.now(), action: editingNewsId ? 'edit' : 'add' };
-            for(let i=1; i<=10; i++) { 
-                let el = document.getElementById(`newsCol${i}`);
-                payload[`col${i}`] = el ? el.value : ''; 
-            }
+            for(let i=1; i<=10; i++) { let el = document.getElementById(`newsCol${i}`); payload[`col${i}`] = el ? el.value : ''; }
             const fullText = Object.values(payload).join(' ').toLowerCase();
             if (editingNewsId) { const idx = newsDataList.findIndex(d => String(d.id) === String(editingNewsId)); if (idx > -1) newsDataList[idx] = { ...payload, fullText };
             } else { newsDataList.push({ ...payload, fullText }); }
             
-            updateNewsCategoryCheckboxes();
-            applyGlobalMultiSort(); 
-            cancelNewsEdit(); 
+            updateNewsCategoryCheckboxes(); applyGlobalMultiSort(); cancelNewsEdit(); 
             fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        }
+
+        // 🌟 留言板核心功能 🌟
+        async function submitComment(id) {
+            const inputEl = document.getElementById(`newCommentInput_${id}`); if(!inputEl) return;
+            const text = inputEl.value.trim(); if(!text) return alert('請先輸入留言內容！');
+
+            const itemIdx = newsDataList.findIndex(d => String(d.id) === String(id)); if(itemIdx === -1) return;
+            let item = newsDataList[itemIdx];
+
+            let comments = []; try { comments = JSON.parse(safeStr(item.col10) || '[]'); } catch(e) { comments = []; }
+            const now = new Date(); const pad = n => n.toString().padStart(2, '0');
+            const timeStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+            comments.push({ time: timeStr, text: text });
+            item.col10 = JSON.stringify(comments);
+            
+            let commentText = comments.map(c => c.text).join(' ');
+            item.fullText = Object.values(item).join(' ').toLowerCase() + ' ' + commentText.toLowerCase();
+
+            inputEl.value = ''; openNewsDetail(id); renderNewsTimeline(); 
+            const payload = { ...item, sheetName: currentPageName, action: 'edit' };
+            try { fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); } catch(e) { console.error("留言儲存失敗", e); }
         }
 
         function copyNewsData(id, event) {
             if(event) event.stopPropagation();
             const item = newsDataList.find(d => String(d.id) === String(id)); if (!item) return;
-            for(let i=1; i<=10; i++) { 
-                let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); 
-                safeSet(`newsCol${i}`, val);
-            }
+            for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`newsCol${i}`, val); }
+            safeSet('newsCol10', ''); 
             editingNewsId = null; 
             const configName = PAGE_CONFIG[currentPageId].name;
-            safeText('newsFormTitle', `新增 ${configName} (複製現有)`); 
-            safeText('submitNewsBtn', '儲存紀錄與筆記'); 
-            safeClass('submitNewsBtn', 'btn-add'); 
-            safeDisplay('cancelNewsBtn', 'inline-block'); 
+            safeText('newsFormTitle', `新增 ${configName} (複製現有)`); safeText('submitNewsBtn', '儲存紀錄'); safeClass('submitNewsBtn', 'btn-add'); safeDisplay('cancelNewsBtn', 'inline-block'); 
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
         function editNewsData(id, event) {
             if(event) event.stopPropagation();
             const item = newsDataList.find(d => String(d.id) === String(id)); if (!item) return;
-            for(let i=1; i<=10; i++) { 
-                let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); 
-                safeSet(`newsCol${i}`, val);
-            }
+            for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`newsCol${i}`, val); }
             editingNewsId = id; 
             const configName = PAGE_CONFIG[currentPageId].name;
-            safeText('newsFormTitle', `編輯 ${configName}`); 
-            safeText('submitNewsBtn', '儲存修改'); 
-            safeClass('submitNewsBtn', 'btn-edit'); 
-            safeDisplay('cancelNewsBtn', 'inline-block'); 
+            safeText('newsFormTitle', `編輯 ${configName}`); safeText('submitNewsBtn', '儲存修改'); safeClass('submitNewsBtn', 'btn-edit'); safeDisplay('cancelNewsBtn', 'inline-block'); 
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
@@ -800,177 +809,133 @@
             if(event) event.stopPropagation(); 
             if (!confirm('確定刪除此紀錄？')) return; 
             newsDataList = newsDataList.filter(d => String(d.id) !== String(id)); 
-            updateNewsCategoryCheckboxes();
-            renderNewsTimeline(); 
+            updateNewsCategoryCheckboxes(); renderNewsTimeline(); 
             fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) }); 
         }
         
         function clearNewsFilters() {
             safeSet('newsFilterInput', ''); safeSet('newsStartDate', ''); safeSet('newsEndDate', '');
-            document.querySelectorAll('.news-cat-cb').forEach(cb => cb.checked = true);
-            renderNewsTimeline();
+            document.querySelectorAll('.news-cat-cb').forEach(cb => cb.checked = true); renderNewsTimeline();
         }
 
         function toggleAllNewsCategories(check) {
-            document.querySelectorAll('.news-cat-cb').forEach(cb => cb.checked = check);
-            renderNewsTimeline();
+            document.querySelectorAll('.news-cat-cb').forEach(cb => cb.checked = check); renderNewsTimeline();
         }
 
         function updateNewsCategoryCheckboxes() {
-            const container = document.getElementById('newsCategoryFilters');
-            if (!container) return;
-            const currentChecked = Array.from(document.querySelectorAll('.news-cat-cb')).filter(cb => cb.checked).map(cb => cb.value);
-            const hasExistingCbs = document.querySelectorAll('.news-cat-cb').length > 0;
+            const container = document.getElementById('newsCategoryFilters'); if (!container) return;
+            
+            const existingCbs = Array.from(document.querySelectorAll('.news-cat-cb'));
+            const existingVals = existingCbs.map(cb => cb.value);
+            const currentChecked = existingCbs.filter(cb => cb.checked).map(cb => cb.value);
+            
             const categories = [...new Set(newsDataList.map(d => safeStr(d.col1).trim() || '未分類'))].sort();
 
-            let html = `
-                <div style="width:100%; display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                    <span style="font-size:13px; font-weight:bold; color:#555;">🏷️ 分類過濾器：</span>
-                    <button class="btn-copy" style="padding:2px 8px; font-size:12px; margin:0;" onclick="toggleAllNewsCategories(true)">☑️ 全選</button>
-                    <button class="btn-cancel" style="display:inline-block; padding:2px 8px; font-size:12px; margin:0;" onclick="toggleAllNewsCategories(false)">❌ 全不選</button>
-                </div>
-                <div style="display:flex; flex-wrap:wrap; gap:10px; width:100%;">
-            `;
+            let html = `<div style="width:100%; display:flex; align-items:center; gap:10px; margin-bottom:10px;"><span style="font-size:13px; font-weight:bold; color:#555;">🏷️ 分類過濾器：</span><button class="btn-copy" style="padding:2px 8px; font-size:12px; margin:0;" onclick="toggleAllNewsCategories(true)">☑️ 全選</button><button class="btn-cancel" style="display:inline-block; padding:2px 8px; font-size:12px; margin:0;" onclick="toggleAllNewsCategories(false)">❌ 全不選</button></div><div style="display:flex; flex-wrap:wrap; gap:10px; width:100%;">`;
             categories.forEach(cat => {
                 const color = getCategoryColor(cat);
-                const isChecked = !hasExistingCbs || currentChecked.includes(cat) ? 'checked' : '';
+                let isChecked = 'checked';
+                if (existingVals.includes(cat)) { isChecked = currentChecked.includes(cat) ? 'checked' : ''; }
+                
                 html += `<label style="display:flex; align-items:center; cursor:pointer; font-size:13px; background:#f4f4f4; padding:4px 10px; border-radius:15px; border-left:4px solid ${color};"><input type="checkbox" value="${cat}" class="news-cat-cb" ${isChecked} onchange="renderNewsTimeline()" style="margin-right:5px;"> ${cat}</label>`;
             });
-            html += '</div>';
-            container.innerHTML = html;
+            html += '</div>'; container.innerHTML = html;
         }
         
         function getCategoryColor(category) {
             const cat = category.toLowerCase();
-            if (cat.includes('政治')) return '#1976d2'; 
-            if (cat.includes('經濟') || cat.includes('財經')) return '#388e3c'; 
-            if (cat.includes('國際')) return '#7b1fa2'; 
-            if (cat.includes('體育') || cat.includes('運動')) return '#f57c00'; 
-            if (cat.includes('社會') || cat.includes('時事')) return '#00796b'; 
-            if (cat.includes('科技')) return '#455a64'; 
+            if (cat.includes('政治')) return '#1976d2'; if (cat.includes('經濟') || cat.includes('財經')) return '#388e3c'; 
+            if (cat.includes('國際')) return '#7b1fa2'; if (cat.includes('體育') || cat.includes('運動')) return '#f57c00'; 
+            if (cat.includes('社會') || cat.includes('時事')) return '#00796b'; if (cat.includes('科技')) return '#455a64'; 
             return '#607d8b'; 
         }
 
         function toggleNewsClamp(id, event) {
             if(event) event.stopPropagation(); 
-            const contentDiv = document.getElementById(`clamp-content-${id}`);
-            const noteDiv = document.getElementById(`clamp-note-${id}`);
-            const btn = document.getElementById(`toggle-btn-${id}`);
+            const contentDiv = document.getElementById(`clamp-content-${id}`); const noteDiv = document.getElementById(`clamp-note-${id}`); const btn = document.getElementById(`toggle-btn-${id}`);
             if(!contentDiv || !btn) return;
-            
             let isExp = contentDiv.classList.contains('expanded');
-            if (isExp) {
-                contentDiv.classList.remove('expanded');
-                if(noteDiv) noteDiv.classList.remove('expanded');
-                btn.innerText = '展開 ▼';
-            } else {
-                contentDiv.classList.add('expanded');
-                if(noteDiv) noteDiv.classList.add('expanded');
-                btn.innerText = '收起 ▲';
-            }
+            if (isExp) { contentDiv.classList.remove('expanded'); if(noteDiv) noteDiv.classList.remove('expanded'); btn.innerText = '展開 ▼'; } 
+            else { contentDiv.classList.add('expanded'); if(noteDiv) noteDiv.classList.add('expanded'); btn.innerText = '收起 ▲'; }
         }
 
-        function toggleGlobalNewsExpand() {
-            isGlobalNewsExpanded = !isGlobalNewsExpanded;
-            renderNewsTimeline(); 
-        }
+        function toggleGlobalNewsExpand() { isGlobalNewsExpanded = !isGlobalNewsExpanded; renderNewsTimeline(); }
 
+        // 🌟 側邊面板渲染 (支援 Auto-linking) 🌟
         function openNewsDetail(id) {
-            const item = newsDataList.find(d => String(d.id) === String(id));
-            if(!item) return;
-            const panel = document.getElementById('newsDetailPanel');
-            const content = document.getElementById('newsDetailContent');
+            const item = newsDataList.find(d => String(d.id) === String(id)); if(!item) return;
+            const panel = document.getElementById('newsDetailPanel'); const content = document.getElementById('newsDetailContent');
             if(!panel || !content) return;
             
-            const cat = safeStr(item.col1) || '未分類';
-            const date = formatDate(item.col2);
-            const title = safeStr(item.col3);
-            const desc = safeStr(item.col4);
-            let link = safeStr(item.col5);
-            const notes = safeStr(item.col6);
+            const cat = safeStr(item.col1) || '未分類'; const date = formatDate(item.col2); const title = safeStr(item.col3);
+            
+            // 使用 linkify 自動轉換網址
+            const desc = linkify(safeStr(item.col4)); 
+            let link = safeStr(item.col5); 
+            const notes = linkify(safeStr(item.col6));
             
             let linkHtml = '無';
-            if (link.trim() !== '') {
-                let href = link.startsWith('http') ? link : 'http://' + link;
-                linkHtml = `<a href="${href}" target="_blank" style="word-break: break-all; color: var(--theme-primary);">${link}</a>`;
-            }
+            if (link.trim() !== '') { let href = link.startsWith('http') ? link : 'http://' + link; linkHtml = `<a href="${href}" target="_blank" style="word-break: break-all; color: var(--theme-primary); font-weight:bold;">${link}</a>`; }
+
+            let comments = []; try { comments = JSON.parse(safeStr(item.col10) || '[]'); } catch(e) { comments = []; }
+            let commentsHtml = '';
+            if (comments.length === 0) { commentsHtml = `<div style="color:#aaa; font-size:13px; text-align:center; padding:15px 0; background:#f9f9f9; border-radius:8px; border:1px dashed #ccc;">👻 目前尚無追蹤留言，在下方新增第一筆吧！</div>`; } 
+            else { commentsHtml = comments.map(c => `<div class="chat-bubble"><div class="chat-time">🕒 ${c.time}</div><div style="white-space: pre-wrap; line-height: 1.5;">${linkify(c.text)}</div></div>`).join(''); }
             
             content.innerHTML = `
-                <div style="margin-bottom:10px;">
-                    <span style="background:var(--theme-primary); color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${cat}</span> 
-                    <span style="color:#666; font-size:12px;">${date}</span>
-                </div>
+                <div style="margin-bottom:10px;"><span style="background:var(--theme-primary); color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${cat}</span> <span style="color:#666; font-size:12px;">${date}</span></div>
                 <h4 style="margin:0 0 10px 0; font-size:18px; color:#333;">${title}</h4>
                 <p style="white-space: pre-wrap; font-size:14px; line-height:1.6; color:#444; border-bottom:1px dashed #ddd; padding-bottom:10px;">${desc}</p>
-                <div style="margin-top:15px; background:#f4f4f4; padding:10px; border-radius:5px;">
-                    <strong style="font-size:13px; color:#555;">🔗 相關連結：</strong><br>
-                    ${linkHtml}
-                </div>
-                ${notes ? `<div style="margin-top:15px; border-left:4px solid #ffb300; padding-left:10px; font-size:14px; white-space:pre-wrap; color:#555;"><strong>💡 心得筆記：</strong><br>${notes}</div>` : ''}
+                <div style="margin-top:15px; background:#f4f4f4; padding:10px; border-radius:5px;"><strong style="font-size:13px; color:#555;">🔗 相關連結：</strong><br>${linkHtml}</div>
+                ${notes ? `<div style="margin-top:15px; border-left:4px solid #ffb300; padding-left:10px; font-size:14px; white-space:pre-wrap; color:#555;"><strong>💡 初始筆記：</strong><br>${notes}</div>` : ''}
+                <div style="margin-top:25px; font-weight:bold; color:var(--theme-dark); font-size:15px; border-bottom:2px solid #eee; padding-bottom:5px;">💬 追蹤留言紀錄 (${comments.length})</div>
+                <div class="chat-container" id="chatContainer_${item.id}">${commentsHtml}</div>
+                <div class="chat-input-area"><textarea id="newCommentInput_${item.id}" placeholder="⌨️ 輸入新的追蹤心得或留言..."></textarea><button class="btn-add" style="width:100%; text-align:center; padding:10px; font-size:15px; margin:0;" onclick="submitComment('${item.id}')">🚀 送出留言</button></div>
             `;
             panel.style.display = 'block';
+            setTimeout(() => { let chatBox = document.getElementById(`chatContainer_${item.id}`); if(chatBox) chatBox.scrollTop = chatBox.scrollHeight; }, 50);
         }
         function closeNewsDetail() { safeDisplay('newsDetailPanel', 'none'); }
 
         function renderNewsTimeline() {
-            const container = document.getElementById('newsTimelineContainer'); 
-            if(!container) return;
-            container.innerHTML = '';
+            const container = document.getElementById('newsTimelineContainer'); if(!container) return; container.innerHTML = '';
             
-            const keywordEl = document.getElementById('newsFilterInput');
-            const keyword = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
-            const startDateEl = document.getElementById('newsStartDate');
-            const startDate = startDateEl ? startDateEl.value : '';
-            const endDateEl = document.getElementById('newsEndDate');
-            const endDate = endDateEl ? endDateEl.value : '';
+            const keywordEl = document.getElementById('newsFilterInput'); const keyword = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
+            const startDateEl = document.getElementById('newsStartDate'); const startDate = startDateEl ? startDateEl.value : '';
+            const endDateEl = document.getElementById('newsEndDate'); const endDate = endDateEl ? endDateEl.value : '';
             
-            const cbList = document.querySelectorAll('.news-cat-cb');
-            let checkedCats = [];
-            if(cbList.length > 0) { cbList.forEach(cb => { if(cb.checked) checkedCats.push(cb.value); }); } 
-            else { checkedCats = null; }
+            const cbList = document.querySelectorAll('.news-cat-cb'); let checkedCats = [];
+            if(cbList.length > 0) { cbList.forEach(cb => { if(cb.checked) checkedCats.push(cb.value); }); } else { checkedCats = null; }
 
-            // 🌟 升級：多關鍵字用空白分隔 (AND 邏輯) 🌟
             const kws = keyword ? keyword.split(/\s+/) : [];
-
-            let isLeft = true;
-            let expClass = isGlobalNewsExpanded ? 'expanded' : '';
-            let btnText = isGlobalNewsExpanded ? '收起 ▲' : '展開 ▼';
+            let isLeft = true; let expClass = isGlobalNewsExpanded ? 'expanded' : ''; let btnText = isGlobalNewsExpanded ? '收起 ▲' : '展開 ▼';
 
             newsDataList.forEach(data => {
-                const fullText = data.fullText;
-                const cat = safeStr(data.col1).trim() || '未分類';
-                const date = formatDate(data.col2);
-                const title = safeStr(data.col3);
-                const content = safeStr(data.col4);
-                let link = safeStr(data.col5);
-                const notes = safeStr(data.col6);
+                const fullText = data.fullText; const cat = safeStr(data.col1).trim() || '未分類'; const date = formatDate(data.col2);
+                const title = safeStr(data.col3); 
+                // Auto-linking 時間軸文字
+                const content = linkify(safeStr(data.col4)); 
+                let link = safeStr(data.col5); 
+                const notes = linkify(safeStr(data.col6));
                 
-                // 🌟 多關鍵字皆須符合 (AND 邏輯)
                 if (kws.length > 0 && !kws.every(kw => fullText.includes(kw))) return;
-                
                 if (startDate && date < startDate) return;
                 if (endDate && date > endDate) return;
-                if (checkedCats !== null && checkedCats.length > 0 && !checkedCats.includes(cat)) return;
-                if (checkedCats !== null && checkedCats.length === 0) return; 
+                if (checkedCats !== null && !checkedCats.includes(cat)) return;
 
                 const catColor = getCategoryColor(cat);
                 const itemDiv = document.createElement('div');
-                itemDiv.className = `timeline-item ${isLeft ? 'left' : 'right'}`;
-                itemDiv.style.setProperty('--cat-color', catColor);
+                itemDiv.className = `timeline-item ${isLeft ? 'left' : 'right'}`; itemDiv.style.setProperty('--cat-color', catColor);
 
                 let linkHtml = '';
-                if(link.trim() !== '') {
-                    let href = link.startsWith('http') ? link : 'http://' + link;
-                    linkHtml = `<div style="margin-bottom:10px; font-size:13px; font-weight:bold;">🔗 <a href="${href}" target="_blank" style="color:${catColor}; word-break: break-all;" onclick="event.stopPropagation()">${link}</a></div>`;
-                }
+                if(link.trim() !== '') { let href = link.startsWith('http') ? link : 'http://' + link; linkHtml = `<div style="margin-bottom:10px; font-size:13px; font-weight:bold;">🔗 <a href="${href}" target="_blank" style="color:${catColor}; word-break: break-all;" onclick="event.stopPropagation()">${link}</a></div>`; }
 
                 let notesHtml = '';
-                if(notes.trim() !== '') {
-                    notesHtml = `<div class="timeline-notes" onclick="event.stopPropagation()">
-                        <div class="timeline-notes-title">💡 心得筆記：</div>
-                        <div class="text-clamp ${expClass}" id="clamp-note-${data.id}">${notes}</div>
-                    </div>`;
-                }
+                if(notes.trim() !== '') { notesHtml = `<div class="timeline-notes" onclick="event.stopPropagation()"><div class="timeline-notes-title">💡 初始筆記：</div><div class="text-clamp ${expClass}" id="clamp-note-${data.id}">${notes}</div></div>`; }
+
+                let comments = []; try { comments = JSON.parse(safeStr(data.col10) || '[]'); } catch(e) { comments = []; }
+                let commentBadge = '';
+                if(comments.length > 0) { commentBadge = `<div style="margin-top:10px; font-size:13px; color:var(--theme-primary); font-weight:bold; background:var(--theme-light); display:inline-block; padding:4px 12px; border-radius:15px; border:1px solid #cce5ff;">💬 ${comments.length} 則追蹤留言</div>`; }
 
                 itemDiv.innerHTML = `
                     <div class="timeline-content" onclick="openNewsDetail('${data.id}')">
@@ -979,8 +944,8 @@
                         ${linkHtml}
                         <div class="text-clamp ${expClass}" id="clamp-content-${data.id}" onclick="event.stopPropagation()">${content}</div>
                         ${notesHtml}
-                        <button class="toggle-text-btn" id="toggle-btn-${data.id}" onclick="toggleNewsClamp('${data.id}', event)">${btnText}</button>
-                        
+                        ${commentBadge}
+                        <br><button class="toggle-text-btn" id="toggle-btn-${data.id}" onclick="toggleNewsClamp('${data.id}', event)">${btnText}</button>
                         <div class="timeline-actions" onclick="event.stopPropagation()">
                             <button class="btn-copy" onclick="copyNewsData('${data.id}', event)">複製</button>
                             <button class="btn-edit" style="background-color: #ffb300; color:white;" onclick="editNewsData('${data.id}', event)">編輯</button>
@@ -988,8 +953,7 @@
                         </div>
                     </div>
                 `;
-                container.appendChild(itemDiv);
-                isLeft = !isLeft; 
+                container.appendChild(itemDiv); isLeft = !isLeft; 
             });
         }
 
@@ -998,20 +962,14 @@
         function copyFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('city', item.city); safeSet('district', item.district); safeSet('address', item.address); safeSet('storeName', item.storeName); safeSet('category', item.category); safeSet('other', item.other); editingFoodId = null; safeText('foodFormTitle', '新增美食店家 (複製現有)'); safeText('submitFoodBtn', '新增資料'); safeClass('submitFoodBtn', 'btn-add'); safeDisplay('cancelFoodBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function editFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('city', item.city); safeSet('district', item.district); safeSet('address', item.address); safeSet('storeName', item.storeName); safeSet('category', item.category); safeSet('other', item.other); editingFoodId = id; safeText('foodFormTitle', '編輯美食資料'); safeText('submitFoodBtn', '儲存修改'); safeClass('submitFoodBtn', 'btn-edit'); safeDisplay('cancelFoodBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function deleteFoodData(id) { if (!confirm('確定刪除此美食紀錄？')) return; foodDataList = foodDataList.filter(d => String(d.id) !== String(id)); renderFoodTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '美食紀錄' }) }); }
-        
         function addFilterKeyword() { handleFilterInput('filterInput', filterKeywords, renderFoodTable, renderKw); }
         function removeKeyword(kw) { filterKeywords = filterKeywords.filter(k => k !== kw); renderKw(); renderFoodTable(); }
         function renderKw() { const c = document.getElementById('keywordContainer'); if(c) { c.innerHTML = ''; filterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeKeyword('${kw}')">✖</span></div>`; }); } }
-        
         function renderFoodTable() {
             const tbody = document.getElementById('tableBody'); if(!tbody) return; tbody.innerHTML = '';
             foodDataList.forEach(data => {
-                // 🌟 所有關鍵字都要出現 (AND 邏輯)
                 if (filterKeywords.length > 0 && !filterKeywords.every(kw => data.fullText.includes(kw))) return;
-                
-                const query = `${safeStr(data.city)} ${safeStr(data.district)} ${safeStr(data.address)} ${safeStr(data.storeName)}`.trim(); 
-                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-                
+                const query = `${safeStr(data.city)} ${safeStr(data.district)} ${safeStr(data.address)} ${safeStr(data.storeName)}`.trim(); const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
                 tbody.innerHTML += `<tr><td data-label="縣市"><div class="resizable-cell">${safeStr(data.city)}</div></td><td data-label="區域"><div class="resizable-cell">${safeStr(data.district)}</div></td><td data-label="地址"><div class="resizable-cell">${safeStr(data.address)}</div></td><td data-label="店名"><div class="resizable-cell">${safeStr(data.storeName)}</div></td><td data-label="分類"><div class="resizable-cell">${safeStr(data.category)}</div></td><td data-label="其他"><div class="resizable-cell">${safeStr(data.other)}</div></td><td data-label="地圖"><div class="resizable-cell" style="resize:none;"><a href="${mapUrl}" target="_blank" class="map-link">📍地圖搜尋</a></div></td>
                 <td class="action-cell"><button class="btn-copy" onclick="copyFoodData('${data.id}')">複製</button><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></td></tr>`;
             });
@@ -1033,11 +991,8 @@
 
         // ================= ✈️ 旅遊筆記 (擴充網頁7) =================
         function toggleTravelAddMode() {
-            const checked = document.querySelector('input[name="travelAddMode"]:checked');
-            if(!checked) return;
-            const mode = checked.value;
-            if (mode === 'single') { safeDisplay('travelSingleForm', 'block'); safeDisplay('travelBatchForm', 'none'); } 
-            else { safeDisplay('travelSingleForm', 'none'); safeDisplay('travelBatchForm', 'block'); if (document.getElementById('travelBatchTbody') && document.getElementById('travelBatchTbody').children.length === 0) { renderTravelBatchRows(3); } }
+            const checked = document.querySelector('input[name="travelAddMode"]:checked'); if(!checked) return; const mode = checked.value;
+            if (mode === 'single') { safeDisplay('travelSingleForm', 'block'); safeDisplay('travelBatchForm', 'none'); } else { safeDisplay('travelSingleForm', 'none'); safeDisplay('travelBatchForm', 'block'); if (document.getElementById('travelBatchTbody') && document.getElementById('travelBatchTbody').children.length === 0) { renderTravelBatchRows(3); } }
         }
         function renderTravelBatchRows(count) { const tb = document.getElementById('travelBatchTbody'); if(tb) tb.innerHTML = ''; for(let i=0; i<count; i++) addTravelBatchRow(); }
         function addTravelBatchRow() {
@@ -1058,8 +1013,7 @@
             });
             if (newItems.length === 0) return alert("請至少填寫一筆包含「名稱(必填)」的資料！");
             if (!confirm(`系統即將處理(新增/合併)畫面上 ${newItems.length} 筆資料？\n請勿關閉視窗。`)) return;
-            toggleLoading(true, `多筆處理中... (0/${newItems.length})`);
-            let successCount = 0;
+            toggleLoading(true, `多筆處理中... (0/${newItems.length})`); let successCount = 0;
             for (let i = 0; i < newItems.length; i++) {
                 const item = newItems[i];
                 try {
@@ -1069,21 +1023,17 @@
                 } catch (e) { console.error(e); }
             }
             renderTravelBatchRows(3); toggleLoading(false); 
-            const rd = document.querySelector('input[name="travelAddMode"][value="single"]');
-            if(rd) { rd.checked = true; toggleTravelAddMode(); }
+            const rd = document.querySelector('input[name="travelAddMode"][value="single"]'); if(rd) { rd.checked = true; toggleTravelAddMode(); }
             applyGlobalMultiSort(); alert(`處理完成！成功新增/合併 ${successCount} 筆資料。`);
         }
         async function submitTravelData() {
-            let nEl = document.getElementById(`travelCol2`); if(!nEl) return;
-            let nameInput = nEl.value.trim();
+            let nEl = document.getElementById(`travelCol2`); if(!nEl) return; let nameInput = nEl.value.trim();
             if (!nameInput) return alert('名稱 (col2) 為必填，才能進行儲存或合併！');
             let isEdit = editingTravelId !== null; let targetId = editingTravelId; let existingItem = null;
-            if (!isEdit) { existingItem = travelDataList.find(d => String(d.col2).trim() === nameInput); if (existingItem) { targetId = existingItem.id; isEdit = true; }
-            } else { existingItem = travelDataList.find(d => String(d.id) === String(targetId)); }
+            if (!isEdit) { existingItem = travelDataList.find(d => String(d.col2).trim() === nameInput); if (existingItem) { targetId = existingItem.id; isEdit = true; } } else { existingItem = travelDataList.find(d => String(d.id) === String(targetId)); }
             const payload = { sheetName: '擴充預留網頁7', id: targetId || Date.now(), action: isEdit ? 'edit' : 'add', col8: '', col9: '', col10: '' };
             for(let i=1; i<=7; i++) { 
-                let tEl = document.getElementById(`travelCol${i}`);
-                let formVal = tEl ? tEl.value : ''; 
+                let tEl = document.getElementById(`travelCol${i}`); let formVal = tEl ? tEl.value : ''; 
                 if (!editingTravelId && existingItem && formVal.trim() === '') { payload[`col${i}`] = existingItem[`col${i}`]; } else { payload[`col${i}`] = formVal; } 
             }
             const fullText = Object.values(payload).join(' ').toLowerCase();
@@ -1102,11 +1052,9 @@
             const tbody = document.getElementById('travelTableBody'); if(!tbody) return; tbody.innerHTML = '';
             travelDataList.forEach(data => {
                 if (travelFilterKeywords.length > 0 && !travelFilterKeywords.every(kw => data.fullText.includes(kw))) return;
-                
                 const tr = document.createElement('tr'); let colsHtml = '';
                 const labels = ['主類別', '名稱', '地點', '地理區域', '彈性標籤', '必訪亮點/筆記', '實用資訊包'];
                 for(let i=1; i<=7; i++) { colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${safeStr(data[`col${i}`])}</div></td>`; }
-
                 const locQuery = `${safeStr(data.col2)} ${safeStr(data.col3)}`.trim(); let mapColHtml = `<td data-label="地圖"><div class="resizable-cell"></div></td>`;
                 if(locQuery !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}`; mapColHtml = `<td data-label="地圖"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 地圖搜尋</a></div></td>`; }
                 tr.innerHTML = `${colsHtml}${mapColHtml}<td class="action-cell"><button class="btn-copy" onclick="copyTravelData('${data.id}')">複製</button><button class="btn-edit" onclick="editTravelData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteTravelData('${data.id}')">刪除</button></td>`;
