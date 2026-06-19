@@ -1,1182 +1,1260 @@
-<!doctype html>
-<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>每週 YouTube 連結</title>
-  <style>
-    :root{--bg:#f6f7f9;--card:#fff;--text:#111827;--muted:#6b7280;--primary:#111827;--radius:16px}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;background:linear-gradient(#ffffff,#f7f8fa);color:var(--text)}
-    .container{max-width:1040px;margin:0 auto;padding:16px}
-    header{position:sticky;top:0;z-index:10;backdrop-filter:saturate(1.2) blur(8px);background:rgba(255,255,255,.85);border-bottom:1px solid #e5e7eb}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px}
-    .logo{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:12px;background:var(--primary);color:#fff}
-    .row{display:flex;gap:12px;align-items:center}
-    .spacer{flex:1}
-    button,.btn{appearance:none;border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-    button.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-    button:disabled{opacity:.6;cursor:not-allowed}
-    select,input,textarea{width:100%;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;font:inherit}
-    label{font-size:12px;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:16px}
-    @media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
-    @media(min-width:880px){.grid{grid-template-columns:repeat(3,1fr)}}
-    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:var(--radius);overflow:hidden}
-    .card .thumb{position:relative;aspect-ratio:16/9;background:#f3f4f6}
-    .card .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-    .badge{position:absolute;top:8px;left:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.9);padding:4px 8px;border-radius:999px}
-    .p{padding:12px}
-    .muted{color:var(--muted)}
-    .section{margin:18px 0}
-    .danger{color:#b91c1c}
-    .hidden{display:none !important}
-    footer{color:#6b7280;font-size:12px;text-align:center;padding:36px 0}
-    .admin-panel{background:#fff;border:1px dashed #cbd5e1;border-radius:16px;padding:16px}
-    .table{width:100%;border-collapse:collapse}
-    .table th,.table td{border-bottom:1px solid #e5e7eb;padding:8px 6px;text-align:left;font-size:14px}
-    .nowrap{white-space:nowrap}
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
-    /* 年份與日期選擇器樣式 */
-    .year-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; overflow-x: auto; }
-    .year-tab { padding: 6px 16px; border-radius: 20px; border: none; background: transparent; color: var(--muted); cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.2s; }
-    .year-tab:hover { color: var(--primary); background: #f3f4f6; }
-    .year-tab.active { background: var(--primary); color: #fff; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人資料管理系統</title>
+    <style>
+        /* 🌟 核心：定義全域動態主題變數 🌟 */
+        :root {
+            --theme-primary: #007bff;
+            --theme-light: #f0f7ff;
+            --theme-dark: #0056b3;
+        }
 
-    .month-row { display: flex; align-items: flex-start; gap: 16px; padding: 12px 0; border-bottom: 1px dashed #e5e7eb; }
-    .month-row:last-child { border-bottom: none; }
-    .month-label { font-weight: 700; color: var(--muted); width: 45px; flex-shrink: 0; padding-top: 6px; }
-    .date-pills { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
-    .date-pill { padding: 6px 12px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 14px; transition: all 0.2s; color: var(--text); }
-    .date-pill:hover { border-color: #cbd5e1; background: #f8fafc; }
-.date-pill.active { background: #e5e7eb; border-color: #d1d5db; font-weight: 700; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
-  </style>
+        body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f9f9f9; color: #333; }
+        h2 { border-bottom: 2px solid #ccc; padding-bottom: 5px; margin-top: 0; color: var(--theme-dark); }
+        .section { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .theme-box { border-left: 5px solid var(--theme-primary); background-color: var(--theme-light); padding: 15px; }
+        .theme-text { color: var(--theme-dark) !important; }
+
+        /* 全新導覽列按鈕樣式 */
+        .nav-container { margin-bottom: 20px; padding: 15px; background-color: var(--theme-light); border: 1px solid var(--theme-primary); border-radius: 8px; transition: all 0.3s; }
+        .nav-buttons-wrapper { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .nav-btn {
+            padding: 8px 14px; border: 1px solid #ccc; border-radius: 20px; background: #fff; 
+            color: #555; cursor: pointer; font-size: 14px; font-weight: bold; 
+            transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .nav-btn:hover { background: #f1f1f1; transform: translateY(-1px); }
+        .nav-btn.active {
+            background: var(--theme-primary); color: #fff; border-color: var(--theme-dark);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2); transform: scale(1.02);
+        }
+
+        .form-group { display: inline-block; margin-right: 15px; margin-bottom: 15px; vertical-align: top; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #555; }
+        input[type="text"], input[type="date"], select, textarea { padding: 8px; width: 160px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; box-sizing: border-box; transition: border-color 0.3s; }
+        input:focus, textarea:focus { border-color: var(--theme-primary); outline: none; }
+        textarea { resize: both; } 
+        button { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; color: #fff; font-weight: bold; margin-right: 5px; margin-bottom: 5px; transition: filter 0.2s; }
+        button:hover { filter: brightness(0.9); }
+        
+        .btn-add { background-color: var(--theme-primary); } 
+        .btn-filter { background-color: var(--theme-primary); } 
+        .btn-edit { background-color: #ffc107; color: #333; padding: 5px 10px; font-size: 13px;} 
+        .btn-copy { background-color: #17a2b8; color: #fff; padding: 5px 10px; font-size: 13px;} 
+        .btn-delete { background-color: #dc3545; padding: 5px 10px; font-size: 13px;} 
+        .btn-cancel { background-color: #6c757d; display: none; } 
+
+        .keyword-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .tag { background-color: #e2e3e5; padding: 5px 10px; border-radius: 15px; font-size: 13px; display: flex; align-items: center; }
+        .tag span { margin-left: 8px; cursor: pointer; color: #dc3545; font-weight: bold; }
+
+        .col-toggle-box { background: var(--theme-light); border: 1px solid #cce5ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 14px; }
+        .col-toggle-box label { display: inline-block; margin-right: 12px; font-weight: normal; cursor: pointer; color: #333; margin-bottom: 0; }
+        .col-toggle-box input[type="checkbox"] { margin-right: 4px; cursor: pointer; }
+
+        .hide-col-1 th:nth-child(1), .hide-col-1 td:nth-child(1) { display: none !important; }
+        .hide-col-2 th:nth-child(2), .hide-col-2 td:nth-child(2) { display: none !important; }
+        .hide-col-3 th:nth-child(3), .hide-col-3 td:nth-child(3) { display: none !important; }
+        .hide-col-4 th:nth-child(4), .hide-col-4 td:nth-child(4) { display: none !important; }
+        .hide-col-5 th:nth-child(5), .hide-col-5 td:nth-child(5) { display: none !important; }
+        .hide-col-6 th:nth-child(6), .hide-col-6 td:nth-child(6) { display: none !important; }
+        .hide-col-7 th:nth-child(7), .hide-col-7 td:nth-child(7) { display: none !important; }
+        .hide-col-8 th:nth-child(8), .hide-col-8 td:nth-child(8) { display: none !important; }
+        .hide-col-9 th:nth-child(9), .hide-col-9 td:nth-child(9) { display: none !important; }
+        .hide-col-10 th:nth-child(10), .hide-col-10 td:nth-child(10) { display: none !important; }
+        .hide-col-11 th:nth-child(11), .hide-col-11 td:nth-child(11) { display: none !important; }
+
+        .table-responsive { overflow-x: auto; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { border: 1px solid #ddd; padding: 0; text-align: left; vertical-align: top;} 
+        th { background-color: #f2f2f2; position: relative; padding: 10px; cursor: pointer; color: var(--theme-dark); }
+        th:hover { background-color: var(--theme-light); }
+        tr:nth-child(even) { background-color: #fcfcfc; }
+        tr:hover { background-color: #f1f1f1; }
+        a.map-link { color: var(--theme-primary); text-decoration: none; font-weight: bold; }
+
+        .resizable-cell { resize: both; overflow: auto; padding: 10px; min-width: 60px; min-height: 25px; max-width: 800px; max-height: 500px; box-sizing: border-box; white-space: pre-wrap; word-wrap: break-word; }
+        .action-cell { white-space: nowrap; padding: 10px; width: 1%; text-align: center; }
+        .action-cell button { margin-bottom: 0; display: inline-block; }
+        
+        .desc-header:hover { opacity: 0.8; }
+        #descToggleIcon { display: inline-block; transition: transform 0.2s; font-size: 14px; margin-left: 8px;}
+        .collapsed #descToggleIcon { transform: rotate(-90deg); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 90%; max-width: 900px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .modal-content h3 { margin-top: 0; color: var(--theme-dark); border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
+        .modal-content textarea { width: 100%; height: 60vh; resize: vertical; margin-bottom: 15px; font-size: 15px; padding: 12px; font-family: inherit; line-height: 1.5; border: 1px solid #ccc; border-radius: 5px; }
+        .modal-actions { text-align: right; }
+
+        @media screen and (max-width: 768px) {
+            body { margin: 10px; }
+            .section { padding: 15px; }
+            .form-group { display: block; width: 100%; margin-right: 0; }
+            .form-group input, .form-group select, .form-group textarea { width: 100% !important; }
+            
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            thead tr { display: none; } 
+            
+            tr { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); padding: 10px; background: #fff; }
+            td { display: flex; flex-direction: column; border: none; border-bottom: 1px solid #f1f1f1; padding: 8px 0; text-align: left; }
+            td:last-child { border-bottom: none; flex-direction: row; justify-content: flex-end; align-items: center; padding-top: 12px; gap: 5px; }
+            
+            td::before { content: attr(data-label); font-weight: bold; color: var(--theme-primary); margin-bottom: 4px; font-size: 13px; }
+            .resizable-cell { min-width: 100% !important; padding: 0; font-size: 15px; }
+            .action-cell { white-space: normal; padding: 0; width: 100%; }
+            .col-toggle-box { display: flex; flex-wrap: wrap; gap: 8px; }
+            .table-responsive { overflow: hidden; }
+        }
+
+        /* ====================================================
+           🌟 時間軸專屬 CSS (News & Ext 8~20) 🌟
+        ==================================================== */
+        .news-layout-wrapper { display: flex; gap: 20px; position: relative; align-items: flex-start; }
+        .news-timeline-section { flex: 1; min-width: 0; }
+        
+        .news-detail-panel {
+            width: 380px; min-width: 250px; max-width: 50vw;
+            background: #fff; border-radius: 8px; box-shadow: -2px 0 15px rgba(0,0,0,0.15);
+            padding: 20px; display: none; position: sticky; top: 20px;
+            max-height: 90vh; overflow: auto; border: 1px solid #ddd;
+            resize: horizontal; 
+        }
+        .detail-close-btn { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: #888; margin-top: -5px; }
+        .detail-close-btn:hover { color: #f00; }
+
+        @media screen and (max-width: 900px) {
+            .news-layout-wrapper { flex-direction: column-reverse; }
+            .news-detail-panel { width: 100%; max-width: 100%; position: static; max-height: none; margin-bottom: 20px; resize: none; }
+        }
+
+        .timeline { position: relative; width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px 0; } 
+        .timeline::after { content: ''; position: absolute; width: 4px; background-color: #ddd; top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 2px; }
+        .timeline-item { padding: 10px 40px; position: relative; background-color: inherit; width: 50%; box-sizing: border-box; }
+        .timeline-item.left { left: 0; }
+        .timeline-item.right { left: 50%; }
+        .timeline-item::after { content: ''; position: absolute; width: 20px; height: 20px; right: -10px; background-color: white; border: 4px solid var(--cat-color, #607d8b); top: 25px; border-radius: 50%; z-index: 1; box-shadow: 0 0 0 4px rgba(255,255,255,0.8); }
+        .timeline-item.right::after { left: -10px; }
+        
+        .timeline-content { padding: 20px; background-color: white; position: relative; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 5px solid var(--cat-color, #607d8b); cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .timeline-content:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        
+        .timeline-date { font-weight: bold; color: var(--cat-color, #607d8b); margin-bottom: 8px; font-size: 14px; letter-spacing: 1px; }
+        .timeline-title { font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #333; line-height: 1.4; }
+        
+        .text-clamp {
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; 
+            overflow: hidden; transition: max-height 0.3s ease;
+            font-size: 15px; color: #555; white-space: pre-wrap; line-height: 1.6;
+        }
+        .text-clamp.expanded { -webkit-line-clamp: unset; display: block; }
+        .toggle-text-btn { background: none; border: none; color: #007bff; cursor: pointer; font-size: 13px; padding: 0; margin-top: 5px; font-weight: bold; }
+        .toggle-text-btn:hover { text-decoration: underline; color: #0056b3; filter: none; }
+
+        .timeline-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; background-color: var(--cat-color, #607d8b); color: white; margin-right: 10px; font-weight: bold; }
+        .timeline-actions { text-align: right; border-top: 1px dashed #eee; padding-top: 10px; margin-top: 10px; cursor: default; }
+        
+        .timeline-notes { background: #fffde7; border-left: 4px solid #ffb300; padding: 12px; margin-top: 15px; font-size: 14.5px; border-radius: 4px; color: #444; box-shadow: inset 0 0 5px rgba(0,0,0,0.02); cursor: default; }
+        .timeline-notes-title { font-weight: bold; color: #f57c00; margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; }
+
+        /* 🌟 留言板專屬 CSS 🌟 */
+        .chat-container { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; max-height: 40vh; overflow-y: auto; padding-right: 5px; }
+        .chat-bubble { background: #f8f9fa; padding: 12px 16px; border-radius: 18px; border-top-left-radius: 4px; font-size: 14.5px; color: #333; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-left: 4px solid var(--theme-primary); }
+        .chat-time { font-size: 12px; color: #888; margin-bottom: 6px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .chat-input-area { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; border-top: 2px solid #eee; padding-top: 15px; }
+        .chat-input-area textarea { width: 100%; border-radius: 8px; border: 1px solid #ccc; padding: 12px; font-size: 14px; resize: vertical; min-height: 70px; box-sizing: border-box; font-family: inherit; transition: border-color 0.3s; }
+        .chat-input-area textarea:focus { border-color: var(--theme-primary); outline: none; }
+
+        @media screen and (max-width: 768px) {
+            .timeline::after { left: 20px; }
+            .timeline-item { width: 100%; padding-left: 50px; padding-right: 0; }
+            .timeline-item.left, .timeline-item.right { left: 0; }
+            .timeline-item::after, .timeline-item.right::after { left: 10px; }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <div class="container row" style="padding:10px 16px">
-      <div class="brand"><span class="logo">YT</span><span>每週 YouTube 連結</span></div>
-      <div class="spacer"></div>
-      <button id="adminBtn" class="hidden" title="登入編輯模式">編輯</button>
-      <button id="logoutBtn" class="hidden" title="離開編輯模式">退出編輯</button>
+
+    <div class="nav-container theme-box">
+        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold; color: var(--theme-dark); display: flex; justify-content: space-between; align-items: center;">
+            <span>切換資料庫分頁：</span>
+            <span id="loadingMsg" style="color: var(--theme-primary); font-size: 14px; display: none;">⏳ 資料載入與同步中...</span>
+        </div>
+        <div id="navButtonsWrapper" class="nav-buttons-wrapper"></div>
     </div>
-  </header>
 
-  <main class="container">
-    <section class="section">
-      <div class="card p" style="margin-bottom: 16px;">
-        <!-- 年份頁籤會長在這裡 -->
-        <div id="yearTabs" class="year-tabs"></div>
-        <!-- 該年份的月份與日期列表會長在這裡 -->
-        <div id="monthList"></div>
-      </div>
-      
-      <div class="row" style="justify-content: flex-end; gap: 16px; flex-wrap: wrap">
-        <!-- 保留原本的 select 但隱藏起來，確保其他邏輯正常運作 -->
-        <select id="weekSelect" class="hidden"></select>
-        <button id="shareBtn" class="btn">複製此週分享連結</button>
-        <button id="openAllBtn" class="primary">開啟全部</button>
-      </div>
-    </section>
+    <div class="section theme-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <h3 class="desc-header theme-text" style="margin: 0; cursor: pointer;" onclick="toggleDescCollapse()">📖 頁面說明 / 欄位定義 <span id="descToggleIcon">▼</span></h3>
+            <div style="margin-top: 5px;" id="descBtnGroup">
+                <button class="btn-edit" id="editDescBtn" onclick="enableDescEdit()">編輯說明</button>
+            </div>
+        </div>
+        <div id="descBody" style="display: block;">
+            <div id="descDisplay" style="margin-top: 10px; white-space: pre-wrap; font-size: 15px; color: #444; min-height: 20px;"></div>
+        </div>
+    </div>
 
-    <section id="weekHeader" class="section">
-      <h1 id="weekTitle" style="margin:0 0 6px;font-size:24px"></h1>
-      <div class="muted" id="weekDate"></div>
-    </section>
+    <div id="descModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="theme-text">✏️ 編輯頁面說明 / 欄位定義</h3>
+            <textarea id="descModalInput" placeholder="請輸入這個頁面的說明，或是記錄這10個欄位分別代表什麼意思..."></textarea>
+            <div class="modal-actions">
+                <button class="btn-delete" onclick="deleteDescription()" style="float: left;">🗑️ 清除內容</button>
+                <button class="btn-cancel" style="display: inline-block;" onclick="closeDescModal()">取消</button>
+                <button class="btn-add" onclick="saveDescription()">💾 儲存</button>
+            </div>
+        </div>
+    </div>
 
-    <section id="cards" class="grid"></section>
+    <div class="section theme-box" style="opacity: 0.95;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <h3 class="theme-text" style="margin: 0 0 5px 0;">🔃 多重優先權排序</h3>
+            <button class="btn-cancel" style="display: inline-block; padding: 4px 8px; font-size: 12px;" onclick="resetMultiSort()">清除所有排序設定</button>
+        </div>
+        <div style="font-size: 13px; color: #666; margin-bottom: 10px;">設定最多 5 層優先權，新資料輸入後會自動排入正確順序。</div>
+        <div id="multiSortContainer" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            </div>
+    </div>
 
-    <!-- Admin Panel (only for provider) -->
-    <section id="adminPanel" class="section admin-panel hidden">
-      <h2 style="margin:0 0 12px">編輯模式（僅自己可見）</h2>
-      <details>
-        <summary>新增 / 更新一週</summary>
-        <div class="row" style="margin-top:12px;gap:12px;align-items:flex-start;flex-wrap:wrap">
-          <div style="flex:1;min-width:220px">
-            <label>日期（週一，YYYY-MM-DD）</label>
-            <input id="inpDate" type="date" />
-          </div>
-          <div style="flex:2;min-width:260px">
-            <label>標題（可選）</label>
-            <input id="inpTitle" type="text" placeholder="例如：第 33 週 – 專題" />
-          </div>
+
+    <div id="newsPage" class="app-page" style="display: none;">
+        <div class="section">
+            <h2 id="newsFormTitle" style="border:none; margin-top:0;">新增紀錄</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 300px;">
+                    <div class="form-group"><label>分類 (col1)</label><input type="text" id="newsCol1" placeholder="填寫分類名稱..." style="width: 100%;"></div><br>
+                    <div class="form-group"><label>日期 (col2)</label><input type="date" id="newsCol2" style="width: 100%;"></div><br>
+                    <div class="form-group"><label>標題 (col3)</label><input type="text" id="newsCol3" placeholder="事件標題..." style="width: 100%;"></div><br>
+                    <div class="form-group"><label>相關連結網址 (col5)</label><textarea id="newsCol5" rows="2" style="width: 100%;" placeholder="貼上網址..."></textarea></div>
+                </div>
+                <div style="flex: 2; min-width: 300px;">
+                    <div class="form-group" style="width: 100%;">
+                        <label>詳細內容 (col4)</label>
+                        <textarea id="newsCol4" rows="8" style="width: 100%; max-width: 600px;" placeholder="記錄重點..."></textarea>
+                    </div>
+                    <div class="form-group" style="width: 100%;">
+                        <label>初始筆記 (col6)</label>
+                        <textarea id="newsCol6" rows="4" style="width: 100%; max-width: 600px;" placeholder="在此記錄您的初始觀點... (後續請使用留言板追蹤)"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div style="display:none;">
+                <input type="hidden" id="newsCol7"><input type="hidden" id="newsCol8">
+                <input type="hidden" id="newsCol9"><input type="hidden" id="newsCol10">
+            </div>
+            <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                <button id="submitNewsBtn" class="btn-add" onclick="submitNewsData()">儲存紀錄</button>
+                <button id="cancelNewsBtn" class="btn-cancel" onclick="cancelNewsEdit()">取消編輯</button>
+            </div>
+        </div>
+
+        <div class="section" style="background-color: #f7f9fc;">
+            <h2 id="newsTableTitle">時間軸總覽</h2>
+            
+            <div style="margin-bottom: 15px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ddd; box-shadow: inset 0 0 5px rgba(0,0,0,0.05);">
+                <div style="display:flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px; align-items: flex-end;">
+                    <div><label style="font-size:13px; color:#555;">🔍 關鍵字 (可用空白隔開)：</label><br><input type="text" id="newsFilterInput" placeholder="輸入關鍵字..." onkeypress="if(event.key === 'Enter') renderNewsTimeline()"></div>
+                    <div><label style="font-size:13px; color:#555;">📅 起始日期：</label><br><input type="date" id="newsStartDate" onchange="renderNewsTimeline()"></div>
+                    <div><label style="font-size:13px; color:#555;">📅 結束日期：</label><br><input type="date" id="newsEndDate" onchange="renderNewsTimeline()"></div>
+                    <div>
+                        <button class="btn-filter" style="margin-bottom:0;" onclick="renderNewsTimeline()">套用篩選</button> 
+                        <button class="btn-cancel" style="display:inline-block; margin-bottom:0;" onclick="clearNewsFilters()">清除條件</button>
+                        <button id="globalNewsExpandBtn" class="btn-copy" style="margin-bottom:0; background-color:#607d8b;" onclick="toggleGlobalNewsExpand()">全展/全收 ↕</button>
+                    </div>
+                </div>
+                
+                <div id="newsCategoryFilters" style="display:flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
+                    </div>
+            </div>
+            
+            <div class="news-layout-wrapper">
+                <div class="news-timeline-section">
+                    <div class="timeline" id="newsTimelineContainer"></div>
+                </div>
+                <div class="news-detail-panel" id="newsDetailPanel">
+                    <button class="detail-close-btn" onclick="closeNewsDetail()">✖</button>
+                    <h3 style="margin-top:0; color:var(--theme-primary);">🔍 詳細檢視與留言</h3>
+                    <div id="newsDetailContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="foodPage" class="app-page" style="display: none;">
+        <div class="section">
+            <h2 id="foodFormTitle">新增美食店家</h2>
+            <div class="form-group"><label>縣市</label><input type="text" id="city"></div><div class="form-group"><label>區域</label><input type="text" id="district"></div><div class="form-group"><label>地址</label><textarea id="address" rows="2"></textarea></div><div class="form-group"><label>店名</label><input type="text" id="storeName"></div><div class="form-group"><label>分類</label><input type="text" id="category"></div><div class="form-group"><label>其他</label><textarea id="other" rows="2"></textarea></div>
+            <div style="margin-top: 10px;"><button id="submitFoodBtn" class="btn-add" onclick="submitFoodData()">新增資料</button><button id="cancelFoodBtn" class="btn-cancel" onclick="cancelFoodEdit()">取消編輯</button></div>
         </div>
         <div class="section">
-          <label>YouTube 連結（每行一個）</label>
-          <textarea id="inpUrls" rows="8" class="mono" placeholder="https://www.youtube.com/watch?v=...\nhttps://youtu.be/...\nhttps://www.youtube.com/shorts/...\n"></textarea>
-        </div>
-        <div class="row">
-          <button id="saveWeekBtn" class="primary">儲存（先存本機）</button>
-          <button id="clearFormBtn">清空表單</button>
-        </div>
-      </details>
-
-      <div class="section">
-        <h3 style="margin:0 0 8px">目前週次（本機草稿，可刪改）</h3>
-        <div class="muted" style="margin-bottom:8px">說明：這些修改只存在你的瀏覽器。確認無誤後，請「匯出資料」，再將產出 JSON 內嵌回此 HTML 的 <span class="mono">const DATA = [...]</span> 中重新發佈，其他人才會看到更新。</div>
-        <table class="table" id="weeksTable">
-          <thead><tr><th>日期</th><th>標題</th><th class="nowrap">連結數</th><th>操作</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <div class="row section" style="flex-wrap:wrap">
-        <button id="exportJsonBtn">匯出資料（JSON 檔）</button>
-        <button id="copyJsonBtn">複製 JSON</button>
-        <span class="muted">或手動複製 JSON 後，覆蓋本檔案中的 <span class="mono">const DATA</span>。</span>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">© <span id="year"></span> 每週 YouTube 連結</div>
-  </footer>
-
-  <script>
-    // ===================== 可自訂區 =====================
-    const ADMIN_PASS = "09110724"; // ← 先改成你自己的密碼
-    // 初始資料（發佈時會顯示給所有訪客）。更新方式：在「編輯模式」匯出 JSON 後，貼回這裡。
-    const DATA = [
-      {
-        "date": "2026-06-14",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=HLPSqcz104I",
-            "https://www.youtube.com/watch?v=iEzwIQXdPrI",
-            "https://www.youtube.com/watch?v=aYrgYSm6ot4",
-            "https://www.youtube.com/watch?v=IKmj4z7isEg",
-            "https://www.youtube.com/watch?v=hBZTbGf40MM",
-            "https://www.youtube.com/watch?v=7MvR0bo-c2Y",
-            "https://www.youtube.com/watch?v=d9PhWb4cwhE",
-            "https://www.youtube.com/watch?v=LZ-OfwgFn2E",
-            "https://www.youtube.com/watch?v=8ZjN-XSiGQ8"
-        ]
-      },
-      {
-        "date": "2026-06-07",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=ErUUMYUsIZk",
-            "https://www.youtube.com/watch?v=lmHb7z2mkQw",
-            "https://www.youtube.com/watch?v=oD6cZ2O7D-Y",
-            "https://www.youtube.com/watch?v=AwowpP1kS6c",
-            "https://www.youtube.com/watch?v=H3gZFwHkLvA",
-            "https://www.youtube.com/watch?v=iYVDoWkzRJU",
-            "https://www.youtube.com/watch?v=FFSN-0PAMyo",
-            "https://www.youtube.com/watch?v=_jcOA2mbUT0",
-            "https://www.youtube.com/watch?v=MSFI43JeVrM"
-        ]
-    },
-    {
-        "date": "2026-05-31",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=EctUP8132Bs",
-            "https://www.youtube.com/watch?v=joeA7-jwQlU",
-            "https://www.youtube.com/watch?v=ZELDDaIMbBQ",
-            "https://www.youtube.com/watch?v=57iZaiakhPg",
-            "https://www.youtube.com/watch?v=_h8jxnPhQ4A",
-            "https://www.youtube.com/watch?v=nMbR2HsqCt8",
-            "https://www.youtube.com/watch?v=sAepS-C9snI",
-            "https://www.youtube.com/watch?v=hXgWTy3lqro",
-            "https://www.youtube.com/watch?v=W-J9fR1g0bI"
-        ]
-    },
-    {
-        "date": "2026-05-17",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=_W49E8AiJ5s",
-            "https://www.youtube.com/watch?v=ucDMDPsFfqw",
-            "https://www.youtube.com/watch?v=UWy_5BGdXu8",
-            "https://www.youtube.com/watch?v=zmOsM_TMAwg",
-            "https://www.youtube.com/watch?v=iezd427mN5g",
-            "https://www.youtube.com/watch?v=tm6KG9I5wxs",
-            "https://www.youtube.com/watch?v=jI6dkLJi7ss",
-            "https://www.youtube.com/watch?v=RvErCBSm0xI"
-        ]
-      },
-      {
-        "date": "2026-05-10",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=6tciFC4y_oo",
-            "https://www.youtube.com/watch?v=VsEtRcjukeY",
-            "https://www.youtube.com/watch?v=J7qKQfsX8mw",
-            "https://www.youtube.com/watch?v=x6SafTxZbPw",
-            "https://www.youtube.com/watch?v=A-tK8aoSv-o",
-            "https://www.youtube.com/watch?v=KLytSXw9BgI",
-            "https://www.youtube.com/watch?v=9a1Z4SFLZ0c",
-            "https://www.youtube.com/watch?v=48iP1jub-iE",
-            "https://www.youtube.com/watch?v=5UGMI-aCkzw"
-        ]
-      },
-      {
-        "date": "2026-05-03",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=oj-c7q9G8KU",
-            "https://www.youtube.com/watch?v=nx3jfA7cAt8",
-            "https://www.youtube.com/watch?v=7ycjZROMPqw",
-            "https://www.youtube.com/watch?v=iTGLJO8NFC4",
-            "https://www.youtube.com/watch?v=BY1OIq1q6Dk",
-            "https://www.youtube.com/watch?v=NOkKMyjikCc",
-            "https://www.youtube.com/watch?v=pFDXJyA6in4",
-            "https://www.youtube.com/watch?v=qK8PK0NWxWA"
-        ]
-      },
-      {
-        "date": "2026-04-26",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=rF_pCJpUYDw",
-            "https://www.youtube.com/watch?v=ywar53_8f-I",
-            "https://www.youtube.com/watch?v=DcxVexyIBus",
-            "https://www.youtube.com/watch?v=l2klOBkMFSQ",
-            "https://www.youtube.com/watch?v=bf9v7A-hrZc",
-            "https://www.youtube.com/watch?v=rh5x-iLfZOA",
-            "https://www.youtube.com/watch?v=78_pec4I3yQ",
-            "https://www.youtube.com/watch?v=2zb2l_FepKY",
-            "https://www.youtube.com/watch?v=2-jGyUFmbXg"
-        ]
-      },
-      {
-        "date": "2026-04-12",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=Ao4ZXHB0S8k",
-            "https://www.youtube.com/watch?v=aBCjMPl7BpU",
-            "https://www.youtube.com/watch?v=UXXmE9d1kzo",
-            "https://www.youtube.com/watch?v=aVcJglJVGcY",
-            "https://www.youtube.com/watch?v=_fDL_4rI518",
-            "https://www.youtube.com/watch?v=C6w8kMUgZH4",
-            "https://www.youtube.com/watch?v=0ssv20XsBT4",
-            "https://www.youtube.com/watch?v=U3_pYbU1y00",
-            "https://www.youtube.com/watch?v=x6pIqjyW8R0"
-        ]
-       },
-      {
-        "date": "2026-03-30",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=v7d_Dxf7ffs.",
-            "https://www.youtube.com/watch?v=IcNiqMQ5BN8",
-            "https://www.youtube.com/watch?v=BmecBvPG_0o",
-            "https://www.youtube.com/watch?v=qrw_OhIXg-8",
-            "https://www.youtube.com/watch?v=sJGbWfIFAuo",
-            "https://www.youtube.com/watch?v=0PgoT2-mhFk",
-            "https://www.youtube.com/watch?v=XkOsNmU_1q8",
-            "https://www.youtube.com/watch?v=j2OeLL4lIHk",
-            "https://www.youtube.com/watch?v=NyISZ-EL6RQ"
-        ]
-      },
-      {
-          "date": "2026-03-22",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=caxfIW5RjZo",
-              "https://www.youtube.com/watch?v=nKndDeascKk",
-              "https://www.youtube.com/watch?v=e_6to-7S-rM",
-              "https://www.youtube.com/watch?v=-4FuuY3VfUU",
-              "https://www.youtube.com/watch?v=-6gCwJzvwr4",
-              "https://www.youtube.com/watch?v=-9m7YE7TiqA",
-              "https://www.youtube.com/watch?v=dCcgDmZcIe8",
-              "https://www.youtube.com/watch?v=OJ_gxFA1VEY"
-          ]
-      },
-      {
-          "date": "2026-03-15",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=AnjQ69toP5w",
-              "https://www.youtube.com/watch?v=h_vfTvmzeOU",
-              "https://www.youtube.com/watch?v=t6Us6q87KLc",
-              "https://www.youtube.com/watch?v=0UPsrur1swA",
-              "https://www.youtube.com/watch?v=tFt6YROZZhs",
-              "https://www.youtube.com/watch?v=T70CvQSuPgY",
-              "https://www.youtube.com/watch?v=gcckvBDxG24",
-              "https://www.youtube.com/watch?v=XADjE9rdGAg",
-              "https://www.youtube.com/watch?v=EU0TWIRP5AA"
-          ]
-      },
-      {
-          "date": "2026-03-09",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=k6lC5n-fqT8",
-              "https://www.youtube.com/watch?v=vKaHe2fxVu8",
-              "https://www.youtube.com/watch?v=P5yfowVLUzU",
-              "https://www.youtube.com/watch?v=3rXsSMUhft4",
-              "https://www.youtube.com/watch?v=gzJ_kkmS5iM",
-              "https://www.youtube.com/watch?v=_Se3VqoWZ60",
-              "https://www.youtube.com/watch?v=FfEZojZ3aLg"
-            ]
-        },
-        {
-          "date": "2026-02-22",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=s_7xerte5Yg",
-              "https://www.youtube.com/watch?v=_gdc6p0kl8Y",
-              "https://www.youtube.com/watch?v=iLE0vAVqxG0",
-              "https://www.youtube.com/watch?v=GlvJS_zu69o",
-              "https://www.youtube.com/watch?v=BJN1oegwwx4",
-              "https://www.youtube.com/watch?v=d96f6TA4gGw"
-          ]
-        },
-        {
-          "date": "2026-02-09",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=TTqqLUCefB8",
-              "https://www.youtube.com/watch?v=1Zn3PXMxTZ0",
-              "https://www.youtube.com/watch?v=Fi1K-jYbSPI",
-              "https://www.youtube.com/watch?v=9pcaevjV4kE",
-              "https://www.youtube.com/watch?v=3AxHpNljX2U",
-              "https://www.youtube.com/watch?v=4wZsSFEEhjg"
-          ]
-      },
-      {
-          "date": "2026-02-02",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=4DBBo9O9OLM",
-              "https://www.youtube.com/watch?v=CBI5-BkfdVU",
-              "https://www.youtube.com/watch?v=1HD7rotEzWc",
-              "https://www.youtube.com/watch?v=NFee1_tY1iY",
-              "https://www.youtube.com/watch?v=3BBa7fThdY4",
-              "https://www.youtube.com/watch?v=pN8tg-vbGD0"
-          ]
-        },
-        {
-          "date": "2026-01-26",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=Txlx49PeXxk",
-              "https://www.youtube.com/watch?v=mo2JNN-WfDI",
-              "https://www.youtube.com/watch?v=zXSw6uKn0H0",
-              "https://www.youtube.com/watch?v=re92hsGIQyY",
-              "https://www.youtube.com/watch?v=PII6n1qXKcs",
-              "https://www.youtube.com/watch?v=qS413E32dOg",
-              "https://www.youtube.com/watch?v=51iJQI6b8GY",
-              "https://www.youtube.com/watch?v=ms0KdROn0Gc",
-              "https://www.youtube.com/watch?v=9pmrxZSN3PE"
-          ]
-      }
-      ,
-      {
-        "date": "2026-01-18",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=_6MtkyKnDr4",
-            "https://www.youtube.com/watch?v=m-GhwxBClJE",
-            "https://www.youtube.com/watch?v=ju-hsvUmdGc",
-            "https://www.youtube.com/watch?v=Wm_KByvLAC8",
-            "https://www.youtube.com/watch?v=TIS76GES8TQ",
-            "https://www.youtube.com/watch?v=5_5LmrRJ3hY",
-            "https://www.youtube.com/watch?v=5tl4CxJznDY",
-            "https://www.youtube.com/watch?v=gw7L457fwCw",
-            "https://www.youtube.com/watch?v=p_OuXdCXg0M"
-        ]
-      },
-      {
-        "date": "2026-01-12",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=38SaZNO2vMo",
-            "https://www.youtube.com/watch?v=vgO0nzknX94",
-            "https://www.youtube.com/watch?v=ivkSQGHUMtU",
-            "https://www.youtube.com/watch?v=SevKTi0JV-g",
-            "https://www.youtube.com/watch?v=8jPo8_P0fWY",
-            "https://www.youtube.com/watch?v=68p84XqNBGM",
-            "https://www.youtube.com/watch?v=t5pJR2Y2mpA",
-            "https://www.youtube.com/watch?v=jYszA-FrjQo",
-            "https://www.youtube.com/watch?v=rIX16MtXYrg"
-        ]
-    }
-    ,{
-        "date": "2026-01-05",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=1ukzDS8S4bs",
-            "https://www.youtube.com/watch?v=znUtl3-Y8SM",
-            "https://www.youtube.com/watch?v=cS8AAt9FVCI",
-            "https://www.youtube.com/watch?v=WuaXRvZKxTE",
-            "https://www.youtube.com/watch?v=pSdGQjUgWbs",
-            "https://www.youtube.com/watch?v=-2HSq_Zfuck"
-        ]
-      },
-      {
-          "date": "2025-12-29",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=5wV0oYDgDZY",
-              "https://www.youtube.com/watch?v=Tmztnqga_A4",
-              "https://www.youtube.com/watch?v=cPtpVUOno5Q",
-              "https://www.youtube.com/watch?v=QzKSAffcbvY",
-              "https://www.youtube.com/watch?v=EnmKK31z5SM",
-              "https://www.youtube.com/watch?v=CeqCr-ZKNUk",
-              "https://www.youtube.com/watch?v=S7IEm_E0F8o",
-              "https://www.youtube.com/watch?v=QxE1xoxDDi4"
-          ]
-      },
-      {
-          "date": "2025-12-07",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=225NmMs-uhw",
-              "https://www.youtube.com/watch?v=ZRY9UzQfhH0",
-              "https://www.youtube.com/watch?v=59pVEubASss",
-              "https://www.youtube.com/watch?v=cyBvvkzyy-8",
-              "https://www.youtube.com/watch?v=uWJPJ3ThCB4",
-              "https://www.youtube.com/watch?v=ICoWqokwKk4"
-          ]
-      },
-      {
-        "date": "2025-11-30",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=oQ2hE4Nh82Q",
-            "https://www.youtube.com/watch?v=aOWUqeAeeBE",
-            "https://www.youtube.com/watch?v=E4xWwoIpWhI",
-            "https://www.youtube.com/watch?v=g_7eMw2YdNY",
-            "https://www.youtube.com/watch?v=HWCFCHiisOY",
-            "https://www.youtube.com/watch?v=Sp07UZor-Ik",
-            "https://www.youtube.com/watch?v=LEBsmu7E8WM",
-            "https://www.youtube.com/watch?v=qgliihBwwV8",
-            "https://www.youtube.com/watch?v=40-mdmwFJkA"
-        ]
-      },
-      {
-        "date": "2025-11-23",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=BYoGZxZnHu8",
-            "https://www.youtube.com/watch?v=nG6vMPnancQ",
-            "https://www.youtube.com/watch?v=8ot8eEMHoGM",
-            "https://www.youtube.com/watch?v=F8VrCxxCkhY",
-            "https://www.youtube.com/watch?v=3kU3vjKyuc4",
-            "https://www.youtube.com/watch?v=Bzh9Nnmq6g4",
-            "https://www.youtube.com/watch?v=XJUXfUeweMc",
-            "https://www.youtube.com/watch?v=2lnmAPoQq9w",
-            "https://www.youtube.com/watch?v=_gNGDGl763c"
-        ]
-      },
-      {
-          "date": "2025-11-16",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=IqCpVTunGk0",
-              "https://www.youtube.com/watch?v=ZmTQ0SDZzY4",
-              "https://www.youtube.com/watch?v=P5I9hSePIFc",
-              "https://www.youtube.com/watch?v=s_RUmTeGyuQ",
-              "https://www.youtube.com/watch?v=1kI-ChpE1So",
-              "https://www.youtube.com/watch?v=_g115favkSs",
-              "https://www.youtube.com/watch?v=-2DaiwkLsLE",
-              "https://www.youtube.com/watch?v=Su_8W332vTc",
-              "https://www.youtube.com/watch?v=K3nVoFZ4YSU"
-          ]
-      },
-      {
-          "date": "2025-11-09",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=O6NxTecSCYE",
-              "https://www.youtube.com/watch?v=Amv0NmVaN3s",
-              "https://www.youtube.com/watch?v=emMlqByQwxA",
-              "https://www.youtube.com/watch?v=oFp6SCx5wug",
-              "https://www.youtube.com/watch?v=F9IkhDQVuY4",
-              "https://www.youtube.com/watch?v=OOYwVjp_kfk",
-              "https://www.youtube.com/watch?v=sxuxg_8-FG8",
-              "https://www.youtube.com/watch?v=6s4egsLvHi4",
-              "https://www.youtube.com/watch?v=SoSqyTisZWo"
-          ]
-      },
-      {
-          "date": "2025-11-03",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=OCN7vvTiAFM",
-              "https://www.youtube.com/watch?v=UDhGnHHgxKY",
-              "https://www.youtube.com/watch?v=hcA1BpNWUj8",
-              "https://www.youtube.com/watch?v=y-CNSgeQiCw",
-              "https://www.youtube.com/watch?v=ic9Tc2D4QMc",
-              "https://www.youtube.com/watch?v=mSXpAnSbA6g",
-              "https://www.youtube.com/watch?v=MH8piEuCzMU",
-              "https://www.youtube.com/watch?v=EqYgsFFKHg4",
-              "https://www.youtube.com/watch?v=q9PkHm8E74o"
-          ]
-      },
-      {  
-          "date": "2025-10-27",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=FfD8Emjjj70",
-              "https://www.youtube.com/watch?v=GjZCQ3LTyUU",
-              "https://www.youtube.com/watch?v=4Lig9jHW3ms",
-              "https://www.youtube.com/watch?v=iynkbce51aU",
-              "https://www.youtube.com/watch?v=-HcsZsKB9ps",
-              "https://www.youtube.com/watch?v=wMg_cLRfEBk"
-          ]
-      },
-      {  
-          "date": "2025-10-19",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=iwoO2K6Zpt8",
-              "https://www.youtube.com/watch?v=UJQqXhygPXU",
-              "https://www.youtube.com/watch?v=Xyugx_J5zPs",
-              "https://www.youtube.com/watch?v=lLSmGX-vdAI",
-              "https://www.youtube.com/watch?v=cyX6KL-2FVA",
-              "https://www.youtube.com/watch?v=85wVKErrzjo",
-              "https://www.youtube.com/watch?v=R5Ev_EmvJzQ",
-              "https://www.youtube.com/watch?v=SUFSchudtng"
-          ]
-      },
-      {
-          "date": "2025-10-12",
-          "title": "65Volleyball",
-          "urls": [
-              "https://www.youtube.com/watch?v=8C1c334gtMI",
-              "https://www.youtube.com/watch?v=OyWns6yRZIA",
-              "https://www.youtube.com/watch?v=0Wjpsqy3n70",
-              "https://www.youtube.com/watch?v=klT13Qbz9Bs",
-              "https://www.youtube.com/watch?v=Y0OOTWzyGiU",
-              "https://www.youtube.com/watch?v=LC-QvWWxuNg",
-              "https://www.youtube.com/watch?v=MceKSGgmQYI",
-              "https://www.youtube.com/watch?v=QEdhmIQ-vG4"
-          ]
-      },
-
-      {
-        "date": "2025-09-28",
-        "title": "65Volleyball",
-        "urls": [
-            "https://www.youtube.com/watch?v=dfFmchLTwzo",
-            "https://www.youtube.com/watch?v=JW8ony-72EM",
-            "https://www.youtube.com/watch?v=ie1w5MOibU8",
-            "https://www.youtube.com/watch?v=M6ZlIZX3KnI",
-            "https://www.youtube.com/watch?v=tNCorvyxMJc",
-            "https://www.youtube.com/watch?v=n_25h4Yfjto"
-        ]
-      },
-
-      {
-        "date": "2025-09-21",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=Na9fy2Haq5Q",
-          "https://www.youtube.com/watch?v=7wSdnYZ0A8E",
-          "https://www.youtube.com/watch?v=VOEmu97sNj4",
-          "https://www.youtube.com/watch?v=CdqE_9HfLXg",
-          "https://www.youtube.com/watch?v=fLJbMBoZ_4c",
-          "https://www.youtube.com/watch?v=hLIZJPd-6Wc",
-          "https://www.youtube.com/watch?v=vHSMpS6ReUM",
-          "https://www.youtube.com/watch?v=FmuUdpASR4Y",
-          "https://www.youtube.com/watch?v=C7JPV-FnCPM"
-        ]
-      },
-      {
-        "date": "2025-09-14",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=UxzlvnxSWQo",
-          "https://www.youtube.com/watch?v=ce6L1DXqX1E",
-          "https://www.youtube.com/watch?v=Hcd-zhchP80",
-          "https://www.youtube.com/watch?v=Pwk6foQLTAA",
-          "https://www.youtube.com/watch?v=pahBgoD6x5Q",
-          "https://www.youtube.com/watch?v=T0XZPxiz488",
-          "https://www.youtube.com/watch?v=X8rFNiHSNVw",
-          "https://youtu.be/fNXUAlifhIs?si=Btt66F5p3SyckMlL"
-        ]
-      },
-      {
-        "date": "2025-09-07",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=CpkW4X3aeG8",
-          "https://www.youtube.com/watch?v=pWp83Rzr6Xk",
-          "https://www.youtube.com/watch?v=UkXlYZMb87c",
-          "https://www.youtube.com/watch?v=tRc0HuH25VY",
-          "https://www.youtube.com/watch?v=B0BAPQC4SK0",
-          "https://www.youtube.com/watch?v=4lPRzqmFc5U",
-          "https://www.youtube.com/watch?v=RMy0ZACcTsc",
-          "https://www.youtube.com/watch?v=68GCuM4bib8",
-          "https://www.youtube.com/watch?v=3T2RqWdvLJ4",
-          "https://www.youtube.com/watch?v=z3Qd_IGzVb4"
-        ]
-      },
-      {
-        "date": "2025-08-31",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=viC2Gqx3Ecs",
-          "https://www.youtube.com/watch?v=oLlWYKaP_7g",
-          "https://www.youtube.com/watch?v=kVhdlPR_Hvw",
-          "https://www.youtube.com/watch?v=gQZE71fVbrA",
-          "https://www.youtube.com/watch?v=AivhyU2qaQg",
-          "https://www.youtube.com/watch?v=ZdS2kBKHepU",
-          "https://www.youtube.com/watch?v=fk2FenjttQs",
-          "https://www.youtube.com/watch?v=V-twGoJjSds"
-        ]
-      },
-      {
-        "date": "2025-08-24",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=7BXJBrKNepE",
-          "https://www.youtube.com/watch?v=4OstkLJZo8E",
-          "https://www.youtube.com/watch?v=t00wNJ8Ia3g",
-          "https://www.youtube.com/watch?v=ab3y2UIPwDQ",
-          "https://www.youtube.com/watch?v=MSdoJXFB7KE",
-          "https://www.youtube.com/watch?v=Q0-2ZTymC_U",
-          "https://www.youtube.com/watch?v=v6mB-tXuxic",
-          "https://www.youtube.com/watch?v=giwr159YqSM",
-          "https://www.youtube.com/watch?v=Ic45nRWVbCo"
-        ]
-      },
-      {
-        "date": "2025-08-17",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=QWT51v2Qowc",
-          "https://www.youtube.com/watch?v=a8Wx-boUflI",
-          "https://www.youtube.com/watch?v=ogv82lE9V6s",
-          "https://www.youtube.com/watch?v=8IjIGsFcKH8",
-          "https://www.youtube.com/watch?v=ESk5CaBpcyw",
-          "https://www.youtube.com/watch?v=DytYNPsqhPM",
-          "https://www.youtube.com/watch?v=iOgZK3adqkw",
-          "https://www.youtube.com/watch?v=JuEC4h105FA"
-        ]
-      },
-      {
-        "date": "2025-08-10",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=5RFF_A_SIzg",
-          "https://www.youtube.com/watch?v=b4AsMV4OBAA",
-          "https://www.youtube.com/watch?v=i3LJqki8Fms",
-          "https://www.youtube.com/watch?v=pzrP0K8hBYo",
-          "https://www.youtube.com/watch?v=mzKYWunfhzA",
-          "https://www.youtube.com/watch?v=BLiFiUHvdkw"
-        ]
-      },
-      {
-        "date": "2025-08-03",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=3LhnX1GS6CI",
-          "https://www.youtube.com/watch?v=9dYbAzYHuF4",
-          "https://www.youtube.com/watch?v=PC-rJjfJj4o",
-          "https://www.youtube.com/watch?v=h_wO19_XD6Q",
-          "https://www.youtube.com/watch?v=e-ot6IEUfac",
-          "https://www.youtube.com/watch?v=-v9KSoc3gvE"
-        ]
-      },
-      {
-        "date": "2025-07-27",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=kPUG2ttFZOs",
-          "https://www.youtube.com/watch?v=ce52ldsWrE4",
-          "https://www.youtube.com/watch?v=HEPjbsC5yn0",
-          "https://www.youtube.com/watch?v=FVE0HAYRpKI",
-          "https://www.youtube.com/watch?v=AIzM6iv77_8",
-          "https://www.youtube.com/watch?v=cmYSe28ek_M"
-        ]
-      },
-      {
-        "date": "2025-07-20",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=I7UMENz-DTU",
-          "https://www.youtube.com/watch?v=Mg7q4mNAJhk",
-          "https://www.youtube.com/watch?v=TYVWFy4nvmk",
-          "https://www.youtube.com/watch?v=P264dR0vuts",
-          "https://www.youtube.com/watch?v=qffP0fQrXrw",
-          "https://www.youtube.com/watch?v=NtpqDbAPPuc"
-        ]
-      },
-      {
-        "date": "2025-07-13",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=UFyD6ElO3Eo",
-          "https://www.youtube.com/watch?v=ky34ed7EkWg",
-          "https://www.youtube.com/watch?v=R441XM5_HPo",
-          "https://www.youtube.com/watch?v=Q0be-rumVWI",
-          "https://www.youtube.com/watch?v=VGKeDOwXg50",
-          "https://www.youtube.com/watch?v=bIKkHaM3kVE",
-          "https://www.youtube.com/watch?v=w1CxtrLo0Uc",
-          "https://www.youtube.com/watch?v=4_26daObIMg",
-          "https://www.youtube.com/watch?v=c0LmA1-0NEI"
-        ]
-      },
-      {
-        "date": "2025-07-06",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=yMTGCA4cRCg",
-          "https://www.youtube.com/watch?v=ncemRGJK4co",
-          "https://www.youtube.com/watch?v=pshh5J0Ixis",
-          "https://www.youtube.com/watch?v=NMUzYji12Tw",
-          "https://www.youtube.com/watch?v=pc40CF3c_6g",
-          "https://www.youtube.com/watch?v=qft1AlBvixw",
-          "https://www.youtube.com/watch?v=j70eu06NEI8",
-          "https://www.youtube.com/watch?v=uNcNtW4smEA",
-          "https://www.youtube.com/watch?v=xL-eR0fkEm0"
-        ]
-      },
-      {
-        "date": "2025-06-29",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=YoDCmxShxQE",
-          "https://www.youtube.com/watch?v=nFRAJF4eiro",
-          "https://www.youtube.com/watch?v=QqTc06AQL0E",
-          "https://www.youtube.com/watch?v=_Ya2e8QfT2Q",
-          "https://www.youtube.com/watch?v=3u6vbduuMm8",
-          "https://www.youtube.com/watch?v=a_MEXdrh8I0"
-        ]
-      },
-      {
-        "date": "2025-06-22",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=lpmrgk2EUds",
-          "https://www.youtube.com/watch?v=wF07vIbp2ok",
-          "https://www.youtube.com/watch?v=MrN_-f1ILhE",
-          "https://www.youtube.com/watch?v=UIDfuZIe1X4",
-          "https://www.youtube.com/watch?v=UzYqiJ14hhg",
-          "https://www.youtube.com/watch?v=-nFw_Os2qdY"
-        ]
-      },
-      {
-        "date": "2025-06-08",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=C2o_Sb5-8zs",
-          "https://www.youtube.com/watch?v=1ymATvhKlO0",
-          "https://www.youtube.com/watch?v=292Ex7_NFVo",
-          "https://www.youtube.com/watch?v=2rhk9QVJy80",
-          "https://www.youtube.com/watch?v=54c_EavV3BQ",
-          "https://www.youtube.com/watch?v=rgNRNngPk4g"
-        ]
-      },
-      {
-        "date": "2025-06-01",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=9-lWDM6CkZQ",
-          "https://www.youtube.com/watch?v=yfFoRbcgTeI",
-          "https://www.youtube.com/watch?v=pLpyar69EOk",
-          "https://www.youtube.com/watch?v=494lxu-Ba8s",
-          "https://www.youtube.com/watch?v=GgdErdXWf04",
-          "https://www.youtube.com/watch?v=gS-UAtwK6og"
-        ]
-      },
-      {
-        "date": "2025-05-25",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=AAgKn-L-qiM",
-          "https://www.youtube.com/watch?v=7WFMc7nXuWM",
-          "https://www.youtube.com/watch?v=ztwOK5iYYRA",
-          "https://www.youtube.com/watch?v=zsuVfPx4UeE",
-          "https://www.youtube.com/watch?v=7g9Ynt9795c",
-          "https://www.youtube.com/watch?v=PEcoBpCQrh8"
-        ]
-      },
-      {
-        "date": "2025-05-18",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=nA0pnqgpvzw",
-          "https://www.youtube.com/watch?v=uBvMlnUFUbY",
-          "https://www.youtube.com/watch?v=xck7aLys1Vg",
-          "https://www.youtube.com/watch?v=duUtB2V3mB0",
-          "https://www.youtube.com/watch?v=l_ZzrgWB5w8",
-          "https://www.youtube.com/watch?v=gxxyC036mVQ"
-        ]
-      },
-      {
-        "date": "2025-05-04",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=jlfgv0Kp5Ts",
-          "https://www.youtube.com/watch?v=K-_MRCcI-m4",
-          "https://www.youtube.com/watch?v=GvdQYXFo3rc",
-          "https://www.youtube.com/watch?v=YnCG1mMpCOs",
-          "https://www.youtube.com/watch?v=RJxkMROBg4o",
-          "https://www.youtube.com/watch?v=ouTM9lrE47s"
-        ]
-      },
-      {
-        "date": "2025-04-27",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=M7up2OXZrtM",
-          "https://www.youtube.com/watch?v=GNJICcUHMoU",
-          "https://www.youtube.com/watch?v=i_taJv0ofIU",
-          "https://www.youtube.com/watch?v=1Iy3fvYsdgQ",
-          "https://www.youtube.com/watch?v=3F4EKFUv6YM",
-          "https://www.youtube.com/watch?v=DsJg_YmqGGs"
-        ]
-      },
-      {
-        "date": "2025-04-20",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=8lFOcqiE_7g",
-          "https://www.youtube.com/watch?v=1Chq-Q04P_M",
-          "https://www.youtube.com/watch?v=dH4Lg6AGK9w",
-          "https://www.youtube.com/watch?v=pVJFDDguTBw",
-          "https://www.youtube.com/watch?v=9tz1a7oxQWQ",
-          "https://www.youtube.com/watch?v=eWxXpzLcTUQ"
-        ]
-      },
-      {
-        "date": "2025-04-13",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=BBDzfCOxCB4",
-          "https://www.youtube.com/watch?v=2thdOoL8-5s",
-          "https://www.youtube.com/watch?v=-aYa0ebweVI",
-          "https://www.youtube.com/watch?v=DzC6a5OqU1c",
-          "https://www.youtube.com/watch?v=e64nUas15KQ",
-          "https://www.youtube.com/watch?v=zzdVkiRIFzE"
-        ]
-      },
-      {
-        "date": "2025-03-30",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=onwzG6_sdTs",
-          "https://www.youtube.com/watch?v=7dej-ekbXv0",
-          "https://www.youtube.com/watch?v=aeMpeVW4yt0",
-          "https://www.youtube.com/watch?v=brf4hLCeJjM",
-          "https://www.youtube.com/watch?v=5ToKFqAdHok",
-          "https://www.youtube.com/watch?v=0wB5hLf0iCI"
-        ]
-      },
-      {
-        "date": "2025-03-23",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=zYc1iKCo-2A",
-          "https://www.youtube.com/watch?v=1gGi_fubnLE",
-          "https://www.youtube.com/watch?v=uqy3_eHsNIc",
-          "https://www.youtube.com/watch?v=h-ros1h1RyA",
-          "https://www.youtube.com/watch?v=hSpiQkGHh0Q",
-          "https://www.youtube.com/watch?v=XwSOEY7aosM"
-        ]
-      },
-      {
-        "date": "2025-03-16",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=F0tQiRQzv38",
-          "https://www.youtube.com/watch?v=ZTQmDnaGQ4s",
-          "https://www.youtube.com/watch?v=E1nqUNG3Lzg",
-          "https://www.youtube.com/watch?v=vM7dnAxbez4",
-          "https://www.youtube.com/watch?v=H0a_hRqIMAU"
-        ]
-      },
-      {
-        "date": "2025-03-09",
-        "title": "65Volleyball",
-        "urls": [
-          "https://www.youtube.com/watch?v=kEtN46hn3B4",
-          "https://www.youtube.com/watch?v=WFGjMC60AcE",
-          "https://www.youtube.com/watch?v=lOXepAQRnvo",
-          "https://www.youtube.com/watch?v=mwyYkBsZpko",
-          "https://www.youtube.com/watch?v=sbitdUFresQ",
-          "https://www.youtube.com/watch?v=eHhxQ7uKNlg"
-        ]
-      }
-    ];
-    // =====================================================
-
-    // ==== 工具 ====
-    const $ = (s, r=document) => r.querySelector(s);
-    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-    const qs = new URLSearchParams(location.search);
-    const fmtDate = (iso) => new Date(iso+"T00:00:00").toLocaleDateString(undefined,{year:'numeric',month:'2-digit',day:'2-digit'});
-    function getYouTubeId(url){
-      try{
-        const u = new URL(url);
-        if(u.hostname.includes('youtu.be')) return u.pathname.replace('/','');
-        if(u.hostname.includes('youtube.com')){
-          if(u.searchParams.get('v')) return u.searchParams.get('v');
-          const m = u.pathname.match(/\/shorts\/([\w-]+)/);
-          if(m) return m[1];
-        }
-      }catch{}
-      return null;
-    }
-
-    // ==== 狀態 ====
-    let baseWeeks = [...DATA];              // 來源（所有訪客可見）
-    let localWeeks = loadLocalWeeks();      // 只存在提供者瀏覽器
-    let weeks = mergeWeeks(baseWeeks, localWeeks);
-
-    function loadLocalWeeks(){
-      try{ return JSON.parse(localStorage.getItem('weekly-yt-data')||'[]'); }catch{return []}
-    }
-    function saveLocalWeeks(arr){ localStorage.setItem('weekly-yt-data', JSON.stringify(arr)); }
-    function mergeWeeks(base, local){
-      const map = new Map(base.map(w=>[w.date,w]));
-      local.forEach(w=>map.set(w.date,w));
-      return Array.from(map.values()).sort((a,b)=>b.date.localeCompare(a.date));
-    }
-
-    // ==== 渲染 ====
-    const weekSelect = $('#weekSelect');
-    const cards = $('#cards');
-    const weekTitle = $('#weekTitle');
-    const weekDate = $('#weekDate');
-
-    let currentYear = ''; // 記錄當前選擇的年份
-
-    function renderSelect() {
-      // 1. 建立隱藏的 select 選項 (維持原有邏輯)
-      weekSelect.innerHTML = weeks.map(w => `<option value="${w.date}">${w.date}</option>`).join('');
-      
-      // 初始化選中的日期
-      const want = qs.get('date');
-      weekSelect.value = weeks.find(w => w.date === want)?.date || weeks[0]?.date || '';
-      
-      // 決定當下要顯示的年份 (優先看網址帶的日期，沒有就抓最新的資料年份)
-      currentYear = weekSelect.value ? weekSelect.value.substring(0, 4) : (weeks[0]?.date.substring(0, 4) || new Date().getFullYear().toString());
-
-      renderCustomPicker();
-      renderWeek();
-    }
-
-    function renderCustomPicker() {
-      // 2. 將資料依年份、月份分組
-      const grouped = {};
-      weeks.forEach(w => {
-        const year = w.date.substring(0, 4);
-        const month = parseInt(w.date.substring(5, 7), 10) + "月"; // 轉成 "1月", "12月"
-        if (!grouped[year]) grouped[year] = {};
-        if (!grouped[year][month]) grouped[year][month] = [];
-        grouped[year][month].push(w);
-      });
-
-      // 3. 渲染年份頁籤
-      const years = Object.keys(grouped).sort((a, b) => b - a); // 遞減排序
-      const yearTabs = $('#yearTabs');
-      yearTabs.innerHTML = years.map(y => 
-        `<button class="year-tab ${y === currentYear ? 'active' : ''}" data-year="${y}">${y}年</button>`
-      ).join('');
-
-      // 綁定年份點擊事件
-      $$('.year-tab').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          currentYear = e.target.getAttribute('data-year');
-          renderCustomPicker(); // 重新渲染下方月份
-        });
-      });
-
-      // 4. 渲染月份與日期標籤
-      const monthList = $('#monthList');
-      const yearData = grouped[currentYear] || {};
-      // 確保月份由大到小排列 (12月 -> 1月)
-      const months = Object.keys(yearData).sort((a, b) => parseInt(b) - parseInt(a)); 
-      
-      let html = '';
-      months.forEach(m => {
-        html += `
-          <div class="month-row">
-            <div class="month-label">${m}</div>
-            <div class="date-pills">
-              ${yearData[m].map(w => {
-                const isSelected = w.date === weekSelect.value;
-                // 只顯示 MM-DD，例如 05-03
-                const shortDate = w.date.substring(5); 
-                return `<button class="date-pill ${isSelected ? 'active' : ''}" data-date="${w.date}">${shortDate}</button>`;
-              }).join('')}
+            <h2>美食清單與過濾</h2>
+            <div style="margin-bottom: 15px;"><input type="text" id="filterInput" placeholder="可用空白分隔多關鍵字" onkeypress="if(event.key === 'Enter') addFilterKeyword()"><button class="btn-filter" onclick="addFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="keywordContainer"></div></div>
+            <div class="col-toggle-box">
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
+                <label><input type="checkbox" checked onchange="toggleCol('dataTable', 1, this)">縣市</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 2, this)">區域</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 3, this)">地址</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 4, this)">店名</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 5, this)">分類</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 6, this)">其他</label><label><input type="checkbox" checked onchange="toggleCol('dataTable', 7, this)">地圖</label>
             </div>
-          </div>
-        `;
-      });
-      monthList.innerHTML = html || '<div class="muted">該年無資料</div>';
-
-      // 綁定日期點擊事件
-      $$('.date-pill').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const selectedDate = e.target.getAttribute('data-date');
-          weekSelect.value = selectedDate;
-          // 觸發原本 select 的 change 事件，這樣網址更新跟畫面渲染都會連動
-          weekSelect.dispatchEvent(new Event('change')); 
-          
-          // 更新按鈕的 active 狀態
-          $$('.date-pill').forEach(p => p.classList.remove('active'));
-          e.target.classList.add('active');
-        });
-      });
-    }
-
-    function renderWeek(){
-      const w = weeks.find(x=>x.date===weekSelect.value);
-      if(!w){ cards.innerHTML = '<div class="muted">尚無資料</div>'; return; }
-      weekTitle.textContent = w.title || '每週清單';
-      weekDate.textContent = '週期開始：' + fmtDate(w.date);
-      cards.innerHTML = w.urls.map((u,i)=>{
-        const id = getYouTubeId(u);
-        const thumb = id? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
-        const label = id? `https://youtu.be/${id}` : u;
-        return `
-          <a class="card" href="${u}" target="_blank" rel="noreferrer">
-            <div class="thumb">${thumb?`<img src="${thumb}" alt="">`:''}<span class="badge">#${i+1}</span></div>
-            <div class="p row" style="justify-content:space-between">
-              <div class="muted" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80%">${label}</div>
-              <span aria-hidden>↗</span>
+            <div class="table-responsive">
+                <table id="dataTable">
+                    <thead><tr><th onclick="handleHeaderSort('city')">縣市 ↕</th><th onclick="handleHeaderSort('district')">區域 ↕</th><th onclick="handleHeaderSort('address')">地址 ↕</th><th onclick="handleHeaderSort('storeName')">店名 ↕</th><th onclick="handleHeaderSort('category')">分類 ↕</th><th onclick="handleHeaderSort('other')">其他 ↕</th><th>地圖</th><th>操作</th></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
-          </a>`;
-      }).join('');
-    }
+        </div>
+    </div>
 
-    // ==== 使用者動作（共用）====
-    weekSelect.addEventListener('change',()=>{
-      renderWeek();
-      const url = new URL(location.href);
-      url.searchParams.set('date', weekSelect.value);
-      history.replaceState(null,'',url);
-    });
 
-    $('#openAllBtn').addEventListener('click',()=>{
-      const w = weeks.find(x=>x.date===weekSelect.value);
-      if(!w) return;
-      w.urls.forEach((u,i)=>setTimeout(()=>window.open(u,'_blank'), i*130));
-    });
+    <div id="sportsPage" class="app-page" style="display: none;">
+        <div class="section">
+            <h2 id="sportsFormTitle">新增運動紀錄</h2>
+            <div class="form-group"><label>日期</label><input type="date" id="sportDate"></div><div class="form-group"><label>運動類型</label><select id="sportType"><option value="跑步">跑步</option><option value="排球">排球</option><option value="其他">其他</option></select></div><div class="form-group"><label>距離 (km)</label><input type="text" id="sportDistance"></div><div class="form-group"><label>備註 / 心得</label><textarea id="sportNotes" rows="2" style="width: 250px;"></textarea></div>
+            <div style="margin-top: 10px;"><button id="submitSportsBtn" class="btn-add" onclick="submitSportsData()">新增紀錄</button><button id="cancelSportsBtn" class="btn-cancel" onclick="cancelSportsEdit()">取消編輯</button></div>
+        </div>
+        <div class="section">
+            <h2>訓練紀錄總覽</h2>
+            <div class="col-toggle-box">
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
+                <label><input type="checkbox" checked onchange="toggleCol('sportsTable', 1, this)">日期</label><label><input type="checkbox" checked onchange="toggleCol('sportsTable', 2, this)">運動類型</label><label><input type="checkbox" checked onchange="toggleCol('sportsTable', 3, this)">距離 (km)</label><label><input type="checkbox" checked onchange="toggleCol('sportsTable', 4, this)">備註</label>
+            </div>
+            <div class="table-responsive">
+                <table id="sportsTable">
+                    <thead><tr><th onclick="handleHeaderSort('date')">日期 ↕</th><th onclick="handleHeaderSort('type')">運動類型 ↕</th><th onclick="handleHeaderSort('distance')">距離 (km) ↕</th><th onclick="handleHeaderSort('notes')">備註 ↕</th><th>操作</th></tr></thead>
+                    <tbody id="sportsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    $('#shareBtn').addEventListener('click', async ()=>{
-      const url = new URL(location.href);
-      url.searchParams.set('date', weekSelect.value);
-      await navigator.clipboard.writeText(url.toString());
-      const btn = $('#shareBtn');
-      const old = btn.textContent; btn.textContent = '已複製';
-      setTimeout(()=>btn.textContent = old, 1200);
-    });
 
-    // ==== Admin / Provider ====
-    const adminBtn = $('#adminBtn');
-    const logoutBtn = $('#logoutBtn');
-    const adminPanel = $('#adminPanel');
+    <div id="travelPage" class="app-page" style="display: none;">
+        <div class="section">
+            <div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">
+                <label style="display:inline-block; margin-right: 20px; cursor: pointer; color: var(--theme-dark); font-weight: bold;"><input type="radio" name="travelAddMode" value="single" checked onchange="toggleTravelAddMode()"> 單筆詳細模式</label>
+                <label style="display:inline-block; cursor: pointer; color: #e65100; font-weight: bold;"><input type="radio" name="travelAddMode" value="batch" onchange="toggleTravelAddMode()"> 多筆快速合併 (網頁填表)</label>
+            </div>
+            <div id="travelSingleForm">
+                <h2 id="travelFormTitle" style="border:none; margin-top:0;">新增旅遊筆記</h2>
+                <div style="font-size: 13px; color: #555; margin-bottom: 15px; background:var(--theme-light); padding:8px; border-radius:5px;">💡 <strong>智慧合併：</strong>只要名稱相同，系統會自動把新欄位資料補進去，不會洗掉舊筆記！</div>
+                <div class="form-group"><label>主類別 (col1)</label><input type="text" id="travelCol1" placeholder="例如：景點/住宿/美食"></div>
+                <div class="form-group"><label>名稱(店名或地點) (col2)</label><input type="text" id="travelCol2" placeholder="合併鍵(必填)" style="border: 2px solid var(--theme-primary);"></div>
+                <div class="form-group"><label>地點(地址/座標) (col3)</label><textarea id="travelCol3" rows="2" placeholder="供 Map 匯入使用"></textarea></div>
+                <div class="form-group"><label>地理區域 (col4)</label><input type="text" id="travelCol4" placeholder="例如：東京"></div>
+                <div class="form-group"><label>彈性標籤 (col5)</label><input type="text" id="travelCol5" placeholder="例如：必去/夜景/排隊"></div><br>
+                <div class="form-group"><label>必訪亮點 / 筆記 (col6)</label><textarea id="travelCol6" rows="4" style="width: 250px;"></textarea></div>
+                <div class="form-group"><label>實用資訊包 (col7)</label><textarea id="travelCol7" rows="4" style="width: 250px;"></textarea></div>
+                <div style="margin-top: 10px;"><button id="submitTravelBtn" class="btn-add" onclick="submitTravelData()">儲存/合併筆記</button><button id="cancelTravelBtn" class="btn-cancel" onclick="cancelTravelEdit()">取消編輯</button></div>
+            </div>
+            <div id="travelBatchForm" style="display: none;">
+                <h2 style="border:none; margin-top:0;">網頁版多筆快速輸入</h2>
+                <div class="table-responsive">
+                    <table style="width: 100%; min-width: 900px; border-collapse: collapse;">
+                        <thead><tr style="background:var(--theme-light);"><th style="padding: 8px; border:1px solid #ccc;">主類別</th><th style="padding: 8px; border:1px solid #ccc; color:var(--theme-dark);">名稱 <small>(必填/合併鍵)</small></th><th style="padding: 8px; border:1px solid #ccc;">地點</th><th style="padding: 8px; border:1px solid #ccc;">地理區域</th><th style="padding: 8px; border:1px solid #ccc;">彈性標籤</th><th style="padding: 8px; border:1px solid #ccc;">必訪亮點/筆記</th><th style="padding: 8px; border:1px solid #ccc;">實用資訊包</th><th style="padding: 8px; border:1px solid #ccc;">操作</th></tr></thead>
+                        <tbody id="travelBatchTbody"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 15px;"><button class="btn-cancel" style="display:inline-block; background-color:#6c757d;" onclick="addTravelBatchRow()">➕ 增加一行輸入列</button><button class="btn-add" style="background-color: var(--theme-dark);" onclick="submitTravelBatchUI()">🚀 一鍵儲存上方所有資料</button></div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>旅遊行程總覽</h2>
+            <div style="margin-bottom: 15px;"><input type="text" id="travelFilterInput" placeholder="可用空白分隔多關鍵字" onkeypress="if(event.key === 'Enter') addTravelFilterKeyword()"><button class="btn-filter" onclick="addTravelFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="travelKeywordContainer"></div></div>
+            <div class="col-toggle-box">
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
+                <label><input type="checkbox" checked onchange="toggleCol('travelTable', 1, this)">主類別</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 2, this)">名稱</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 3, this)">地點</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 4, this)">區域</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 5, this)">標籤</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 6, this)">必訪亮點/筆記</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 7, this)">實用資訊包</label><label><input type="checkbox" checked onchange="toggleCol('travelTable', 8, this)">地圖</label>
+            </div>
+            <div class="table-responsive">
+                <table id="travelTable">
+                    <thead><tr><th onclick="handleHeaderSort('col1')">主類別 ↕</th><th onclick="handleHeaderSort('col2')">名稱 ↕</th><th onclick="handleHeaderSort('col3')">地點 ↕</th><th onclick="handleHeaderSort('col4')">地理區域 ↕</th><th onclick="handleHeaderSort('col5')">彈性標籤 ↕</th><th onclick="handleHeaderSort('col6')">必訪亮點/筆記 ↕</th><th onclick="handleHeaderSort('col7')">實用資訊包 ↕</th><th>地圖</th><th>操作</th></tr></thead>
+                    <tbody id="travelTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    function isAdminUrl(){ return qs.get('admin') === '1'; }
-    function setAdminUI(on){
-      adminPanel.classList.toggle('hidden', !on);
-      adminBtn.classList.toggle('hidden', on);
-      logoutBtn.classList.toggle('hidden', !on);
-    }
 
-    if(isAdminUrl()){
-      adminBtn.classList.remove('hidden');
-    }
+    <div id="notePage" class="app-page" style="display: none;">
+        <div class="section">
+            <h2 id="noteFormTitle">新增筆記 / 事件</h2>
+            <div class="form-group"><label>流水號 (col1)</label><input type="text" id="noteCol1" placeholder="例如：001"></div><div class="form-group"><label>日期 (col2)</label><input type="date" id="noteCol2"></div><div class="form-group"><label>分類 (col3)</label><input type="text" id="noteCol3"></div><div class="form-group"><label>內容 (col4)</label><textarea id="noteCol4" rows="3" style="width: 250px;"></textarea></div>
+            <script>for(let i=5; i<=10; i++) document.write(`<div class="form-group"><label>保留欄位 ${i}</label><textarea id="noteCol${i}" rows="2"></textarea></div>`);</script>
+            <div style="margin-top: 10px;"><button id="submitNoteBtn" class="btn-add" onclick="submitNoteData()">儲存筆記</button><button id="cancelNoteBtn" class="btn-cancel" onclick="cancelNoteEdit()">取消編輯</button></div>
+        </div>
+        <div class="section">
+            <h2>筆記總覽</h2>
+            <div style="margin-bottom: 15px;"><input type="text" id="noteFilterInput" placeholder="可用空白分隔多關鍵字" onkeypress="if(event.key === 'Enter') addNoteFilterKeyword()"><button class="btn-filter" onclick="addNoteFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="noteKeywordContainer"></div></div>
+            <div class="col-toggle-box">
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
+                <label><input type="checkbox" checked onchange="toggleCol('noteTable', 1, this)">流水號</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 2, this)">日期</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 3, this)">分類</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 4, this)">內容</label>
+                <script>for(let i=5; i<=10; i++){ document.write(`<label><input type="checkbox" checked onchange="toggleCol('noteTable', ${i}, this)">欄位 ${i}</label>`); }</script>
+            </div>
+            <div class="table-responsive">
+                <table id="noteTable">
+                    <thead><tr><th onclick="handleHeaderSort('col1')">流水號 ↕</th><th onclick="handleHeaderSort('col2')">日期 ↕</th><th onclick="handleHeaderSort('col3')">分類 ↕</th><th onclick="handleHeaderSort('col4')">內容 ↕</th><th onclick="handleHeaderSort('col5')">欄位5 ↕</th><th onclick="handleHeaderSort('col6')">欄位6 ↕</th><th onclick="handleHeaderSort('col7')">欄位7 ↕</th><th onclick="handleHeaderSort('col8')">欄位8 ↕</th><th onclick="handleHeaderSort('col9')">欄位9 ↕</th><th onclick="handleHeaderSort('col10')">欄位10 ↕</th><th>操作</th></tr></thead>
+                    <tbody id="noteTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    let authed = false;
 
-    adminBtn.addEventListener('click', ()=>{
-      const p = prompt('請輸入編輯密碼：');
-      if(p === ADMIN_PASS){
-        authed = true; setAdminUI(true); renderWeeksTable(); preloadFormFromSelected();
-      }else if(p!==null){
-        alert('密碼錯誤');
-      }
-    });
+    <div id="genericPage" class="app-page" style="display: none;">
+        <div class="section">
+            <h2 id="genericFormTitle">新增擴充資料</h2>
+            <div id="genericInputsContainer">
+                <script>
+                    document.write(`<div class="form-group"><label id="genLabel1">流水號 (col1)</label><input type="text" id="genCol1"></div><div class="form-group"><label id="genLabel2">日期 (col2)</label><input type="date" id="genCol2"></div>`);
+                    for(let i=3; i<=10; i++){ document.write(`<div class="form-group"><label id="genLabel${i}">欄位 ${i}</label><textarea id="genCol${i}" rows="2"></textarea></div>`); }
+                </script>
+            </div>
+            <div style="margin-top: 10px;"><button id="submitGenericBtn" class="btn-add" onclick="submitGenericData()">新增資料</button><button id="cancelGenericBtn" class="btn-cancel" onclick="cancelGenericEdit()">取消編輯</button></div>
+        </div>
+        <div class="section">
+            <h2 id="genericTableTitle">資料總覽</h2>
+            <div style="margin-bottom: 15px;"><input type="text" id="genericFilterInput" placeholder="可用空白分隔多關鍵字" onkeypress="if(event.key === 'Enter') addGenericFilterKeyword()"><button class="btn-filter" onclick="addGenericFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="genericKeywordContainer"></div></div>
+            <div class="col-toggle-box">
+                <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
+                <script>for(let i=1; i<=10; i++){ document.write(`<label><input type="checkbox" checked onchange="toggleCol('genericTable', ${i}, this)">欄位 ${i}</label>`); }</script>
+            </div>
+            <div class="table-responsive">
+                <table id="genericTable">
+                    <thead><tr id="genericTableHeader">
+                        <script>for(let i=1; i<=10; i++){ document.write(`<th onclick="handleHeaderSort('col${i}')">欄位 ${i} ↕</th>`); } document.write(`<th>操作</th>`);</script>
+                    </tr></thead>
+                    <tbody id="genericTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    logoutBtn.addEventListener('click', ()=>{ authed=false; setAdminUI(false); });
 
-    function renderWeeksTable(){
-      const tbody = $('#weeksTable tbody');
-      tbody.innerHTML = weeks.map(w=>{
-        const count = w.urls.length;
-        return `<tr>
-          <td class="mono">${w.date}</td>
-          <td>${w.title||''}</td>
-          <td class="nowrap">${count}</td>
-          <td class="nowrap">
-            <button data-act="edit" data-date="${w.date}">編輯</button>
-            <button data-act="del" data-date="${w.date}" class="danger">刪除（本機）</button>
-          </td>
-        </tr>`;
-      }).join('');
+    <script>
+        // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
+        const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
 
-      tbody.querySelectorAll('button').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const date = e.currentTarget.getAttribute('data-date');
-          const act = e.currentTarget.getAttribute('data-act');
-          const w = weeks.find(x=>x.date===date);
-          if(act==='edit' && w){ fillForm(w); window.scrollTo({top:0,behavior:'smooth'}); }
-          if(act==='del'){
-            if(confirm('僅刪除此日期在「本機草稿」的版本，確定？')){
-              localWeeks = loadLocalWeeks().filter(x=>x.date!==date);
-              saveLocalWeeks(localWeeks);
-              weeks = mergeWeeks(baseWeeks, localWeeks);
-              renderSelect(); renderWeeksTable();
+        const PAGE_CONFIG = {
+            'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', label: '🍔 美食紀錄', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
+            'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', label: '🏃‍♂️ 運動紀錄', color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
+            'travelPage': { sheet: '擴充預留網頁7', name: '旅遊行程筆記', label: '✈️ 旅遊(7)', color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
+            'newsPage':   { sheet: '擴充預留網頁5', name: '時事焦點紀錄', label: '📰 時事(5)', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
+            'notePage':   { sheet: '擴充預留網頁1', name: '隨身綜合筆記', label: '📝 筆記(1)', color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
+            'extPage2':   { sheet: '擴充預留網頁2', name: '飲食日常紀錄', label: '🍽️ 飲食(2)', color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
+            'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', label: '🔗 連結(3)', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊紀錄', label: '🗼 東京旅遊(4)', color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
+            'extPage6':   { sheet: '擴充預留網頁6', name: '擴充預留網頁6', label: '📄 網頁6', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
+            'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', label: '📰 網頁8', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
+            'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', label: '📰 網頁9', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
+            'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', label: '📰 網頁10', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage11':  { sheet: '擴充預留網頁11', name: '擴充預留網頁11', label: '📰 網頁11', color: '#8e24aa', light: '#f3e5f5', dark: '#4a148c' },
+            'extPage12':  { sheet: '擴充預留網頁12', name: '擴充預留網頁12', label: '📰 網頁12', color: '#e53935', light: '#ffebee', dark: '#b71c1c' },
+            'extPage13':  { sheet: '擴充預留網頁13', name: '擴充預留網頁13', label: '📰 網頁13', color: '#d81b60', light: '#fce4ec', dark: '#880e4f' },
+            'extPage14':  { sheet: '擴充預留網頁14', name: '擴充預留網頁14', label: '📰 網頁14', color: '#3949ab', light: '#e8eaf6', dark: '#1a237e' },
+            'extPage15':  { sheet: '擴充預留網頁15', name: '擴充預留網頁15', label: '📰 網頁15', color: '#039be5', light: '#e0f7fa', dark: '#01579b' },
+            'extPage16':  { sheet: '擴充預留網頁16', name: '擴充預留網頁16', label: '📰 網頁16', color: '#00897b', light: '#e0f2f1', dark: '#004d40' },
+            'extPage17':  { sheet: '擴充預留網頁17', name: '擴充預留網頁17', label: '📰 網頁17', color: '#7cb342', light: '#f1f8e9', dark: '#33691e' },
+            'extPage18':  { sheet: '擴充預留網頁18', name: '擴充預留網頁18', label: '📰 網頁18', color: '#fdd835', light: '#fffde7', dark: '#f57f17' },
+            'extPage19':  { sheet: '擴充預留網頁19', name: '擴充預留網頁19', label: '📰 網頁19', color: '#fb8c00', light: '#fff3e0', dark: '#e65100' },
+            'extPage20':  { sheet: '擴充預留網頁20', name: '擴充預留網頁20', label: '📰 網頁20', color: '#6d4c41', light: '#efebe9', dark: '#3e2723' }
+        };
+
+        const TIMELINE_PAGES = ['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10', '擴充預留網頁11', '擴充預留網頁12', '擴充預留網頁13', '擴充預留網頁14', '擴充預留網頁15', '擴充預留網頁16', '擴充預留網頁17', '擴充預留網頁18', '擴充預留網頁19', '擴充預留網頁20'];
+
+        let currentPageId = 'foodPage';
+        let currentPageName = '美食紀錄';
+        let currentDescription = '';
+        let isDescCollapsed = false; 
+        let isGlobalNewsExpanded = false;
+
+        let filterKeywords = []; 
+        let foodDataList = []; let editingFoodId = null; 
+        let sportsDataList = []; let editingSportsId = null;
+        let noteDataList = []; let editingNoteId = null; let noteFilterKeywords = []; 
+        let genericDataList = []; let editingGenericId = null; let genericFilterKeywords = []; 
+        let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
+        let newsDataList = []; let editingNewsId = null; 
+
+        // 安全賦值與讀取 Helper
+        const safeStr = (val) => val != null ? String(val) : '';
+        const formatDate = (val) => { let str = safeStr(val); return str.includes('T') ? str.split('T')[0] : str; };
+        const safeSet = (id, val) => { let el = document.getElementById(id); if(el) el.value = val; };
+        const safeText = (id, text) => { let el = document.getElementById(id); if(el) el.innerText = text; };
+        const safeClass = (id, cls) => { let el = document.getElementById(id); if(el) el.className = cls; };
+        const safeDisplay = (id, disp) => { let el = document.getElementById(id); if(el) el.style.display = disp; };
+
+        window.onload = function() {
+            renderSortOptionsUI(); 
+            renderNavButtons();
+            
+            const today = new Date().toISOString().split('T')[0];
+            safeSet('sportDate', today); safeSet('noteCol2', today); safeSet('genCol2', today); safeSet('newsCol2', today);
+            switchPage('foodPage'); 
+        };
+
+        function renderNavButtons() {
+            let html = '';
+            for(let key in PAGE_CONFIG) {
+                html += `<button id="navBtn_${key}" class="nav-btn" onclick="switchPage('${key}')">${PAGE_CONFIG[key].label}</button>`;
             }
-          }
-        });
-      });
-    }
+            const wrapper = document.getElementById('navButtonsWrapper');
+            if(wrapper) wrapper.innerHTML = html;
+        }
 
-    // 表單
-    const inpDate = $('#inpDate');
-    const inpTitle = $('#inpTitle');
-    const inpUrls = $('#inpUrls');
-    $('#clearFormBtn').addEventListener('click', ()=>{ inpDate.value=''; inpTitle.value=''; inpUrls.value=''; });
+        function renderSortOptionsUI() {
+            let html = '';
+            for(let i=1; i<=5; i++) {
+                html += `
+                    <div style="background: rgba(255,255,255,0.6); padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                        <span class="theme-text" style="font-weight:bold; font-size: 13px;">優先順序 ${i}</span><br>
+                        <select id="sortCol${i}" onchange="applyGlobalMultiSort()" style="margin-top: 5px; width: 120px; padding: 4px; font-size: 13px;"></select>
+                        <select id="sortDir${i}" onchange="applyGlobalMultiSort()" style="margin-top: 5px; width: 85px; padding: 4px; font-size: 13px;">
+                            <option value="asc">升冪 ▴</option>
+                            <option value="desc">降冪 ▾</option>
+                        </select>
+                    </div>`;
+            }
+            const container = document.getElementById('multiSortContainer');
+            if (container) container.innerHTML = html;
+        }
 
-    function fillForm(w){ inpDate.value=w.date; inpTitle.value=w.title||''; inpUrls.value=(w.urls||[]).join('\n'); }
-    function preloadFormFromSelected(){
-      const w = weeks.find(x=>x.date===weekSelect.value);
-      if(w) fillForm(w);
-    }
+        function applyTheme(config) {
+            document.documentElement.style.setProperty('--theme-primary', config.color);
+            document.documentElement.style.setProperty('--theme-light', config.light);
+            document.documentElement.style.setProperty('--theme-dark', config.dark);
+        }
 
-    $('#saveWeekBtn').addEventListener('click', ()=>{
-      if(!authed) return alert('請先登入編輯模式');
-      const date = inpDate.value.trim();
-      if(!date) return alert('請輸入日期');
-      const urls = inpUrls.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-      if(urls.length===0) return alert('請至少輸入一個連結');
-      const title = inpTitle.value.trim();
+        function toggleLoading(show, text = '⏳ 資料載入與同步中...') { 
+            const msg = document.getElementById('loadingMsg');
+            if(msg) { msg.innerText = text; msg.style.display = show ? 'inline' : 'none'; }
+        }
 
-      // upsert to local
-      const map = new Map(loadLocalWeeks().map(w=>[w.date,w]));
-      map.set(date, {date, title, urls});
-      localWeeks = Array.from(map.values());
-      saveLocalWeeks(localWeeks);
-      weeks = mergeWeeks(baseWeeks, localWeeks);
-      renderSelect(); renderWeeksTable();
-      weekSelect.value = date; renderWeek();
-      alert('已儲存到本機草稿。若要讓所有訪客看到，請點「匯出資料」。');
-    });
+        function toggleCol(tableId, colIndex, checkbox) {
+            const table = document.getElementById(tableId);
+            if(!table) return;
+            if (checkbox.checked) { table.classList.remove(`hide-col-${colIndex}`); } else { table.classList.add(`hide-col-${colIndex}`); }
+        }
 
-    // 匯出 JSON
-    $('#exportJsonBtn').addEventListener('click', ()=>{
-      const byDate = new Map(DATA.map(w=>[w.date,w]));
-      loadLocalWeeks().forEach(w=>byDate.set(w.date,w));
-      const out = Array.from(byDate.values()).sort((a,b)=>b.date.localeCompare(a.date));
-      const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'weekly-youtube-data.json'; a.click();
-      URL.revokeObjectURL(url);
-    });
+        // ================= 頁面說明區塊功能 =================
+        function toggleDescCollapse() {
+            isDescCollapsed = !isDescCollapsed;
+            safeDisplay('descBody', isDescCollapsed ? 'none' : 'block');
+            const header = document.querySelector('.desc-header');
+            if(header) header.classList.toggle('collapsed', isDescCollapsed);
+        }
+        function enableDescEdit() {
+            safeSet('descModalInput', currentDescription);
+            safeDisplay('descModal', 'flex');
+        }
+        function closeDescModal() { safeDisplay('descModal', 'none'); }
+        async function saveDescription() {
+            const el = document.getElementById('descModalInput');
+            if(!el) return;
+            const newDesc = el.value.trim(); 
+            currentDescription = newDesc;
+            safeText('descDisplay', newDesc || '目前無說明，請點擊「編輯說明」來新增內容或欄位定義。');
+            closeDescModal();
+            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ sheetName: currentPageName, action: 'update_desc', description: newDesc }) }); } catch(e) {}
+        }
+        async function deleteDescription() { 
+            if(!confirm('確定要清除此頁面的說明嗎？')) return; 
+            safeSet('descModalInput', '');
+            saveDescription(); 
+        }
 
-    $('#copyJsonBtn').addEventListener('click', async ()=>{
-      const byDate = new Map(DATA.map(w=>[w.date,w]));
-      loadLocalWeeks().forEach(w=>byDate.set(w.date,w));
-      const out = Array.from(byDate.values()).sort((a,b)=>b.date.localeCompare(a.date));
-      await navigator.clipboard.writeText(JSON.stringify(out, null, 2));
-      alert('已複製 JSON，請回到 HTML 中覆蓋 const DATA = [...]');
-    });
+        // ================= 多重排序核心邏輯 =================
+        function updateSortOptions() {
+            let options = [{val: '', text: '-- 無 --'}];
+            if (currentPageName === '美食紀錄') { options.push({val: 'city', text: '縣市'}, {val: 'district', text: '區域'}, {val: 'address', text: '地址'}, {val: 'storeName', text: '店名'}, {val: 'category', text: '分類'}, {val: 'other', text: '其他'});
+            } else if (currentPageName === '運動紀錄') { options.push({val: 'date', text: '日期'}, {val: 'type', text: '運動類型'}, {val: 'distance', text: '距離(km)'}, {val: 'notes', text: '備註'});
+            } else if (currentPageName === '擴充預留網頁1') { options.push({val: 'col1', text: '流水號'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '分類'}, {val: 'col4', text: '內容'}); for(let i=5; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i});
+            } else if (currentPageName === '擴充預留網頁7') { options.push({val: 'col1', text: '主類別'}, {val: 'col2', text: '名稱'}, {val: 'col3', text: '地點'}, {val: 'col4', text: '地理區域'}, {val: 'col5', text: '彈性標籤'}, {val: 'col6', text: '必訪亮點/筆記'}, {val: 'col7', text: '實用資訊包'});
+            } else if (TIMELINE_PAGES.includes(currentPageName)) { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
+            } else { for(let i=1; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i}); }
 
-    // 初始
-    $('#year').textContent = new Date().getFullYear();
-    renderSelect();
-  </script>
+            for(let i=1; i<=5; i++) {
+                let sel = document.getElementById(`sortCol${i}`); 
+                if(!sel) continue;
+                let currentVal = sel.value; sel.innerHTML = '';
+                options.forEach(opt => { let o = document.createElement('option'); o.value = opt.val; o.innerText = opt.text; sel.appendChild(o); });
+                if (options.some(opt => opt.val === currentVal)) sel.value = currentVal; else sel.value = '';
+            }
+        }
+        function resetMultiSort() { 
+            for(let i=1; i<=5; i++) { safeSet(`sortCol${i}`, ''); safeSet(`sortDir${i}`, 'asc'); } 
+            applyGlobalMultiSort(); 
+        }
+        function handleHeaderSort(col) { 
+            let p1 = document.getElementById('sortCol1');
+            let d1 = document.getElementById('sortDir1'); 
+            if(!p1 || !d1) return;
+            if (p1.value === col) { d1.value = d1.value === 'asc' ? 'desc' : 'asc'; } else { p1.value = col; d1.value = 'asc'; } 
+            for(let i=2; i<=5; i++) { safeSet(`sortCol${i}`, ''); }
+            applyGlobalMultiSort(); 
+        }
+        
+        function applyGlobalMultiSort() {
+            let sortConfigs = [];
+            for(let i=1; i<=5; i++) { 
+                let colEl = document.getElementById(`sortCol${i}`);
+                let dirEl = document.getElementById(`sortDir${i}`); 
+                if(colEl && dirEl && colEl.value) sortConfigs.push({col: colEl.value, dir: dirEl.value}); 
+            }
+            
+            // 時間軸若無手動排序，預設以日期降冪
+            if (TIMELINE_PAGES.includes(currentPageName) && sortConfigs.length === 0) {
+                sortConfigs.push({col: 'col2', dir: 'desc'});
+            }
+
+            let targetList = []; let renderFn = null;
+            if(currentPageName === '美食紀錄') { targetList = foodDataList; renderFn = renderFoodTable; } 
+            else if(currentPageName === '運動紀錄') { targetList = sportsDataList; renderFn = renderSportsTable; } 
+            else if(currentPageName === '擴充預留網頁1') { targetList = noteDataList; renderFn = renderNoteTable; } 
+            else if(currentPageName === '擴充預留網頁7') { targetList = travelDataList; renderFn = renderTravelTable; } 
+            else if(TIMELINE_PAGES.includes(currentPageName)) { targetList = newsDataList; renderFn = renderNewsTimeline; } 
+            else { targetList = genericDataList; renderFn = renderGenericTable; }
+
+            targetList.sort((a, b) => {
+                for(let config of sortConfigs) {
+                    let valA = safeStr(a[config.col]), valB = safeStr(b[config.col]); 
+                    if (config.col === 'col2' || config.col === 'date') {
+                        if (valA !== valB) { return config.dir === 'asc' ? (valA < valB ? -1 : 1) : (valA > valB ? -1 : 1); }
+                    } else {
+                        let numA = Number(valA), numB = Number(valB);
+                        if(!isNaN(numA) && !isNaN(numB) && valA.trim() !== '' && valB.trim() !== '') { 
+                            if(numA !== numB) return config.dir === 'asc' ? numA - numB : numB - numA; 
+                        } else { 
+                            if(valA !== valB) { return config.dir === 'asc' ? (valA < valB ? -1 : 1) : (valA > valB ? -1 : 1); } 
+                        }
+                    }
+                }
+                return parseFloat(a.id) - parseFloat(b.id); 
+            });
+            if(renderFn) renderFn();
+        }
+
+        // ================= 安全的表單還原邏輯 =================
+        function cancelFoodEdit() {
+            editingFoodId = null;
+            ['city','district','address','storeName','category','other'].forEach(id => safeSet(id, ''));
+            safeText('foodFormTitle', '新增美食店家'); safeText('submitFoodBtn', '新增資料');
+            safeClass('submitFoodBtn', 'btn-add'); safeDisplay('cancelFoodBtn', 'none');
+        }
+        function cancelSportsEdit() {
+            editingSportsId = null;
+            safeSet('sportDate', new Date().toISOString().split('T')[0]);
+            safeSet('sportType', '跑步'); safeSet('sportDistance', ''); safeSet('sportNotes', '');
+            safeText('sportsFormTitle', '新增運動紀錄'); safeText('submitSportsBtn', '新增紀錄');
+            safeClass('submitSportsBtn', 'btn-add'); safeDisplay('cancelSportsBtn', 'none');
+        }
+        function cancelNoteEdit() {
+            editingNoteId = null;
+            for(let i=1; i<=10; i++) safeSet(`noteCol${i}`, '');
+            safeSet('noteCol2', new Date().toISOString().split('T')[0]);
+            safeText('noteFormTitle', '新增筆記 / 事件'); safeText('submitNoteBtn', '儲存筆記');
+            safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'none');
+        }
+        function cancelTravelEdit() {
+            editingTravelId = null;
+            for(let i=1; i<=7; i++) safeSet(`travelCol${i}`, '');
+            safeText('travelFormTitle', '新增旅遊筆記'); safeText('submitTravelBtn', '儲存/合併筆記');
+            safeClass('submitTravelBtn', 'btn-add'); safeDisplay('cancelTravelBtn', 'none');
+        }
+        function cancelNewsEdit() {
+            editingNewsId = null; 
+            for(let i=1; i<=10; i++) safeSet(`newsCol${i}`, '');
+            safeSet('newsCol2', new Date().toISOString().split('T')[0]);
+            const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '紀錄';
+            safeText('newsFormTitle', `新增 ${configName}`); safeText('submitNewsBtn', '儲存紀錄與筆記');
+            safeClass('submitNewsBtn', 'btn-add'); safeDisplay('cancelNewsBtn', 'none');
+        }
+        function cancelGenericEdit() {
+            editingGenericId = null; 
+            for(let i=1; i<=10; i++) safeSet(`genCol${i}`, '');
+            safeSet('genCol2', new Date().toISOString().split('T')[0]);
+            const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料';
+            safeText('genericFormTitle', `新增 ${configName} 資料`); safeText('submitGenericBtn', '新增資料');
+            safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'none');
+        }
+
+        // ================= 頁面切換與資料載入 =================
+        function switchPage(selectedPageId) {
+            if(!selectedPageId) return;
+            currentPageId = selectedPageId;
+            const config = PAGE_CONFIG[currentPageId];
+            if(!config) return;
+            
+            // 按鈕高亮切換
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`navBtn_${currentPageId}`);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            document.querySelectorAll('.app-page').forEach(page => { page.style.display = 'none'; });
+            
+            // 安全清除所有表單狀態
+            cancelFoodEdit(); cancelSportsEdit(); cancelNoteEdit(); cancelTravelEdit(); cancelNewsEdit(); cancelGenericEdit();
+            
+            applyTheme(config);
+            currentPageName = config.sheet;
+
+            if (selectedPageId === 'foodPage') { safeDisplay('foodPage', 'block'); } 
+            else if (selectedPageId === 'sportsPage') { safeDisplay('sportsPage', 'block'); } 
+            else if (selectedPageId === 'notePage') { safeDisplay('notePage', 'block'); } 
+            else if (selectedPageId === 'travelPage') { safeDisplay('travelPage', 'block'); }
+            else if (TIMELINE_PAGES.includes(config.sheet)) { 
+                safeDisplay('newsPage', 'block'); 
+                safeText('newsFormTitle', `新增 ${config.name}`);
+                safeText('newsTableTitle', `${config.name} 時間軸總覽`);
+                safeSet('newsFilterInput', ''); 
+            }
+            else {
+                safeDisplay('genericPage', 'block');
+                safeText('genericFormTitle', `新增 ${config.name} 資料`);
+                safeText('genericTableTitle', `${config.name} 總覽`);
+                genericFilterKeywords = []; renderGenericKw();
+            }
+            loadData(currentPageName);
+        }
+
+        async function loadData(sheetName) {
+            toggleLoading(true, '⏳ 資料載入與同步中...');
+            try {
+                const response = await fetch(`${API_URL}?sheetName=${encodeURIComponent(sheetName)}`);
+                const json = await response.json();
+                const data = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []); 
+                
+                currentPageName = sheetName;
+                currentDescription = json.description || '';
+                safeText('descDisplay', currentDescription || '目前無說明，請點擊「編輯說明」來新增內容或欄位定義。');
+                
+                updateSortOptions(); 
+                
+                if (sheetName === '美食紀錄') { foodDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.city)} ${safeStr(item.district)} ${safeStr(item.address)} ${safeStr(item.storeName)} ${safeStr(item.category)} ${safeStr(item.other)}`.toLowerCase() })); } 
+                else if (sheetName === '運動紀錄') { sportsDataList = data; } 
+                else if (sheetName === '擴充預留網頁1') { noteDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); } 
+                else if (sheetName === '擴充預留網頁7') { travelDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)}`.toLowerCase() })); } 
+                else if (TIMELINE_PAGES.includes(sheetName)) { 
+                    newsDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)}`.toLowerCase() })); 
+                    updateNewsCategoryCheckboxes();
+                } 
+                else { genericDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); }
+                
+                applyGlobalMultiSort(); 
+            } catch (error) { alert("資料讀取失敗！請確認 API 是否已更新。"); } 
+            finally { toggleLoading(false); }
+        }
+
+        // ================= 🌟 共用過濾邏輯 (支援多關鍵字) 🌟 =================
+        function handleFilterInput(inputId, arr, renderFn, renderKwFn) {
+            const el = document.getElementById(inputId);
+            if(!el) return;
+            const inputVal = el.value.trim().toLowerCase();
+            if (!inputVal) return;
+            
+            const kws = inputVal.split(/\s+/);
+            kws.forEach(kw => {
+                if (kw && !arr.includes(kw)) arr.push(kw);
+            });
+            el.value = '';
+            renderKwFn();
+            renderFn();
+        }
+
+        // ================= 📰 留言板與時間軸模組 (時事5, 擴充8~20) =================
+        function addTimestampToNewsNote() {
+            const noteEl = document.getElementById('newsCol6');
+            if(!noteEl) return;
+            const now = new Date();
+            const pad = n => n.toString().padStart(2, '0');
+            const timeStr = `\n[${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}] `;
+            noteEl.value = (noteEl.value + timeStr).trimStart();
+            noteEl.focus();
+        }
+
+        async function submitNewsData() {
+            const payload = { sheetName: currentPageName, id: editingNewsId || Date.now(), action: editingNewsId ? 'edit' : 'add' };
+            for(let i=1; i<=10; i++) { 
+                let el = document.getElementById(`newsCol${i}`);
+                payload[`col${i}`] = el ? el.value : ''; 
+            }
+            const fullText = Object.values(payload).join(' ').toLowerCase();
+            if (editingNewsId) { const idx = newsDataList.findIndex(d => String(d.id) === String(editingNewsId)); if (idx > -1) newsDataList[idx] = { ...payload, fullText };
+            } else { newsDataList.push({ ...payload, fullText }); }
+            
+            updateNewsCategoryCheckboxes();
+            applyGlobalMultiSort(); 
+            cancelNewsEdit(); 
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        }
+
+        // 🌟 留言送出核心 🌟
+        async function submitComment(id) {
+            const inputEl = document.getElementById(`newCommentInput_${id}`);
+            if(!inputEl) return;
+            const text = inputEl.value.trim();
+            if(!text) return alert('請先輸入留言內容！');
+
+            const itemIdx = newsDataList.findIndex(d => String(d.id) === String(id));
+            if(itemIdx === -1) return;
+            let item = newsDataList[itemIdx];
+
+            let comments = [];
+            try { comments = JSON.parse(safeStr(item.col10) || '[]'); } catch(e) { comments = []; }
+
+            const now = new Date();
+            const pad = n => n.toString().padStart(2, '0');
+            const timeStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+            comments.push({ time: timeStr, text: text });
+            item.col10 = JSON.stringify(comments);
+            
+            // 讓留言也能被搜尋
+            let commentText = comments.map(c => c.text).join(' ');
+            item.fullText = Object.values(item).join(' ').toLowerCase() + ' ' + commentText.toLowerCase();
+
+            inputEl.value = '';
+            openNewsDetail(id); 
+            renderNewsTimeline(); 
+
+            const payload = { ...item, sheetName: currentPageName, action: 'edit' };
+            try { fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); } catch(e) { console.error("留言儲存失敗", e); }
+        }
+
+        function copyNewsData(id, event) {
+            if(event) event.stopPropagation();
+            const item = newsDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            for(let i=1; i<=10; i++) { 
+                let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); 
+                safeSet(`newsCol${i}`, val);
+            }
+            safeSet('newsCol10', ''); // 複製時清空留言
+            editingNewsId = null; 
+            const configName = PAGE_CONFIG[currentPageId].name;
+            safeText('newsFormTitle', `新增 ${configName} (複製現有)`); 
+            safeText('submitNewsBtn', '儲存紀錄'); 
+            safeClass('submitNewsBtn', 'btn-add'); 
+            safeDisplay('cancelNewsBtn', 'inline-block'); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        function editNewsData(id, event) {
+            if(event) event.stopPropagation();
+            const item = newsDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            for(let i=1; i<=10; i++) { 
+                let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); 
+                safeSet(`newsCol${i}`, val);
+            }
+            editingNewsId = id; 
+            const configName = PAGE_CONFIG[currentPageId].name;
+            safeText('newsFormTitle', `編輯 ${configName}`); 
+            safeText('submitNewsBtn', '儲存修改'); 
+            safeClass('submitNewsBtn', 'btn-edit'); 
+            safeDisplay('cancelNewsBtn', 'inline-block'); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        function deleteNewsData(id, event) { 
+            if(event) event.stopPropagation(); 
+            if (!confirm('確定刪除此紀錄？')) return; 
+            newsDataList = newsDataList.filter(d => String(d.id) !== String(id)); 
+            updateNewsCategoryCheckboxes();
+            renderNewsTimeline(); 
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) }); 
+        }
+        
+        function clearNewsFilters() {
+            safeSet('newsFilterInput', ''); safeSet('newsStartDate', ''); safeSet('newsEndDate', '');
+            document.querySelectorAll('.news-cat-cb').forEach(cb => cb.checked = true);
+            renderNewsTimeline();
+        }
+
+        function toggleAllNewsCategories(check) {
+            document.querySelectorAll('.news-cat-cb').forEach(cb => cb.checked = check);
+            renderNewsTimeline();
+        }
+
+        function updateNewsCategoryCheckboxes() {
+            const container = document.getElementById('newsCategoryFilters');
+            if (!container) return;
+            const currentChecked = Array.from(document.querySelectorAll('.news-cat-cb')).filter(cb => cb.checked).map(cb => cb.value);
+            const hasExistingCbs = document.querySelectorAll('.news-cat-cb').length > 0;
+            const categories = [...new Set(newsDataList.map(d => safeStr(d.col1).trim() || '未分類'))].sort();
+
+            let html = `
+                <div style="width:100%; display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <span style="font-size:13px; font-weight:bold; color:#555;">🏷️ 分類過濾器：</span>
+                    <button class="btn-copy" style="padding:2px 8px; font-size:12px; margin:0;" onclick="toggleAllNewsCategories(true)">☑️ 全選</button>
+                    <button class="btn-cancel" style="display:inline-block; padding:2px 8px; font-size:12px; margin:0;" onclick="toggleAllNewsCategories(false)">❌ 全不選</button>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:10px; width:100%;">
+            `;
+            categories.forEach(cat => {
+                const color = getCategoryColor(cat);
+                const isChecked = !hasExistingCbs || currentChecked.includes(cat) ? 'checked' : '';
+                html += `<label style="display:flex; align-items:center; cursor:pointer; font-size:13px; background:#f4f4f4; padding:4px 10px; border-radius:15px; border-left:4px solid ${color};"><input type="checkbox" value="${cat}" class="news-cat-cb" ${isChecked} onchange="renderNewsTimeline()" style="margin-right:5px;"> ${cat}</label>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function getCategoryColor(category) {
+            const cat = category.toLowerCase();
+            if (cat.includes('政治')) return '#1976d2'; 
+            if (cat.includes('經濟') || cat.includes('財經')) return '#388e3c'; 
+            if (cat.includes('國際')) return '#7b1fa2'; 
+            if (cat.includes('體育') || cat.includes('運動')) return '#f57c00'; 
+            if (cat.includes('社會') || cat.includes('時事')) return '#00796b'; 
+            if (cat.includes('科技')) return '#455a64'; 
+            return '#607d8b'; 
+        }
+
+        function toggleNewsClamp(id, event) {
+            if(event) event.stopPropagation(); 
+            const contentDiv = document.getElementById(`clamp-content-${id}`);
+            const noteDiv = document.getElementById(`clamp-note-${id}`);
+            const btn = document.getElementById(`toggle-btn-${id}`);
+            if(!contentDiv || !btn) return;
+            
+            let isExp = contentDiv.classList.contains('expanded');
+            if (isExp) {
+                contentDiv.classList.remove('expanded');
+                if(noteDiv) noteDiv.classList.remove('expanded');
+                btn.innerText = '展開 ▼';
+            } else {
+                contentDiv.classList.add('expanded');
+                if(noteDiv) noteDiv.classList.add('expanded');
+                btn.innerText = '收起 ▲';
+            }
+        }
+
+        function toggleGlobalNewsExpand() {
+            isGlobalNewsExpanded = !isGlobalNewsExpanded;
+            renderNewsTimeline(); 
+        }
+
+        // 🌟 留言板渲染核心 🌟
+        function openNewsDetail(id) {
+            const item = newsDataList.find(d => String(d.id) === String(id));
+            if(!item) return;
+            const panel = document.getElementById('newsDetailPanel');
+            const content = document.getElementById('newsDetailContent');
+            if(!panel || !content) return;
+            
+            const cat = safeStr(item.col1) || '未分類';
+            const date = formatDate(item.col2);
+            const title = safeStr(item.col3);
+            const desc = safeStr(item.col4);
+            let link = safeStr(item.col5);
+            const notes = safeStr(item.col6);
+            
+            let linkHtml = '無';
+            if (link.trim() !== '') {
+                let href = link.startsWith('http') ? link : 'http://' + link;
+                linkHtml = `<a href="${href}" target="_blank" style="word-break: break-all; color: var(--theme-primary);">${link}</a>`;
+            }
+
+            let comments = [];
+            try { comments = JSON.parse(safeStr(item.col10) || '[]'); } catch(e) { comments = []; }
+            
+            let commentsHtml = '';
+            if (comments.length === 0) {
+                commentsHtml = `<div style="color:#aaa; font-size:13px; text-align:center; padding:15px 0; background:#f9f9f9; border-radius:8px; border:1px dashed #ccc;">👻 目前尚無追蹤留言，在下方新增第一筆吧！</div>`;
+            } else {
+                commentsHtml = comments.map(c => `
+                    <div class="chat-bubble">
+                        <div class="chat-time">🕒 ${c.time}</div>
+                        <div style="white-space: pre-wrap; line-height: 1.5;">${c.text}</div>
+                    </div>
+                `).join('');
+            }
+            
+            content.innerHTML = `
+                <div style="margin-bottom:10px;">
+                    <span style="background:var(--theme-primary); color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${cat}</span> 
+                    <span style="color:#666; font-size:12px;">${date}</span>
+                </div>
+                <h4 style="margin:0 0 10px 0; font-size:18px; color:#333;">${title}</h4>
+                <p style="white-space: pre-wrap; font-size:14px; line-height:1.6; color:#444; border-bottom:1px dashed #ddd; padding-bottom:10px;">${desc}</p>
+                <div style="margin-top:15px; background:#f4f4f4; padding:10px; border-radius:5px;">
+                    <strong style="font-size:13px; color:#555;">🔗 相關連結：</strong><br>
+                    ${linkHtml}
+                </div>
+                ${notes ? `<div style="margin-top:15px; border-left:4px solid #ffb300; padding-left:10px; font-size:14px; white-space:pre-wrap; color:#555;"><strong>💡 初始筆記：</strong><br>${notes}</div>` : ''}
+                
+                <div style="margin-top:25px; font-weight:bold; color:var(--theme-dark); font-size:15px; border-bottom:2px solid #eee; padding-bottom:5px;">
+                    💬 追蹤留言紀錄 (${comments.length})
+                </div>
+                <div class="chat-container" id="chatContainer_${item.id}">
+                    ${commentsHtml}
+                </div>
+                
+                <div class="chat-input-area">
+                    <textarea id="newCommentInput_${item.id}" placeholder="⌨️ 輸入新的追蹤心得或留言..."></textarea>
+                    <button class="btn-add" style="width:100%; text-align:center; padding:10px; font-size:15px; margin:0;" onclick="submitComment('${item.id}')">🚀 送出留言</button>
+                </div>
+            `;
+            panel.style.display = 'block';
+
+            setTimeout(() => {
+                let chatBox = document.getElementById(`chatContainer_${item.id}`);
+                if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+            }, 50);
+        }
+
+        function closeNewsDetail() { safeDisplay('newsDetailPanel', 'none'); }
+
+        function renderNewsTimeline() {
+            const container = document.getElementById('newsTimelineContainer'); 
+            if(!container) return;
+            container.innerHTML = '';
+            
+            const keywordEl = document.getElementById('newsFilterInput');
+            const keyword = keywordEl ? keywordEl.value.trim().toLowerCase() : '';
+            const startDateEl = document.getElementById('newsStartDate');
+            const startDate = startDateEl ? startDateEl.value : '';
+            const endDateEl = document.getElementById('newsEndDate');
+            const endDate = endDateEl ? endDateEl.value : '';
+            
+            const cbList = document.querySelectorAll('.news-cat-cb');
+            let checkedCats = [];
+            if(cbList.length > 0) { cbList.forEach(cb => { if(cb.checked) checkedCats.push(cb.value); }); } 
+            else { checkedCats = null; }
+
+            const kws = keyword ? keyword.split(/\s+/) : [];
+
+            let isLeft = true;
+            let expClass = isGlobalNewsExpanded ? 'expanded' : '';
+            let btnText = isGlobalNewsExpanded ? '收起 ▲' : '展開 ▼';
+
+            newsDataList.forEach(data => {
+                const fullText = data.fullText;
+                const cat = safeStr(data.col1).trim() || '未分類';
+                const date = formatDate(data.col2);
+                const title = safeStr(data.col3);
+                const content = safeStr(data.col4);
+                let link = safeStr(data.col5);
+                const notes = safeStr(data.col6);
+                
+                if (kws.length > 0 && !kws.every(kw => fullText.includes(kw))) return;
+                if (startDate && date < startDate) return;
+                if (endDate && date > endDate) return;
+                if (checkedCats !== null && checkedCats.length > 0 && !checkedCats.includes(cat)) return;
+                if (checkedCats !== null && checkedCats.length === 0) return; 
+
+                const catColor = getCategoryColor(cat);
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `timeline-item ${isLeft ? 'left' : 'right'}`;
+                itemDiv.style.setProperty('--cat-color', catColor);
+
+                let linkHtml = '';
+                if(link.trim() !== '') {
+                    let href = link.startsWith('http') ? link : 'http://' + link;
+                    linkHtml = `<div style="margin-bottom:10px; font-size:13px; font-weight:bold;">🔗 <a href="${href}" target="_blank" style="color:${catColor}; word-break: break-all;" onclick="event.stopPropagation()">${link}</a></div>`;
+                }
+
+                let notesHtml = '';
+                if(notes.trim() !== '') {
+                    notesHtml = `<div class="timeline-notes" onclick="event.stopPropagation()">
+                        <div class="timeline-notes-title">💡 初始筆記：</div>
+                        <div class="text-clamp ${expClass}" id="clamp-note-${data.id}">${notes}</div>
+                    </div>`;
+                }
+
+                let comments = [];
+                try { comments = JSON.parse(safeStr(data.col10) || '[]'); } catch(e) { comments = []; }
+                let commentBadge = '';
+                if(comments.length > 0) {
+                    commentBadge = `<div style="margin-top:10px; font-size:13px; color:var(--theme-primary); font-weight:bold; background:var(--theme-light); display:inline-block; padding:4px 12px; border-radius:15px; border:1px solid #cce5ff;">💬 ${comments.length} 則追蹤留言</div>`;
+                }
+
+                itemDiv.innerHTML = `
+                    <div class="timeline-content" onclick="openNewsDetail('${data.id}')">
+                        <div class="timeline-date">${date}</div>
+                        <h3 class="timeline-title"><span class="timeline-badge">${cat}</span>${title}</h3>
+                        ${linkHtml}
+                        <div class="text-clamp ${expClass}" id="clamp-content-${data.id}" onclick="event.stopPropagation()">${content}</div>
+                        ${notesHtml}
+                        ${commentBadge}
+                        <br>
+                        <button class="toggle-text-btn" id="toggle-btn-${data.id}" onclick="toggleNewsClamp('${data.id}', event)">${btnText}</button>
+                        
+                        <div class="timeline-actions" onclick="event.stopPropagation()">
+                            <button class="btn-copy" onclick="copyNewsData('${data.id}', event)">複製</button>
+                            <button class="btn-edit" style="background-color: #ffb300; color:white;" onclick="editNewsData('${data.id}', event)">編輯</button>
+                            <button class="btn-delete" style="background-color: #e53935;" onclick="deleteNewsData('${data.id}', event)">刪除</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+                isLeft = !isLeft; 
+            });
+        }
+
+        // ================= 美食功能 =================
+        async function submitFoodData() { const city = document.getElementById('city').value, district = document.getElementById('district').value, address = document.getElementById('address').value, storeName = document.getElementById('storeName').value, category = document.getElementById('category').value, other = document.getElementById('other').value; if (!storeName.trim()) return alert('店名為必填！'); const payload = { sheetName: '美食紀錄', id: editingFoodId || Date.now(), action: editingFoodId ? 'edit' : 'add', city, district, address, storeName, category, other }; const fullText = `${city} ${district} ${address} ${storeName} ${category} ${other}`.toLowerCase(); if (editingFoodId) { const idx = foodDataList.findIndex(d => String(d.id) === String(editingFoodId)); if (idx > -1) foodDataList[idx] = { ...payload, fullText }; } else { foodDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelFoodEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
+        function copyFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('city', item.city); safeSet('district', item.district); safeSet('address', item.address); safeSet('storeName', item.storeName); safeSet('category', item.category); safeSet('other', item.other); editingFoodId = null; safeText('foodFormTitle', '新增美食店家 (複製現有)'); safeText('submitFoodBtn', '新增資料'); safeClass('submitFoodBtn', 'btn-add'); safeDisplay('cancelFoodBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('city', item.city); safeSet('district', item.district); safeSet('address', item.address); safeSet('storeName', item.storeName); safeSet('category', item.category); safeSet('other', item.other); editingFoodId = id; safeText('foodFormTitle', '編輯美食資料'); safeText('submitFoodBtn', '儲存修改'); safeClass('submitFoodBtn', 'btn-edit'); safeDisplay('cancelFoodBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function deleteFoodData(id) { if (!confirm('確定刪除此美食紀錄？')) return; foodDataList = foodDataList.filter(d => String(d.id) !== String(id)); renderFoodTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '美食紀錄' }) }); }
+        
+        function addFilterKeyword() { handleFilterInput('filterInput', filterKeywords, renderFoodTable, renderKw); }
+        function removeKeyword(kw) { filterKeywords = filterKeywords.filter(k => k !== kw); renderKw(); renderFoodTable(); }
+        function renderKw() { const c = document.getElementById('keywordContainer'); if(c) { c.innerHTML = ''; filterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeKeyword('${kw}')">✖</span></div>`; }); } }
+        
+        function renderFoodTable() {
+            const tbody = document.getElementById('tableBody'); if(!tbody) return; tbody.innerHTML = '';
+            foodDataList.forEach(data => {
+                if (filterKeywords.length > 0 && !filterKeywords.every(kw => data.fullText.includes(kw))) return;
+                
+                const query = `${safeStr(data.city)} ${safeStr(data.district)} ${safeStr(data.address)} ${safeStr(data.storeName)}`.trim(); 
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+                
+                tbody.innerHTML += `<tr><td data-label="縣市"><div class="resizable-cell">${safeStr(data.city)}</div></td><td data-label="區域"><div class="resizable-cell">${safeStr(data.district)}</div></td><td data-label="地址"><div class="resizable-cell">${safeStr(data.address)}</div></td><td data-label="店名"><div class="resizable-cell">${safeStr(data.storeName)}</div></td><td data-label="分類"><div class="resizable-cell">${safeStr(data.category)}</div></td><td data-label="其他"><div class="resizable-cell">${safeStr(data.other)}</div></td><td data-label="地圖"><div class="resizable-cell" style="resize:none;"><a href="${mapUrl}" target="_blank" class="map-link">📍地圖搜尋</a></div></td>
+                <td class="action-cell"><button class="btn-copy" onclick="copyFoodData('${data.id}')">複製</button><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></td></tr>`;
+            });
+        }
+
+        // ================= 運動功能 =================
+        async function submitSportsData() { const date = document.getElementById('sportDate').value, type = document.getElementById('sportType').value, distance = document.getElementById('sportDistance').value, notes = document.getElementById('sportNotes').value; if (!date) return alert('請選擇日期！'); const payload = { sheetName: '運動紀錄', id: editingSportsId || Date.now(), action: editingSportsId ? 'edit' : 'add', date, type, distance: distance || '-', notes: notes || '-' }; if (editingSportsId) { const idx = sportsDataList.findIndex(d => String(d.id) === String(editingSportsId)); if (idx > -1) sportsDataList[idx] = payload; } else { sportsDataList.push(payload); } applyGlobalMultiSort(); cancelSportsEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
+        function copySportsData(id) { const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('sportDate', formatDate(item.date)); safeSet('sportType', item.type || '跑步'); safeSet('sportDistance', item.distance === '-' ? '' : item.distance); safeSet('sportNotes', item.notes === '-' ? '' : item.notes); editingSportsId = null; safeText('sportsFormTitle', '新增運動紀錄 (複製現有)'); safeText('submitSportsBtn', '新增紀錄'); safeClass('submitSportsBtn', 'btn-add'); safeDisplay('cancelSportsBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editSportsData(id) { const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('sportDate', formatDate(item.date)); safeSet('sportType', item.type || '跑步'); safeSet('sportDistance', item.distance === '-' ? '' : item.distance); safeSet('sportNotes', item.notes === '-' ? '' : item.notes); editingSportsId = id; safeText('sportsFormTitle', '編輯運動紀錄'); safeText('submitSportsBtn', '儲存修改'); safeClass('submitSportsBtn', 'btn-edit'); safeDisplay('cancelSportsBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function deleteSportsData(id) { if (!confirm('確定刪除此運動紀錄？')) return; sportsDataList = sportsDataList.filter(d => String(d.id) !== String(id)); renderSportsTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '運動紀錄' }) }); }
+        function renderSportsTable() {
+            const tbody = document.getElementById('sportsTableBody'); if(!tbody) return; tbody.innerHTML = '';
+            sportsDataList.forEach(data => {
+                const dateStr = formatDate(data.date);
+                tbody.innerHTML += `<tr><td data-label="日期"><div class="resizable-cell">${dateStr}</div></td><td data-label="運動類型"><div class="resizable-cell">${safeStr(data.type)}</div></td><td data-label="距離 (km)"><div class="resizable-cell">${safeStr(data.distance)}</div></td><td data-label="備註"><div class="resizable-cell">${safeStr(data.notes)}</div></td>
+                <td class="action-cell"><button class="btn-copy" onclick="copySportsData('${data.id}')">複製</button><button class="btn-edit" onclick="editSportsData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteSportsData('${data.id}')">刪除</button></td></tr>`;
+            });
+        }
+
+        // ================= ✈️ 旅遊筆記 (擴充網頁7) =================
+        function toggleTravelAddMode() {
+            const checked = document.querySelector('input[name="travelAddMode"]:checked');
+            if(!checked) return;
+            const mode = checked.value;
+            if (mode === 'single') { safeDisplay('travelSingleForm', 'block'); safeDisplay('travelBatchForm', 'none'); } 
+            else { safeDisplay('travelSingleForm', 'none'); safeDisplay('travelBatchForm', 'block'); if (document.getElementById('travelBatchTbody') && document.getElementById('travelBatchTbody').children.length === 0) { renderTravelBatchRows(3); } }
+        }
+        function renderTravelBatchRows(count) { const tb = document.getElementById('travelBatchTbody'); if(tb) tb.innerHTML = ''; for(let i=0; i<count; i++) addTravelBatchRow(); }
+        function addTravelBatchRow() {
+            const tbody = document.getElementById('travelBatchTbody'); if(!tbody) return; const tr = document.createElement('tr');
+            tr.innerHTML = `<td data-label="主類別" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col1" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="名稱" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col2" style="width:100%; min-width:120px; padding:6px; box-sizing:border-box; border:2px solid var(--theme-primary);"></td><td data-label="地點" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col3" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td data-label="地理區域" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col4" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="標籤" style="padding:4px; border:1px solid #ddd;"><input type="text" class="b-col5" style="width:100%; padding:6px; box-sizing:border-box;"></td><td data-label="必訪亮點/筆記" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col6" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td data-label="實用資訊包" style="padding:4px; border:1px solid #ddd;"><textarea class="b-col7" rows="1" style="width:100%; min-width:150px; padding:6px; box-sizing:border-box; resize:vertical;"></textarea></td><td style="padding:4px; border:1px solid #ddd; text-align:center;"><button class="btn-delete" onclick="this.parentElement.parentElement.remove()" style="padding:4px 8px;">移除</button></td>`;
+            tbody.appendChild(tr);
+        }
+        async function submitTravelBatchUI() {
+            const rows = document.querySelectorAll('#travelBatchTbody tr'); const newItems = [];
+            rows.forEach(tr => {
+                const cols = [tr.querySelector('.b-col1').value, tr.querySelector('.b-col2').value.trim(), tr.querySelector('.b-col3').value, tr.querySelector('.b-col4').value, tr.querySelector('.b-col5').value, tr.querySelector('.b-col6').value, tr.querySelector('.b-col7').value];
+                if (cols[1]) {
+                    let existingItem = travelDataList.find(d => String(d.col2).trim() === cols[1]);
+                    let item = { sheetName: '擴充預留網頁7', id: existingItem ? existingItem.id : (Date.now() + Math.floor(Math.random() * 10000)), action: existingItem ? 'edit' : 'add', col8: '', col9: '', col10: '' };
+                    for(let i=1; i<=7; i++) { let pasteVal = cols[i-1]; if (existingItem && pasteVal.trim() === '') { item[`col${i}`] = existingItem[`col${i}`]; } else { item[`col${i}`] = pasteVal; } }
+                    newItems.push(item);
+                }
+            });
+            if (newItems.length === 0) return alert("請至少填寫一筆包含「名稱(必填)」的資料！");
+            if (!confirm(`系統即將處理(新增/合併)畫面上 ${newItems.length} 筆資料？\n請勿關閉視窗。`)) return;
+            toggleLoading(true, `多筆處理中... (0/${newItems.length})`);
+            let successCount = 0;
+            for (let i = 0; i < newItems.length; i++) {
+                const item = newItems[i];
+                try {
+                    const fullText = Object.values(item).join(' ').toLowerCase(); const idx = travelDataList.findIndex(d => String(d.id) === String(item.id));
+                    if (idx > -1) travelDataList[idx] = { ...item, fullText }; else travelDataList.push({ ...item, fullText });
+                    await fetch(API_URL, { method: 'POST', body: JSON.stringify(item) }); successCount++; toggleLoading(true, `多筆處理中... (${successCount}/${newItems.length})`);
+                } catch (e) { console.error(e); }
+            }
+            renderTravelBatchRows(3); toggleLoading(false); 
+            const rd = document.querySelector('input[name="travelAddMode"][value="single"]');
+            if(rd) { rd.checked = true; toggleTravelAddMode(); }
+            applyGlobalMultiSort(); alert(`處理完成！成功新增/合併 ${successCount} 筆資料。`);
+        }
+        async function submitTravelData() {
+            let nEl = document.getElementById(`travelCol2`); if(!nEl) return;
+            let nameInput = nEl.value.trim();
+            if (!nameInput) return alert('名稱 (col2) 為必填，才能進行儲存或合併！');
+            let isEdit = editingTravelId !== null; let targetId = editingTravelId; let existingItem = null;
+            if (!isEdit) { existingItem = travelDataList.find(d => String(d.col2).trim() === nameInput); if (existingItem) { targetId = existingItem.id; isEdit = true; }
+            } else { existingItem = travelDataList.find(d => String(d.id) === String(targetId)); }
+            const payload = { sheetName: '擴充預留網頁7', id: targetId || Date.now(), action: isEdit ? 'edit' : 'add', col8: '', col9: '', col10: '' };
+            for(let i=1; i<=7; i++) { 
+                let tEl = document.getElementById(`travelCol${i}`);
+                let formVal = tEl ? tEl.value : ''; 
+                if (!editingTravelId && existingItem && formVal.trim() === '') { payload[`col${i}`] = existingItem[`col${i}`]; } else { payload[`col${i}`] = formVal; } 
+            }
+            const fullText = Object.values(payload).join(' ').toLowerCase();
+            if (isEdit) { const idx = travelDataList.findIndex(d => String(d.id) === String(targetId)); if (idx > -1) travelDataList[idx] = { ...payload, fullText }; } else { travelDataList.push({ ...payload, fullText }); }
+            applyGlobalMultiSort(); cancelTravelEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+        }
+        function copyTravelData(id) { const item = travelDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=7; i++) { safeSet(`travelCol${i}`, safeStr(item[`col${i}`])); } editingTravelId = null; safeText('travelFormTitle', '新增旅遊筆記 (複製現有)'); safeText('submitTravelBtn', '儲存/合併筆記'); safeClass('submitTravelBtn', 'btn-add'); safeDisplay('cancelTravelBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editTravelData(id) { const item = travelDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=7; i++) { safeSet(`travelCol${i}`, safeStr(item[`col${i}`])); } editingTravelId = id; safeText('travelFormTitle', '編輯旅遊筆記'); safeText('submitTravelBtn', '儲存修改'); safeClass('submitTravelBtn', 'btn-edit'); safeDisplay('cancelTravelBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function deleteTravelData(id) { if (!confirm('確定刪除此筆記？')) return; travelDataList = travelDataList.filter(d => String(d.id) !== String(id)); renderTravelTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁7' }) }); }
+        
+        function addTravelFilterKeyword() { handleFilterInput('travelFilterInput', travelFilterKeywords, renderTravelTable, renderTravelKw); }
+        function removeTravelKeyword(kw) { travelFilterKeywords = travelFilterKeywords.filter(k => k !== kw); renderTravelKw(); renderTravelTable(); }
+        function renderTravelKw() { const c = document.getElementById('travelKeywordContainer'); if(c) { c.innerHTML = ''; travelFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeTravelKeyword('${kw}')">✖</span></div>`; }); } }
+        
+        function renderTravelTable() {
+            const tbody = document.getElementById('travelTableBody'); if(!tbody) return; tbody.innerHTML = '';
+            travelDataList.forEach(data => {
+                if (travelFilterKeywords.length > 0 && !travelFilterKeywords.every(kw => data.fullText.includes(kw))) return;
+                
+                const tr = document.createElement('tr'); let colsHtml = '';
+                const labels = ['主類別', '名稱', '地點', '地理區域', '彈性標籤', '必訪亮點/筆記', '實用資訊包'];
+                for(let i=1; i<=7; i++) { colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${safeStr(data[`col${i}`])}</div></td>`; }
+
+                const locQuery = `${safeStr(data.col2)} ${safeStr(data.col3)}`.trim(); let mapColHtml = `<td data-label="地圖"><div class="resizable-cell"></div></td>`;
+                if(locQuery !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}`; mapColHtml = `<td data-label="地圖"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 地圖搜尋</a></div></td>`; }
+                tr.innerHTML = `${colsHtml}${mapColHtml}<td class="action-cell"><button class="btn-copy" onclick="copyTravelData('${data.id}')">複製</button><button class="btn-edit" onclick="editTravelData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteTravelData('${data.id}')">刪除</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ================= 綜合筆記 (擴充1) =================
+        async function submitNoteData() { const payload = { sheetName: '擴充預留網頁1', id: editingNoteId || Date.now(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`noteCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
+        function copyNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = null; safeText('noteFormTitle', '新增筆記 / 事件 (複製現有)'); safeText('submitNoteBtn', '儲存筆記'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = id; safeText('noteFormTitle', '編輯筆記 / 事件'); safeText('submitNoteBtn', '儲存修改'); safeClass('submitNoteBtn', 'btn-edit'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function deleteNoteData(id) { if (!confirm('確定刪除此筆記？')) return; noteDataList = noteDataList.filter(d => String(d.id) !== String(id)); renderNoteTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁1' }) }); }
+        
+        function addNoteFilterKeyword() { handleFilterInput('noteFilterInput', noteFilterKeywords, renderNoteTable, renderNoteKw); }
+        function removeNoteKeyword(kw) { noteFilterKeywords = noteFilterKeywords.filter(k => k !== kw); renderNoteKw(); renderNoteTable(); }
+        function renderNoteKw() { const c = document.getElementById('noteKeywordContainer'); if(c){ c.innerHTML = ''; noteFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeNoteKeyword('${kw}')">✖</span></div>`; }); } }
+        
+        function renderNoteTable() {
+            const tbody = document.getElementById('noteTableBody'); if(!tbody) return; tbody.innerHTML = '';
+            const labels = ['流水號','日期','分類','內容','欄位 5','欄位 6','欄位 7','欄位 8','欄位 9','欄位 10'];
+            noteDataList.forEach(data => {
+                if (noteFilterKeywords.length > 0 && !noteFilterKeywords.every(kw => data.fullText.includes(kw))) return;
+                const tr = document.createElement('tr'); let colsHtml = '';
+                for(let i=1; i<=10; i++) { let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${val}</div></td>`; }
+                tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyNoteData('${data.id}')">複製</button><button class="btn-edit" onclick="editNoteData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteNoteData('${data.id}')">刪除</button></td>`; tbody.appendChild(tr);
+            });
+        }
+
+        // ================= 一般表格紀錄模組 (擴充 2,3,4,6) =================
+        async function submitGenericData() { const payload = { sheetName: currentPageName, id: editingGenericId || Date.now(), action: editingGenericId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`genCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = { ...payload, fullText }; } else { genericDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelGenericEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
+        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } editingGenericId = null; const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料'; safeText('genericFormTitle', `新增 ${configName} 資料 (複製現有)`); safeText('submitGenericBtn', '新增資料'); safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } editingGenericId = id; const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料'; safeText('genericFormTitle', `編輯 ${configName} 資料`); safeText('submitGenericBtn', '儲存修改'); safeClass('submitGenericBtn', 'btn-edit'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function deleteGenericData(id) { if (!confirm('確定刪除此筆資料？')) return; genericDataList = genericDataList.filter(d => String(d.id) !== String(id)); renderGenericTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) }); }
+        
+        function addGenericFilterKeyword() { handleFilterInput('genericFilterInput', genericFilterKeywords, renderGenericTable, renderGenericKw); }
+        function removeGenericKeyword(kw) { genericFilterKeywords = genericFilterKeywords.filter(k => k !== kw); renderGenericKw(); renderGenericTable(); }
+        function renderGenericKw() { const c = document.getElementById('genericKeywordContainer'); if(c){ c.innerHTML = ''; genericFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeGenericKeyword('${kw}')">✖</span></div>`; }); } }
+        
+        function renderGenericTable() {
+            const tbody = document.getElementById('genericTableBody'); if(!tbody) return; tbody.innerHTML = '';
+            genericDataList.forEach(data => {
+                if (genericFilterKeywords.length > 0 && !genericFilterKeywords.every(kw => data.fullText.includes(kw))) return;
+                const tr = document.createElement('tr'); let colsHtml = '';
+                for(let i=1; i<=10; i++) { 
+                    let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); 
+                    if (currentPageName === '擴充預留網頁4' && i === 8 && val.trim() !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val.trim())}`; colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 ${val}</a></div></td>`; } else { colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell">${val}</div></td>`; }
+                }
+                tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyGenericData('${data.id}')">複製</button><button class="btn-edit" onclick="editGenericData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteGenericData('${data.id}')">刪除</button></td>`; tbody.appendChild(tr);
+            });
+        }
+    </script>
 </body>
 </html>
