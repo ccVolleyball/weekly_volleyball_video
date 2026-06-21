@@ -19,7 +19,6 @@
         .theme-box { border-left: 5px solid var(--theme-primary); background-color: var(--theme-light); padding: 15px; }
         .theme-text { color: var(--theme-dark) !important; }
 
-        /* 全新導覽列按鈕樣式 */
         .nav-container { margin-bottom: 20px; padding: 15px; background-color: var(--theme-light); border: 1px solid var(--theme-primary); border-radius: 8px; transition: all 0.3s; }
         .nav-buttons-wrapper { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .nav-btn {
@@ -111,9 +110,7 @@
             .table-responsive { overflow: hidden; }
         }
 
-        /* ====================================================
-           🌟 時間軸與側邊留言面板專屬 CSS 🌟
-        ==================================================== */
+        /* 時間軸與側邊留言面板專屬 CSS */
         .news-layout-wrapper { display: flex; gap: 20px; position: relative; align-items: flex-start; }
         .news-timeline-section { flex: 1; min-width: 0; }
         
@@ -146,7 +143,6 @@
         .timeline-date { font-weight: bold; color: var(--cat-color, #607d8b); margin-bottom: 8px; font-size: 14px; letter-spacing: 1px; }
         .timeline-title { font-size: 18px; font-weight: bold; margin: 0 0 10px 0; color: #333; line-height: 1.4; }
         
-        /* 限制 3 行 CSS */
         .text-clamp {
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; 
             overflow: hidden; transition: max-height 0.3s ease;
@@ -181,9 +177,12 @@
 <body>
 
     <div class="nav-container theme-box">
-        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold; color: var(--theme-dark); display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 16px; margin-bottom: 5px; font-weight: bold; color: var(--theme-dark); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <span>切換資料庫分頁：</span>
-            <span id="loadingMsg" style="color: var(--theme-primary); font-size: 14px; display: none;">⏳ 資料載入與同步中...</span>
+            <div>
+                <span id="loadingMsg" style="color: var(--theme-primary); font-size: 14px; display: none; margin-right: 15px;">⏳ 資料載入與同步中...</span>
+                <button class="btn-edit" style="margin: 0; background-color: #ff9800; color: #fff;" onclick="openLogModal()">🕒 檢視系統操作紀錄</button>
+            </div>
         </div>
         <div id="navButtonsWrapper" class="nav-buttons-wrapper"></div>
     </div>
@@ -212,13 +211,39 @@
         </div>
     </div>
 
+    <div id="logModal" class="modal-overlay" onclick="if(event.target===this) closeLogModal()">
+        <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+            <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 class="theme-text" style="margin: 0;">🕒 系統操作紀錄</h3>
+                <button class="detail-close-btn" style="float:none; margin:0;" onclick="closeLogModal()">✖</button>
+            </div>
+            <div id="logLoading" style="text-align: center; color: var(--theme-primary); font-weight: bold; display: none;">⏳ 載入紀錄中，請稍候...</div>
+            <div class="table-responsive" style="overflow-y: auto; flex: 1;">
+                <table style="width: 100%; min-width: 700px;">
+                    <thead>
+                        <tr style="background: var(--theme-light);">
+                            <th style="padding: 10px; width: 40px; text-align:center;">#</th>
+                            <th style="padding: 10px; width: 140px;">時間</th>
+                            <th style="padding: 10px; width: 120px;">頁面</th>
+                            <th style="padding: 10px; width: 80px;">動作</th>
+                            <th style="padding: 10px;">資料標題</th>
+                            <th style="padding: 10px; width: 120px; text-align:center;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div class="section theme-box" style="opacity: 0.95;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <h3 class="theme-text" style="margin: 0 0 5px 0;">🔃 多重優先權排序</h3>
             <button class="btn-cancel" style="display: inline-block; padding: 4px 8px; font-size: 12px;" onclick="resetMultiSort()">清除所有排序設定</button>
         </div>
         <div style="font-size: 13px; color: #666; margin-bottom: 10px;">設定最多 5 層優先權，新資料輸入後會自動排入正確順序。</div>
-        <div id="multiSortContainer" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+        <div id="multiSortContainer" style="display: flex; flex-wrap: wrap; gap: 10px;">
+        </div>
     </div>
 
 
@@ -434,10 +459,9 @@
         </div>
     </div>
 
-
     <script>
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
-        const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwLwsVsgm8diIhnC-Wxh2oRI58G6GIFrFizK8pp-Pvw12sXnpcXpJKOFyRdS_FOG38w/exec";
 
         const PAGE_CONFIG = {
             'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', label: '🍔 美食紀錄', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
@@ -480,6 +504,7 @@
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
         let newsDataList = []; let editingNewsId = null; 
 
+        // 安全賦值與讀取 Helper
         const safeStr = (val) => val != null ? String(val) : '';
         const formatDate = (val) => { let str = safeStr(val); return str.includes('T') ? str.split('T')[0] : str; };
         const safeSet = (id, val) => { let el = document.getElementById(id); if(el) el.value = val; };
@@ -490,7 +515,7 @@
         // 🌟 新增：Auto-linking 網址轉換函數 🌟
         function linkify(text) {
             if (!text) return '';
-            let escaped = String(text).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            let escaped = String(text).replace(/</g, '<').replace(/>/g, '>');
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return escaped.replace(urlRegex, function(url) {
                 return `<a href="${url}" target="_blank" style="color: var(--theme-primary); text-decoration: underline; font-weight: bold; word-break: break-all;" onclick="event.stopPropagation()">${url}</a>`;
@@ -503,8 +528,99 @@
             
             const today = new Date().toISOString().split('T')[0];
             safeSet('sportDate', today); safeSet('noteCol2', today); safeSet('genCol2', today); safeSet('newsCol2', today);
+            
+            // 🌟 新增：取得操作紀錄 API
+            // ...
+            
             switchPage('foodPage'); 
         };
+
+        // 🌟 新增：打開操作紀錄視窗 🌟
+        let logDataList = [];
+        async function openLogModal() {
+            safeDisplay('logModal', 'flex');
+            safeDisplay('logLoading', 'block');
+            document.getElementById('logTableBody').innerHTML = '';
+            try {
+                const response = await fetch(`${API_URL}?sheetName=${encodeURIComponent('操作紀錄表')}`);
+                const json = await response.json();
+                logDataList = Array.isArray(json.data) ? json.data : [];
+                // 依時間由新到舊排序
+                logDataList.sort((a, b) => new Date(b.actionTime || b.logId || 0) - new Date(a.actionTime || a.logId || 0));
+                renderLogTable();
+            } catch (e) {
+                alert("無法載入紀錄，請確認您的 Google Sheet 中是否已建立「操作紀錄表」分頁！");
+            } finally {
+                safeDisplay('logLoading', 'none');
+            }
+        }
+
+        function closeLogModal() {
+            safeDisplay('logModal', 'none');
+        }
+
+        function renderLogTable() {
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+            if (logDataList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:15px; color:#888;">目前尚無任何操作紀錄。</td></tr>`;
+                return;
+            }
+            
+            logDataList.forEach((log, index) => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = "1px solid #eee";
+                
+                let id = log.logId || log.id || log.col1 || log[Object.keys(log)[0]];
+                let time = log.actionTime || log.col2 || '';
+                if(time.includes('T')) {
+                    let d = new Date(time);
+                    time = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                }
+                let sName = log.sheetName || log.col3 || '';
+                let targetId = log.targetId || log.col4 || '';
+                let title = log.targetTitle || log.col5 || '';
+                let type = log.actionType || log.col6 || '';
+
+                tr.innerHTML = `
+                    <td style="padding: 10px; text-align:center; font-weight:bold; color:#777;">${index + 1}</td>
+                    <td style="padding: 10px; font-size: 13px; color: #555;">${time}</td>
+                    <td style="padding: 10px;"><span style="background:#e0f7fa; color:#006064; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${sName}</span></td>
+                    <td style="padding: 10px;"><span style="background:${type==='新增'?'#e8f5e9':'#fff3e0'}; color:${type==='新增'?'#2e7d32':'#e65100'}; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${type}</span></td>
+                    <td style="padding: 10px; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size:14px; color:#333;" title="${title}">${title}</td>
+                    <td style="padding: 10px; text-align: center;">
+                        <button class="btn-filter" style="padding:5px 10px; font-size:12px; margin-bottom:0;" onclick="goToLogItem('${sName}', '${targetId}')">前往</button>
+                        <button class="btn-delete" style="padding:5px 10px; font-size:12px; margin-bottom:0;" onclick="deleteLogItem('${id}')">刪除</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function deleteLogItem(logId) {
+            if(!confirm('確定要移除這筆操作紀錄嗎？\n(注意：這只會移除紀錄，不會刪除真實資料)')) return;
+            logDataList = logDataList.filter(l => (l.logId || l.id || l.col1 || l[Object.keys(l)[0]]) !== logId);
+            renderLogTable();
+            try {
+                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', id: logId, sheetName: '操作紀錄表' }) });
+            } catch(e) {}
+        }
+
+        function goToLogItem(sheetName, targetId) {
+            closeLogModal();
+            let targetPageKey = null;
+            for(let key in PAGE_CONFIG) {
+                if (PAGE_CONFIG[key].sheet === sheetName) {
+                    targetPageKey = key;
+                    break;
+                }
+            }
+            if(targetPageKey) {
+                switchPage(targetPageKey, targetId);
+            } else {
+                alert("找不到對應的頁面！");
+            }
+        }
 
         function renderNavButtons() {
             let html = '';
@@ -658,7 +774,7 @@
         }
 
         // ================= 頁面切換與資料載入 =================
-        function switchPage(selectedPageId) {
+        function switchPage(selectedPageId, targetIdToOpen = null) {
             if(!selectedPageId) return;
             currentPageId = selectedPageId;
             const config = PAGE_CONFIG[currentPageId];
@@ -695,10 +811,10 @@
                 safeText('genericTableTitle', `${config.name} 總覽`);
                 genericFilterKeywords = []; renderGenericKw();
             }
-            loadData(currentPageName);
+            loadData(currentPageName, targetIdToOpen);
         }
 
-        async function loadData(sheetName) {
+        async function loadData(sheetName, targetIdToOpen = null) {
             toggleLoading(true, '⏳ 資料載入與同步中...');
             try {
                 const response = await fetch(`${API_URL}?sheetName=${encodeURIComponent(sheetName)}`);
@@ -727,10 +843,20 @@
                 
                 applyGlobalMultiSort(); 
             } catch (error) { alert("資料讀取失敗！請確認 API 是否已更新。"); } 
-            finally { toggleLoading(false); }
+            finally { 
+                toggleLoading(false);
+                // 如果是從 Log 面板點擊「前往」，載入後自動打開詳細檢視
+                if (targetIdToOpen && TIMELINE_PAGES.includes(sheetName)) {
+                    setTimeout(() => {
+                        openNewsDetail(targetIdToOpen);
+                        const card = document.getElementById(`clamp-content-${targetIdToOpen}`);
+                        if(card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                }
+            }
         }
 
-        // ================= 🌟 共用過濾邏輯 🌟 =================
+        // ================= 🌟 共用過濾邏輯 =================
         function handleFilterInput(inputId, arr, renderFn, renderKwFn) {
             const el = document.getElementById(inputId);
             if(!el) return;
@@ -761,7 +887,7 @@
             fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         }
 
-        // 🌟 留言板核心功能 🌟
+        // 🌟 留言板核心 🌟
         async function submitComment(id) {
             const inputEl = document.getElementById(`newCommentInput_${id}`); if(!inputEl) return;
             const text = inputEl.value.trim(); if(!text) return alert('請先輸入留言內容！');
@@ -925,6 +1051,7 @@
 
                 const catColor = getCategoryColor(cat);
                 const itemDiv = document.createElement('div');
+                itemDiv.id = `clamp-content-${data.id}`; // 讓 scrollIntoView 找得到
                 itemDiv.className = `timeline-item ${isLeft ? 'left' : 'right'}`; itemDiv.style.setProperty('--cat-color', catColor);
 
                 let linkHtml = '';
@@ -942,7 +1069,7 @@
                         <div class="timeline-date">${date}</div>
                         <h3 class="timeline-title"><span class="timeline-badge">${cat}</span>${title}</h3>
                         ${linkHtml}
-                        <div class="text-clamp ${expClass}" id="clamp-content-${data.id}" onclick="event.stopPropagation()">${content}</div>
+                        <div class="text-clamp ${expClass}" onclick="event.stopPropagation()">${content}</div>
                         ${notesHtml}
                         ${commentBadge}
                         <br><button class="toggle-text-btn" id="toggle-btn-${data.id}" onclick="toggleNewsClamp('${data.id}', event)">${btnText}</button>
