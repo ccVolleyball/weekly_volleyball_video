@@ -19,6 +19,7 @@
         .theme-box { border-left: 5px solid var(--theme-primary); background-color: var(--theme-light); padding: 15px; }
         .theme-text { color: var(--theme-dark) !important; }
 
+        /* 全新導覽列按鈕樣式 */
         .nav-container { margin-bottom: 20px; padding: 15px; background-color: var(--theme-light); border: 1px solid var(--theme-primary); border-radius: 8px; transition: all 0.3s; }
         .nav-buttons-wrapper { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .nav-btn {
@@ -110,7 +111,9 @@
             .table-responsive { overflow: hidden; }
         }
 
-        /* 時間軸與側邊留言面板專屬 CSS */
+        /* ====================================================
+           🌟 時間軸與側邊留言面板專屬 CSS 🌟
+        ==================================================== */
         .news-layout-wrapper { display: flex; gap: 20px; position: relative; align-items: flex-start; }
         .news-timeline-section { flex: 1; min-width: 0; }
         
@@ -242,8 +245,7 @@
             <button class="btn-cancel" style="display: inline-block; padding: 4px 8px; font-size: 12px;" onclick="resetMultiSort()">清除所有排序設定</button>
         </div>
         <div style="font-size: 13px; color: #666; margin-bottom: 10px;">設定最多 5 層優先權，新資料輸入後會自動排入正確順序。</div>
-        <div id="multiSortContainer" style="display: flex; flex-wrap: wrap; gap: 10px;">
-        </div>
+        <div id="multiSortContainer" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
     </div>
 
 
@@ -459,9 +461,10 @@
         </div>
     </div>
 
+
     <script>
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
-        const API_URL = "https://script.google.com/macros/s/AKfycbwLwsVsgm8diIhnC-Wxh2oRI58G6GIFrFizK8pp-Pvw12sXnpcXpJKOFyRdS_FOG38w/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
 
         const PAGE_CONFIG = {
             'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', label: '🍔 美食紀錄', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
@@ -512,7 +515,7 @@
         const safeClass = (id, cls) => { let el = document.getElementById(id); if(el) el.className = cls; };
         const safeDisplay = (id, disp) => { let el = document.getElementById(id); if(el) el.style.display = disp; };
 
-        // 🌟 新增：Auto-linking 網址轉換函數 🌟
+        // 🌟 Auto-linking 網址轉換函數 🌟
         function linkify(text) {
             if (!text) return '';
             let escaped = String(text).replace(/</g, '<').replace(/>/g, '>');
@@ -529,58 +532,41 @@
             const today = new Date().toISOString().split('T')[0];
             safeSet('sportDate', today); safeSet('noteCol2', today); safeSet('genCol2', today); safeSet('newsCol2', today);
             
-            // 🌟 新增：取得操作紀錄 API
-            // ...
-            
             switchPage('foodPage'); 
         };
 
-        // 🌟 新增：打開操作紀錄視窗 🌟
+        // 🌟 操作紀錄檢視視窗相關 🌟
         let logDataList = [];
         async function openLogModal() {
-            safeDisplay('logModal', 'flex');
-            safeDisplay('logLoading', 'block');
+            safeDisplay('logModal', 'flex'); safeDisplay('logLoading', 'block');
             document.getElementById('logTableBody').innerHTML = '';
             try {
                 const response = await fetch(`${API_URL}?sheetName=${encodeURIComponent('操作紀錄表')}`);
                 const json = await response.json();
                 logDataList = Array.isArray(json.data) ? json.data : [];
-                // 依時間由新到舊排序
                 logDataList.sort((a, b) => new Date(b.actionTime || b.logId || 0) - new Date(a.actionTime || a.logId || 0));
                 renderLogTable();
             } catch (e) {
                 alert("無法載入紀錄，請確認您的 Google Sheet 中是否已建立「操作紀錄表」分頁！");
-            } finally {
-                safeDisplay('logLoading', 'none');
-            }
+            } finally { safeDisplay('logLoading', 'none'); }
         }
-
-        function closeLogModal() {
-            safeDisplay('logModal', 'none');
-        }
+        function closeLogModal() { safeDisplay('logModal', 'none'); }
 
         function renderLogTable() {
-            const tbody = document.getElementById('logTableBody');
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('logTableBody'); tbody.innerHTML = '';
             if (logDataList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:15px; color:#888;">目前尚無任何操作紀錄。</td></tr>`;
-                return;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:15px; color:#888;">目前尚無任何操作紀錄。</td></tr>`; return;
             }
-            
             logDataList.forEach((log, index) => {
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = "1px solid #eee";
-                
+                const tr = document.createElement('tr'); tr.style.borderBottom = "1px solid #eee";
                 let id = log.logId || log.id || log.col1 || log[Object.keys(log)[0]];
                 let time = log.actionTime || log.col2 || '';
                 if(time.includes('T')) {
                     let d = new Date(time);
                     time = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
                 }
-                let sName = log.sheetName || log.col3 || '';
-                let targetId = log.targetId || log.col4 || '';
-                let title = log.targetTitle || log.col5 || '';
-                let type = log.actionType || log.col6 || '';
+                let sName = log.sheetName || log.col3 || ''; let targetId = log.targetId || log.col4 || '';
+                let title = log.targetTitle || log.col5 || ''; let type = log.actionType || log.col6 || '';
 
                 tr.innerHTML = `
                     <td style="padding: 10px; text-align:center; font-weight:bold; color:#777;">${index + 1}</td>
@@ -601,34 +587,20 @@
             if(!confirm('確定要移除這筆操作紀錄嗎？\n(注意：這只會移除紀錄，不會刪除真實資料)')) return;
             logDataList = logDataList.filter(l => (l.logId || l.id || l.col1 || l[Object.keys(l)[0]]) !== logId);
             renderLogTable();
-            try {
-                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', id: logId, sheetName: '操作紀錄表' }) });
-            } catch(e) {}
+            try { fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', id: logId, sheetName: '操作紀錄表' }) }); } catch(e) {}
         }
 
         function goToLogItem(sheetName, targetId) {
             closeLogModal();
             let targetPageKey = null;
-            for(let key in PAGE_CONFIG) {
-                if (PAGE_CONFIG[key].sheet === sheetName) {
-                    targetPageKey = key;
-                    break;
-                }
-            }
-            if(targetPageKey) {
-                switchPage(targetPageKey, targetId);
-            } else {
-                alert("找不到對應的頁面！");
-            }
+            for(let key in PAGE_CONFIG) { if (PAGE_CONFIG[key].sheet === sheetName) { targetPageKey = key; break; } }
+            if(targetPageKey) { switchPage(targetPageKey, targetId); } else { alert("找不到對應的頁面！"); }
         }
 
         function renderNavButtons() {
             let html = '';
-            for(let key in PAGE_CONFIG) {
-                html += `<button id="navBtn_${key}" class="nav-btn" onclick="switchPage('${key}')">${PAGE_CONFIG[key].label}</button>`;
-            }
-            const wrapper = document.getElementById('navButtonsWrapper');
-            if(wrapper) wrapper.innerHTML = html;
+            for(let key in PAGE_CONFIG) { html += `<button id="navBtn_${key}" class="nav-btn" onclick="switchPage('${key}')">${PAGE_CONFIG[key].label}</button>`; }
+            const wrapper = document.getElementById('navButtonsWrapper'); if(wrapper) wrapper.innerHTML = html;
         }
 
         function renderSortOptionsUI() {
@@ -644,8 +616,7 @@
                         </select>
                     </div>`;
             }
-            const container = document.getElementById('multiSortContainer');
-            if (container) container.innerHTML = html;
+            const container = document.getElementById('multiSortContainer'); if (container) container.innerHTML = html;
         }
 
         function applyTheme(config) {
@@ -660,26 +631,20 @@
         }
 
         function toggleCol(tableId, colIndex, checkbox) {
-            const table = document.getElementById(tableId);
-            if(!table) return;
+            const table = document.getElementById(tableId); if(!table) return;
             if (checkbox.checked) { table.classList.remove(`hide-col-${colIndex}`); } else { table.classList.add(`hide-col-${colIndex}`); }
         }
 
         function toggleDescCollapse() {
-            isDescCollapsed = !isDescCollapsed;
-            safeDisplay('descBody', isDescCollapsed ? 'none' : 'block');
-            const header = document.querySelector('.desc-header');
-            if(header) header.classList.toggle('collapsed', isDescCollapsed);
+            isDescCollapsed = !isDescCollapsed; safeDisplay('descBody', isDescCollapsed ? 'none' : 'block');
+            const header = document.querySelector('.desc-header'); if(header) header.classList.toggle('collapsed', isDescCollapsed);
         }
         function enableDescEdit() { safeSet('descModalInput', currentDescription); safeDisplay('descModal', 'flex'); }
         function closeDescModal() { safeDisplay('descModal', 'none'); }
         async function saveDescription() {
-            const el = document.getElementById('descModalInput');
-            if(!el) return;
-            const newDesc = el.value.trim(); 
-            currentDescription = newDesc;
-            safeText('descDisplay', newDesc || '目前無說明，請點擊「編輯說明」來新增內容或欄位定義。');
-            closeDescModal();
+            const el = document.getElementById('descModalInput'); if(!el) return;
+            const newDesc = el.value.trim(); currentDescription = newDesc;
+            safeText('descDisplay', newDesc || '目前無說明，請點擊「編輯說明」來新增內容或欄位定義。'); closeDescModal();
             try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ sheetName: currentPageName, action: 'update_desc', description: newDesc }) }); } catch(e) {}
         }
         async function deleteDescription() { if(!confirm('確定要清除此頁面的說明嗎？')) return; safeSet('descModalInput', ''); saveDescription(); }
@@ -694,8 +659,7 @@
             } else { for(let i=1; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i}); }
 
             for(let i=1; i<=5; i++) {
-                let sel = document.getElementById(`sortCol${i}`); 
-                if(!sel) continue;
+                let sel = document.getElementById(`sortCol${i}`); if(!sel) continue;
                 let currentVal = sel.value; sel.innerHTML = '';
                 options.forEach(opt => { let o = document.createElement('option'); o.value = opt.val; o.innerText = opt.text; sel.appendChild(o); });
                 if (options.some(opt => opt.val === currentVal)) sel.value = currentVal; else sel.value = '';
@@ -703,11 +667,9 @@
         }
         function resetMultiSort() { for(let i=1; i<=5; i++) { safeSet(`sortCol${i}`, ''); safeSet(`sortDir${i}`, 'asc'); } applyGlobalMultiSort(); }
         function handleHeaderSort(col) { 
-            let p1 = document.getElementById('sortCol1'); let d1 = document.getElementById('sortDir1'); 
-            if(!p1 || !d1) return;
+            let p1 = document.getElementById('sortCol1'); let d1 = document.getElementById('sortDir1'); if(!p1 || !d1) return;
             if (p1.value === col) { d1.value = d1.value === 'asc' ? 'desc' : 'asc'; } else { p1.value = col; d1.value = 'asc'; } 
-            for(let i=2; i<=5; i++) { safeSet(`sortCol${i}`, ''); }
-            applyGlobalMultiSort(); 
+            for(let i=2; i<=5; i++) { safeSet(`sortCol${i}`, ''); } applyGlobalMultiSort(); 
         }
         
         function applyGlobalMultiSort() {
@@ -827,6 +789,8 @@
                 
                 updateSortOptions(); 
                 
+                const todayStr = new Date().toISOString().split('T')[0];
+
                 if (sheetName === '美食紀錄') { foodDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.city)} ${safeStr(item.district)} ${safeStr(item.address)} ${safeStr(item.storeName)} ${safeStr(item.category)} ${safeStr(item.other)}`.toLowerCase() })); } 
                 else if (sheetName === '運動紀錄') { sportsDataList = data; } 
                 else if (sheetName === '擴充預留網頁1') { noteDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); } 
@@ -835,7 +799,14 @@
                     newsDataList = data.map(item => {
                         let commentsText = '';
                         try { let cArr = JSON.parse(safeStr(item.col10) || '[]'); commentsText = cArr.map(c => c.text).join(' '); } catch(e){}
-                        return { ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${commentsText}`.toLowerCase() };
+                        
+                        // 🌟 新增：預設只展開「今天」的資料 🌟
+                        let isDetailed = (formatDate(item.col2) === todayStr);
+
+                        return { ...item, 
+                            fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${commentsText}`.toLowerCase(),
+                            isDetailed: isDetailed 
+                        };
                     }); 
                     updateNewsCategoryCheckboxes();
                 } 
@@ -845,8 +816,10 @@
             } catch (error) { alert("資料讀取失敗！請確認 API 是否已更新。"); } 
             finally { 
                 toggleLoading(false);
-                // 如果是從 Log 面板點擊「前往」，載入後自動打開詳細檢視
                 if (targetIdToOpen && TIMELINE_PAGES.includes(sheetName)) {
+                    // 如果有指定要開啟的 ID，強制設為展開
+                    newsDataList.forEach(d => { if(String(d.id) === String(targetIdToOpen)) d.isDetailed = true; });
+                    renderNewsTimeline();
                     setTimeout(() => {
                         openNewsDetail(targetIdToOpen);
                         const card = document.getElementById(`clamp-content-${targetIdToOpen}`);
@@ -858,11 +831,8 @@
 
         // ================= 🌟 共用過濾邏輯 =================
         function handleFilterInput(inputId, arr, renderFn, renderKwFn) {
-            const el = document.getElementById(inputId);
-            if(!el) return;
-            const inputVal = el.value.trim().toLowerCase();
-            if (!inputVal) return;
-            
+            const el = document.getElementById(inputId); if(!el) return;
+            const inputVal = el.value.trim().toLowerCase(); if (!inputVal) return;
             const kws = inputVal.split(/\s+/);
             kws.forEach(kw => { if (kw && !arr.includes(kw)) arr.push(kw); });
             el.value = ''; renderKwFn(); renderFn();
@@ -880,14 +850,20 @@
             const payload = { sheetName: currentPageName, id: editingNewsId || Date.now(), action: editingNewsId ? 'edit' : 'add' };
             for(let i=1; i<=10; i++) { let el = document.getElementById(`newsCol${i}`); payload[`col${i}`] = el ? el.value : ''; }
             const fullText = Object.values(payload).join(' ').toLowerCase();
-            if (editingNewsId) { const idx = newsDataList.findIndex(d => String(d.id) === String(editingNewsId)); if (idx > -1) newsDataList[idx] = { ...payload, fullText };
-            } else { newsDataList.push({ ...payload, fullText }); }
+            if (editingNewsId) { 
+                const idx = newsDataList.findIndex(d => String(d.id) === String(editingNewsId)); 
+                if (idx > -1) {
+                    let oldDetailed = newsDataList[idx].isDetailed; // 保留展開狀態
+                    newsDataList[idx] = { ...payload, fullText, isDetailed: oldDetailed };
+                }
+            } else { 
+                newsDataList.push({ ...payload, fullText, isDetailed: true }); // 新增預設展開
+            }
             
             updateNewsCategoryCheckboxes(); applyGlobalMultiSort(); cancelNewsEdit(); 
             fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         }
 
-        // 🌟 留言板核心 🌟
         async function submitComment(id) {
             const inputEl = document.getElementById(`newCommentInput_${id}`); if(!inputEl) return;
             const text = inputEl.value.trim(); if(!text) return alert('請先輸入留言內容！');
@@ -995,10 +971,7 @@
             
             const cat = safeStr(item.col1) || '未分類'; const date = formatDate(item.col2); const title = safeStr(item.col3);
             
-            // 使用 linkify 自動轉換網址
-            const desc = linkify(safeStr(item.col4)); 
-            let link = safeStr(item.col5); 
-            const notes = linkify(safeStr(item.col6));
+            const desc = linkify(safeStr(item.col4)); let link = safeStr(item.col5); const notes = linkify(safeStr(item.col6));
             
             let linkHtml = '無';
             if (link.trim() !== '') { let href = link.startsWith('http') ? link : 'http://' + link; linkHtml = `<a href="${href}" target="_blank" style="word-break: break-all; color: var(--theme-primary); font-weight:bold;">${link}</a>`; }
@@ -1023,6 +996,20 @@
         }
         function closeNewsDetail() { safeDisplay('newsDetailPanel', 'none'); }
 
+        // 🌟 新增：延遲載入控制函數 🌟
+        window.loadSelectedLazy = function() {
+            const cbs = document.querySelectorAll('.lazy-cb:checked');
+            if (cbs.length === 0) return alert('請先勾選要展開的文章！');
+            const ids = Array.from(cbs).map(cb => cb.value);
+            newsDataList.forEach(d => { if(ids.includes(String(d.id))) d.isDetailed = true; });
+            renderNewsTimeline();
+        };
+
+        window.loadAllLazy = function() {
+            newsDataList.forEach(d => d.isDetailed = true);
+            renderNewsTimeline();
+        };
+
         function renderNewsTimeline() {
             const container = document.getElementById('newsTimelineContainer'); if(!container) return; container.innerHTML = '';
             
@@ -1034,24 +1021,62 @@
             if(cbList.length > 0) { cbList.forEach(cb => { if(cb.checked) checkedCats.push(cb.value); }); } else { checkedCats = null; }
 
             const kws = keyword ? keyword.split(/\s+/) : [];
-            let isLeft = true; let expClass = isGlobalNewsExpanded ? 'expanded' : ''; let btnText = isGlobalNewsExpanded ? '收起 ▲' : '展開 ▼';
 
+            let previewItems = [];
+            let detailedItems = [];
+
+            // 過濾並分流資料
             newsDataList.forEach(data => {
                 const fullText = data.fullText; const cat = safeStr(data.col1).trim() || '未分類'; const date = formatDate(data.col2);
-                const title = safeStr(data.col3); 
-                // Auto-linking 時間軸文字
-                const content = linkify(safeStr(data.col4)); 
-                let link = safeStr(data.col5); 
-                const notes = linkify(safeStr(data.col6));
                 
                 if (kws.length > 0 && !kws.every(kw => fullText.includes(kw))) return;
                 if (startDate && date < startDate) return;
                 if (endDate && date > endDate) return;
                 if (checkedCats !== null && !checkedCats.includes(cat)) return;
 
+                if (data.isDetailed) detailedItems.push(data);
+                else previewItems.push(data);
+            });
+
+            // 🌟 1. 繪製「預覽清單區」🌟
+            if (previewItems.length > 0) {
+                let listHtml = previewItems.map(d => `
+                    <label style="display:flex; align-items:center; padding:10px; border-bottom:1px solid #f1f1f1; cursor:pointer; transition:background 0.2s;">
+                        <input type="checkbox" class="lazy-cb" value="${d.id}" style="margin-right:12px; transform:scale(1.2);">
+                        <span style="font-size:13px; color:#888; width:85px;">${formatDate(d.col2)}</span>
+                        <span style="background:var(--theme-light); color:var(--theme-primary); padding:2px 6px; border-radius:4px; font-size:12px; margin-right:12px; font-weight:bold;">${safeStr(d.col1)}</span>
+                        <span style="font-size:15px; color:#333; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold;">${safeStr(d.col3)}</span>
+                    </label>
+                `).join('');
+
+                let previewDiv = document.createElement('div');
+                previewDiv.style.cssText = "background:#fff; border:1px solid #ddd; border-radius:8px; margin-bottom:30px; padding:20px; box-shadow:0 4px 10px rgba(0,0,0,0.05);";
+                previewDiv.innerHTML = `
+                    <h4 style="margin:0 0 12px 0; color:var(--theme-dark); border-bottom:2px solid #eee; padding-bottom:10px; display:flex; align-items:center;">
+                        📁 歷史文章預覽區 <span style="font-size:13px; font-weight:normal; color:#666; margin-left:10px;">(共 ${previewItems.length} 篇符合條件未展開)</span>
+                    </h4>
+                    <div style="max-height:250px; overflow-y:auto; border:1px solid #eee; border-radius:6px; margin-bottom:15px; background:#fafafa;">
+                        ${listHtml}
+                    </div>
+                    <div>
+                        <button class="btn-add" onclick="loadSelectedLazy()">⬇️ 局部展開勾選文章</button>
+                        <button class="btn-filter" style="background:#6c757d;" onclick="loadAllLazy()">📚 載入並展開全部 (${previewItems.length})</button>
+                    </div>
+                `;
+                container.appendChild(previewDiv);
+            }
+
+            // 🌟 2. 繪製「完整時間軸卡片區」🌟
+            let isLeft = true; let expClass = isGlobalNewsExpanded ? 'expanded' : ''; let btnText = isGlobalNewsExpanded ? '收起 ▲' : '展開 ▼';
+
+            detailedItems.forEach(data => {
+                const cat = safeStr(data.col1).trim() || '未分類'; const date = formatDate(data.col2);
+                const title = safeStr(data.col3); const content = linkify(safeStr(data.col4)); 
+                let link = safeStr(data.col5); const notes = linkify(safeStr(data.col6));
+
                 const catColor = getCategoryColor(cat);
                 const itemDiv = document.createElement('div');
-                itemDiv.id = `clamp-content-${data.id}`; // 讓 scrollIntoView 找得到
+                itemDiv.id = `clamp-content-${data.id}`;
                 itemDiv.className = `timeline-item ${isLeft ? 'left' : 'right'}`; itemDiv.style.setProperty('--cat-color', catColor);
 
                 let linkHtml = '';
