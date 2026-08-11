@@ -239,6 +239,22 @@
         </div>
     </div>
 
+    <div id="moveCopyModal" class="modal-overlay" onclick="if(event.target===this) closeMoveCopyModal()">
+        <div class="modal-content" style="max-width: 480px;">
+            <h3 class="theme-text">📤 複製 / 移動紀錄到其他分頁</h3>
+            <div style="font-size: 13px; color: #666; margin-bottom: 15px;">只能選擇與目前分頁相同欄位格式的分頁。「移動」不會刪除原本這筆資料，只會在原始卡片上標記已移至的分頁。</div>
+            <div class="form-group" style="width: 100%;">
+                <label>目標分頁</label>
+                <select id="moveCopyTargetSelect" style="width: 100%; max-width: 100%;"></select>
+            </div>
+            <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
+                <button class="btn-cancel" style="display: inline-block;" onclick="closeMoveCopyModal()">取消</button>
+                <button class="btn-copy" onclick="submitMoveCopy('copy')">📋 複製到此分頁</button>
+                <button class="btn-add" onclick="submitMoveCopy('move')">➡️ 移動到此分頁</button>
+            </div>
+        </div>
+    </div>
+
     <div class="section theme-box" style="opacity: 0.95;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <h3 class="theme-text" style="margin: 0 0 5px 0;">🔃 多重優先權排序</h3>
@@ -467,28 +483,28 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
 
         const PAGE_CONFIG = {
-            'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', label: '🍔 美食紀錄', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
-            'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', label: '🏃‍♂️ 運動紀錄', color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
-            'travelPage': { sheet: '擴充預留網頁7', name: '旅遊行程筆記', label: '✈️ 旅遊(7)', color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
-            'newsPage':   { sheet: '擴充預留網頁5', name: '時事焦點紀錄', label: '📰 時事(5)', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
-            'notePage':   { sheet: '擴充預留網頁1', name: '隨身綜合筆記', label: '📝 筆記(1)', color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
-            'extPage2':   { sheet: '擴充預留網頁2', name: '飲食日常紀錄', label: '🍽️ 飲食(2)', color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
-            'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', label: '🔗 連結(3)', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
-            'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊紀錄', label: '🗼 東京旅遊(4)', color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
-            'extPage6':   { sheet: '擴充預留網頁6', name: '擴充預留網頁6', label: '📄 網頁6', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
-            'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', label: '📰 網頁8', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
-            'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', label: '📰 網頁9', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
-            'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', label: '📰 網頁10', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
-            'extPage11':  { sheet: '擴充預留網頁11', name: '擴充預留網頁11', label: '📰 網頁11', color: '#8e24aa', light: '#f3e5f5', dark: '#4a148c' },
-            'extPage12':  { sheet: '擴充預留網頁12', name: '擴充預留網頁12', label: '📰 網頁12', color: '#e53935', light: '#ffebee', dark: '#b71c1c' },
-            'extPage13':  { sheet: '擴充預留網頁13', name: '擴充預留網頁13', label: '📰 網頁13', color: '#d81b60', light: '#fce4ec', dark: '#880e4f' },
-            'extPage14':  { sheet: '擴充預留網頁14', name: '擴充預留網頁14', label: '📰 網頁14', color: '#3949ab', light: '#e8eaf6', dark: '#1a237e' },
-            'extPage15':  { sheet: '擴充預留網頁15', name: '擴充預留網頁15', label: '📰 網頁15', color: '#039be5', light: '#e0f7fa', dark: '#01579b' },
-            'extPage16':  { sheet: '擴充預留網頁16', name: '擴充預留網頁16', label: '📰 網頁16', color: '#00897b', light: '#e0f2f1', dark: '#004d40' },
-            'extPage17':  { sheet: '擴充預留網頁17', name: '擴充預留網頁17', label: '📰 網頁17', color: '#7cb342', light: '#f1f8e9', dark: '#33691e' },
-            'extPage18':  { sheet: '擴充預留網頁18', name: '擴充預留網頁18', label: '📰 網頁18', color: '#fdd835', light: '#fffde7', dark: '#f57f17' },
-            'extPage19':  { sheet: '擴充預留網頁19', name: '擴充預留網頁19', label: '📰 網頁19', color: '#fb8c00', light: '#fff3e0', dark: '#e65100' },
-            'extPage20':  { sheet: '擴充預留網頁20', name: '擴充預留網頁20', label: '📰 網頁20', color: '#6d4c41', light: '#efebe9', dark: '#3e2723' }
+            'foodPage':   { sheet: '美食紀錄', name: '美食記錄', label: '🍔 (1)美食記錄', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
+            'sportsPage': { sheet: '運動紀錄', name: '運動記錄', label: '🏃‍♂️ (2)運動記錄', color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
+            'travelPage': { sheet: '擴充預留網頁7', name: '旅遊', label: '✈️ (3)旅遊', color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
+            'newsPage':   { sheet: '擴充預留網頁5', name: '時事', label: '📰 (4)時事', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
+            'notePage':   { sheet: '擴充預留網頁1', name: '筆記', label: '📝 (5)筆記', color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
+            'extPage2':   { sheet: '擴充預留網頁2', name: '飲食', label: '🍽️ (6)飲食', color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
+            'extPage3':   { sheet: '擴充預留網頁3', name: '連結', label: '🔗 (7)連結', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊', label: '🗼 (8)東京旅遊', color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
+            'extPage6':   { sheet: '擴充預留網頁6', name: '網頁6', label: '📄 (9)網頁6', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
+            'extPage8':   { sheet: '擴充預留網頁8', name: '政治', label: '📰 (10)政治', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
+            'extPage9':   { sheet: '擴充預留網頁9', name: '經濟|科技', label: '📰 (11)經濟|科技', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
+            'extPage10':  { sheet: '擴充預留網頁10', name: 'Code議題', label: '📰 (12)Code議題', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage11':  { sheet: '擴充預留網頁11', name: '日本旅遊', label: '📰 (13)日本旅遊', color: '#8e24aa', light: '#f3e5f5', dark: '#4a148c' },
+            'extPage12':  { sheet: '擴充預留網頁12', name: '好文分享', label: '📰 (14)好文分享', color: '#e53935', light: '#ffebee', dark: '#b71c1c' },
+            'extPage13':  { sheet: '擴充預留網頁13', name: '專業結合英文', label: '📰 (15)專業結合英文', color: '#d81b60', light: '#fce4ec', dark: '#880e4f' },
+            'extPage14':  { sheet: '擴充預留網頁14', name: '網頁14', label: '📰 (16)網頁', color: '#3949ab', light: '#e8eaf6', dark: '#1a237e' },
+            'extPage15':  { sheet: '擴充預留網頁15', name: '網頁15', label: '📰 (17)網頁', color: '#039be5', light: '#e0f7fa', dark: '#01579b' },
+            'extPage16':  { sheet: '擴充預留網頁16', name: '網頁16', label: '📰 (18)網頁', color: '#00897b', light: '#e0f2f1', dark: '#004d40' },
+            'extPage17':  { sheet: '擴充預留網頁17', name: '網頁17', label: '📰 (19)網頁', color: '#7cb342', light: '#f1f8e9', dark: '#33691e' },
+            'extPage18':  { sheet: '擴充預留網頁18', name: '網頁18', label: '📰 (20)網頁', color: '#fdd835', light: '#fffde7', dark: '#f57f17' },
+            'extPage19':  { sheet: '擴充預留網頁19', name: '網頁19', label: '📰 (21)網頁', color: '#fb8c00', light: '#fff3e0', dark: '#e65100' },
+            'extPage20':  { sheet: '擴充預留網頁20', name: '網頁20', label: '📰 (22)網頁', color: '#6d4c41', light: '#efebe9', dark: '#3e2723' }
         };
 
         const TIMELINE_PAGES = ['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10', '擴充預留網頁11', '擴充預留網頁12', '擴充預留網頁13', '擴充預留網頁14', '擴充預留網頁15', '擴充預留網頁16', '擴充預留網頁17', '擴充預留網頁18', '擴充預留網頁19', '擴充預留網頁20'];
@@ -515,10 +531,32 @@
         const safeClass = (id, cls) => { let el = document.getElementById(id); if(el) el.className = cls; };
         const safeDisplay = (id, disp) => { let el = document.getElementById(id); if(el) el.style.display = disp; };
 
+        // 🛡️ XSS 防護 Helper：將任意資料轉為可安全插入 HTML 文字/屬性的字串
+        function escapeHtml(val) {
+            return safeStr(val)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+        // 🛡️ XSS 防護 Helper：專門處理插入 onclick="fn('${val}')" 這種「HTML 屬性內含 JS 字串」的情境
+        // 先做 JS 字串跳脫（避免提早結束字串字面值），再做 HTML 屬性跳脫（避免提早結束屬性）
+        function escapeJsAttr(val) {
+            return safeStr(val)
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/\r?\n/g, '\\n')
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
         // 🌟 Auto-linking 網址轉換函數 🌟
         function linkify(text) {
             if (!text) return '';
-            let escaped = String(text).replace(/</g, '<').replace(/>/g, '>');
+            let escaped = escapeHtml(text);
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return escaped.replace(urlRegex, function(url) {
                 return `<a href="${url}" target="_blank" style="color: var(--theme-primary); text-decoration: underline; font-weight: bold; word-break: break-all;" onclick="event.stopPropagation()">${url}</a>`;
@@ -570,13 +608,13 @@
 
                 tr.innerHTML = `
                     <td style="padding: 10px; text-align:center; font-weight:bold; color:#777;">${index + 1}</td>
-                    <td style="padding: 10px; font-size: 13px; color: #555;">${time}</td>
-                    <td style="padding: 10px;"><span style="background:#e0f7fa; color:#006064; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${sName}</span></td>
-                    <td style="padding: 10px;"><span style="background:${type==='新增'?'#e8f5e9':'#fff3e0'}; color:${type==='新增'?'#2e7d32':'#e65100'}; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${type}</span></td>
-                    <td style="padding: 10px; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size:14px; color:#333;" title="${title}">${title}</td>
+                    <td style="padding: 10px; font-size: 13px; color: #555;">${escapeHtml(time)}</td>
+                    <td style="padding: 10px;"><span style="background:#e0f7fa; color:#006064; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${escapeHtml(sName)}</span></td>
+                    <td style="padding: 10px;"><span style="background:${type==='新增'?'#e8f5e9':'#fff3e0'}; color:${type==='新增'?'#2e7d32':'#e65100'}; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold;">${escapeHtml(type)}</span></td>
+                    <td style="padding: 10px; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size:14px; color:#333;" title="${escapeHtml(title)}">${escapeHtml(title)}</td>
                     <td style="padding: 10px; text-align: center;">
-                        <button class="btn-filter" style="padding:5px 10px; font-size:12px; margin-bottom:0;" onclick="goToLogItem('${sName}', '${targetId}')">前往</button>
-                        <button class="btn-delete" style="padding:5px 10px; font-size:12px; margin-bottom:0;" onclick="deleteLogItem('${id}')">刪除</button>
+                        <button class="btn-filter" style="padding:5px 10px; font-size:12px; margin-bottom:0;" onclick="goToLogItem('${escapeJsAttr(sName)}', '${escapeJsAttr(targetId)}')">前往</button>
+                        <button class="btn-delete" style="padding:5px 10px; font-size:12px; margin-bottom:0;" onclick="deleteLogItem('${escapeJsAttr(id)}')">刪除</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -803,8 +841,8 @@
                         // 🌟 新增：預設只展開「今天」的資料 🌟
                         let isDetailed = (formatDate(item.col2) === todayStr);
 
-                        return { ...item, 
-                            fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${commentsText}`.toLowerCase(),
+                        return { ...item,
+                            fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col9)} ${commentsText}`.toLowerCase(),
                             isDetailed: isDetailed 
                         };
                     }); 
@@ -890,8 +928,8 @@
             if(event) event.stopPropagation();
             const item = newsDataList.find(d => String(d.id) === String(id)); if (!item) return;
             for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`newsCol${i}`, val); }
-            safeSet('newsCol10', ''); 
-            editingNewsId = null; 
+            safeSet('newsCol9', ''); safeSet('newsCol10', '');
+            editingNewsId = null;
             const configName = PAGE_CONFIG[currentPageId].name;
             safeText('newsFormTitle', `新增 ${configName} (複製現有)`); safeText('submitNewsBtn', '儲存紀錄'); safeClass('submitNewsBtn', 'btn-add'); safeDisplay('cancelNewsBtn', 'inline-block'); 
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
@@ -907,14 +945,76 @@
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
-        function deleteNewsData(id, event) { 
-            if(event) event.stopPropagation(); 
-            if (!confirm('確定刪除此紀錄？')) return; 
-            newsDataList = newsDataList.filter(d => String(d.id) !== String(id)); 
-            updateNewsCategoryCheckboxes(); renderNewsTimeline(); 
-            fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) }); 
+        function deleteNewsData(id, event) {
+            if(event) event.stopPropagation();
+            if (!confirm('確定刪除此紀錄？')) return;
+            newsDataList = newsDataList.filter(d => String(d.id) !== String(id));
+            updateNewsCategoryCheckboxes(); renderNewsTimeline();
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) });
         }
-        
+
+        // ================= 📤 複製 / 移動到其他分頁 (時事5 ~ 網頁20 共用格式) =================
+        let moveCopyItemId = null;
+
+        function findPageKeyBySheet(sheetName) {
+            for (let key in PAGE_CONFIG) { if (PAGE_CONFIG[key].sheet === sheetName) return key; }
+            return null;
+        }
+
+        function openMoveCopyModal(id, event) {
+            if (event) event.stopPropagation();
+            moveCopyItemId = id;
+            const sel = document.getElementById('moveCopyTargetSelect'); if (!sel) return;
+            sel.innerHTML = '';
+            TIMELINE_PAGES.forEach(sheetName => {
+                if (sheetName === currentPageName) return;
+                const key = findPageKeyBySheet(sheetName); if (!key) return;
+                const opt = document.createElement('option');
+                opt.value = sheetName; opt.textContent = PAGE_CONFIG[key].label;
+                sel.appendChild(opt);
+            });
+            if (sel.options.length === 0) { alert('沒有其他可用的目標分頁！'); return; }
+            safeDisplay('moveCopyModal', 'flex');
+        }
+        function closeMoveCopyModal() { moveCopyItemId = null; safeDisplay('moveCopyModal', 'none'); }
+
+        async function submitMoveCopy(mode) {
+            const sel = document.getElementById('moveCopyTargetSelect'); if (!sel || !sel.value) return;
+            const targetSheet = sel.value;
+            const targetKey = findPageKeyBySheet(targetSheet);
+            const targetLabel = targetKey ? PAGE_CONFIG[targetKey].name : targetSheet;
+
+            const idx = newsDataList.findIndex(d => String(d.id) === String(moveCopyItemId));
+            if (idx === -1) { closeMoveCopyModal(); return; }
+            const item = newsDataList[idx];
+
+            const newId = Date.now() + Math.floor(Math.random() * 10000);
+            const copyPayload = { sheetName: targetSheet, id: newId, action: 'add' };
+            for (let i = 1; i <= 10; i++) { copyPayload[`col${i}`] = safeStr(item[`col${i}`]); }
+
+            try {
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify(copyPayload) });
+            } catch (e) { alert('複製失敗，請檢查網路連線！'); return; }
+
+            if (mode === 'move') {
+                const now = new Date(); const pad = n => n.toString().padStart(2, '0');
+                const timeStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+                const marker = `📤 已移動至：${targetLabel} (${timeStr})`;
+                const oldMarker = safeStr(item.col9).trim();
+                item.col9 = oldMarker ? `${oldMarker}\n${marker}` : marker;
+                item.fullText = `${item.fullText} ${marker}`.toLowerCase();
+                const editPayload = { sheetName: currentPageName, id: item.id, action: 'edit' };
+                for (let i = 1; i <= 10; i++) { editPayload[`col${i}`] = safeStr(item[`col${i}`]); }
+                fetch(API_URL, { method: 'POST', body: JSON.stringify(editPayload) });
+            }
+
+            closeMoveCopyModal();
+            renderNewsTimeline();
+            const detailPanel = document.getElementById('newsDetailPanel');
+            if (detailPanel && detailPanel.style.display === 'block') openNewsDetail(item.id);
+            alert(mode === 'move' ? `已標記移動至「${targetLabel}」，並在該分頁新增一筆複本（原資料仍保留在此分頁）。` : `已複製到「${targetLabel}」！`);
+        }
+
         function clearNewsFilters() {
             safeSet('newsFilterInput', ''); safeSet('newsStartDate', ''); safeSet('newsEndDate', '');
             document.querySelectorAll('.news-cat-cb').forEach(cb => cb.checked = true); renderNewsTimeline();
@@ -939,7 +1039,7 @@
                 let isChecked = 'checked';
                 if (existingVals.includes(cat)) { isChecked = currentChecked.includes(cat) ? 'checked' : ''; }
                 
-                html += `<label style="display:flex; align-items:center; cursor:pointer; font-size:13px; background:#f4f4f4; padding:4px 10px; border-radius:15px; border-left:4px solid ${color};"><input type="checkbox" value="${cat}" class="news-cat-cb" ${isChecked} onchange="renderNewsTimeline()" style="margin-right:5px;"> ${cat}</label>`;
+                html += `<label style="display:flex; align-items:center; cursor:pointer; font-size:13px; background:#f4f4f4; padding:4px 10px; border-radius:15px; border-left:4px solid ${color};"><input type="checkbox" value="${escapeHtml(cat)}" class="news-cat-cb" ${isChecked} onchange="renderNewsTimeline()" style="margin-right:5px;"> ${escapeHtml(cat)}</label>`;
             });
             html += '</div>'; container.innerHTML = html;
         }
@@ -974,22 +1074,27 @@
             const desc = linkify(safeStr(item.col4)); let link = safeStr(item.col5); const notes = linkify(safeStr(item.col6));
             
             let linkHtml = '無';
-            if (link.trim() !== '') { let href = link.startsWith('http') ? link : 'http://' + link; linkHtml = `<a href="${href}" target="_blank" style="word-break: break-all; color: var(--theme-primary); font-weight:bold;">${link}</a>`; }
+            if (link.trim() !== '') { let href = link.startsWith('http') ? link : 'http://' + link; linkHtml = `<a href="${escapeHtml(href)}" target="_blank" style="word-break: break-all; color: var(--theme-primary); font-weight:bold;">${escapeHtml(link)}</a>`; }
 
             let comments = []; try { comments = JSON.parse(safeStr(item.col10) || '[]'); } catch(e) { comments = []; }
             let commentsHtml = '';
-            if (comments.length === 0) { commentsHtml = `<div style="color:#aaa; font-size:13px; text-align:center; padding:15px 0; background:#f9f9f9; border-radius:8px; border:1px dashed #ccc;">👻 目前尚無追蹤留言，在下方新增第一筆吧！</div>`; } 
-            else { commentsHtml = comments.map(c => `<div class="chat-bubble"><div class="chat-time">🕒 ${c.time}</div><div style="white-space: pre-wrap; line-height: 1.5;">${linkify(c.text)}</div></div>`).join(''); }
-            
+            if (comments.length === 0) { commentsHtml = `<div style="color:#aaa; font-size:13px; text-align:center; padding:15px 0; background:#f9f9f9; border-radius:8px; border:1px dashed #ccc;">👻 目前尚無追蹤留言，在下方新增第一筆吧！</div>`; }
+            else { commentsHtml = comments.map(c => `<div class="chat-bubble"><div class="chat-time">🕒 ${escapeHtml(c.time)}</div><div style="white-space: pre-wrap; line-height: 1.5;">${linkify(c.text)}</div></div>`).join(''); }
+
+            const moveMarker = safeStr(item.col9).trim();
+            const moveMarkerHtml = moveMarker ? `<div style="margin-top:15px; font-size:13px; color:#6a1b9a; background:#f3e5f5; border-left:4px solid #8e24aa; padding:8px 10px; border-radius:4px; white-space:pre-wrap;">${escapeHtml(moveMarker)}</div>` : '';
+
             content.innerHTML = `
-                <div style="margin-bottom:10px;"><span style="background:var(--theme-primary); color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${cat}</span> <span style="color:#666; font-size:12px;">${date}</span></div>
-                <h4 style="margin:0 0 10px 0; font-size:18px; color:#333;">${title}</h4>
+                <div style="margin-bottom:10px;"><span style="background:var(--theme-primary); color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${escapeHtml(cat)}</span> <span style="color:#666; font-size:12px;">${escapeHtml(date)}</span></div>
+                <h4 style="margin:0 0 10px 0; font-size:18px; color:#333;">${escapeHtml(title)}</h4>
                 <p style="white-space: pre-wrap; font-size:14px; line-height:1.6; color:#444; border-bottom:1px dashed #ddd; padding-bottom:10px;">${desc}</p>
                 <div style="margin-top:15px; background:#f4f4f4; padding:10px; border-radius:5px;"><strong style="font-size:13px; color:#555;">🔗 相關連結：</strong><br>${linkHtml}</div>
                 ${notes ? `<div style="margin-top:15px; border-left:4px solid #ffb300; padding-left:10px; font-size:14px; white-space:pre-wrap; color:#555;"><strong>💡 初始筆記：</strong><br>${notes}</div>` : ''}
+                ${moveMarkerHtml}
+                <div style="margin-top:15px; text-align:right;"><button class="btn-copy" style="background-color:#8e24aa;" onclick="openMoveCopyModal('${escapeJsAttr(item.id)}')">📤 複製 / 移動到其他分頁</button></div>
                 <div style="margin-top:25px; font-weight:bold; color:var(--theme-dark); font-size:15px; border-bottom:2px solid #eee; padding-bottom:5px;">💬 追蹤留言紀錄 (${comments.length})</div>
-                <div class="chat-container" id="chatContainer_${item.id}">${commentsHtml}</div>
-                <div class="chat-input-area"><textarea id="newCommentInput_${item.id}" placeholder="⌨️ 輸入新的追蹤心得或留言..."></textarea><button class="btn-add" style="width:100%; text-align:center; padding:10px; font-size:15px; margin:0;" onclick="submitComment('${item.id}')">🚀 送出留言</button></div>
+                <div class="chat-container" id="chatContainer_${escapeHtml(item.id)}">${commentsHtml}</div>
+                <div class="chat-input-area"><textarea id="newCommentInput_${escapeHtml(item.id)}" placeholder="⌨️ 輸入新的追蹤心得或留言..."></textarea><button class="btn-add" style="width:100%; text-align:center; padding:10px; font-size:15px; margin:0;" onclick="submitComment('${escapeJsAttr(item.id)}')">🚀 送出留言</button></div>
             `;
             panel.style.display = 'block';
             setTimeout(() => { let chatBox = document.getElementById(`chatContainer_${item.id}`); if(chatBox) chatBox.scrollTop = chatBox.scrollHeight; }, 50);
@@ -1042,10 +1147,10 @@
             if (previewItems.length > 0) {
                 let listHtml = previewItems.map(d => `
                     <label style="display:flex; align-items:center; padding:10px; border-bottom:1px solid #f1f1f1; cursor:pointer; transition:background 0.2s;">
-                        <input type="checkbox" class="lazy-cb" value="${d.id}" style="margin-right:12px; transform:scale(1.2);">
-                        <span style="font-size:13px; color:#888; width:85px;">${formatDate(d.col2)}</span>
-                        <span style="background:var(--theme-light); color:var(--theme-primary); padding:2px 6px; border-radius:4px; font-size:12px; margin-right:12px; font-weight:bold;">${safeStr(d.col1)}</span>
-                        <span style="font-size:15px; color:#333; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold;">${safeStr(d.col3)}</span>
+                        <input type="checkbox" class="lazy-cb" value="${escapeHtml(d.id)}" style="margin-right:12px; transform:scale(1.2);">
+                        <span style="font-size:13px; color:#888; width:85px;">${escapeHtml(formatDate(d.col2))}</span>
+                        <span style="background:var(--theme-light); color:var(--theme-primary); padding:2px 6px; border-radius:4px; font-size:12px; margin-right:12px; font-weight:bold;">${escapeHtml(d.col1)}</span>
+                        <span style="font-size:15px; color:#333; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:bold;">${escapeHtml(d.col3)}</span>
                     </label>
                 `).join('');
 
@@ -1071,37 +1176,43 @@
 
             detailedItems.forEach(data => {
                 const cat = safeStr(data.col1).trim() || '未分類'; const date = formatDate(data.col2);
-                const title = safeStr(data.col3); const content = linkify(safeStr(data.col4)); 
+                const title = safeStr(data.col3); const content = linkify(safeStr(data.col4));
                 let link = safeStr(data.col5); const notes = linkify(safeStr(data.col6));
 
                 const catColor = getCategoryColor(cat);
                 const itemDiv = document.createElement('div');
-                itemDiv.id = `clamp-content-${data.id}`;
+                itemDiv.id = `clamp-content-${escapeHtml(data.id)}`;
                 itemDiv.className = `timeline-item ${isLeft ? 'left' : 'right'}`; itemDiv.style.setProperty('--cat-color', catColor);
 
                 let linkHtml = '';
-                if(link.trim() !== '') { let href = link.startsWith('http') ? link : 'http://' + link; linkHtml = `<div style="margin-bottom:10px; font-size:13px; font-weight:bold;">🔗 <a href="${href}" target="_blank" style="color:${catColor}; word-break: break-all;" onclick="event.stopPropagation()">${link}</a></div>`; }
+                if(link.trim() !== '') { let href = link.startsWith('http') ? link : 'http://' + link; linkHtml = `<div style="margin-bottom:10px; font-size:13px; font-weight:bold;">🔗 <a href="${escapeHtml(href)}" target="_blank" style="color:${catColor}; word-break: break-all;" onclick="event.stopPropagation()">${escapeHtml(link)}</a></div>`; }
 
                 let notesHtml = '';
-                if(notes.trim() !== '') { notesHtml = `<div class="timeline-notes" onclick="event.stopPropagation()"><div class="timeline-notes-title">💡 初始筆記：</div><div class="text-clamp ${expClass}" id="clamp-note-${data.id}">${notes}</div></div>`; }
+                if(notes.trim() !== '') { notesHtml = `<div class="timeline-notes" onclick="event.stopPropagation()"><div class="timeline-notes-title">💡 初始筆記：</div><div class="text-clamp ${expClass}" id="clamp-note-${escapeHtml(data.id)}">${notes}</div></div>`; }
 
                 let comments = []; try { comments = JSON.parse(safeStr(data.col10) || '[]'); } catch(e) { comments = []; }
                 let commentBadge = '';
                 if(comments.length > 0) { commentBadge = `<div style="margin-top:10px; font-size:13px; color:var(--theme-primary); font-weight:bold; background:var(--theme-light); display:inline-block; padding:4px 12px; border-radius:15px; border:1px solid #cce5ff;">💬 ${comments.length} 則追蹤留言</div>`; }
 
+                let moveMarkerHtml = '';
+                const moveMarker = safeStr(data.col9).trim();
+                if (moveMarker !== '') { moveMarkerHtml = `<div style="margin-top:10px; font-size:12.5px; color:#6a1b9a; background:#f3e5f5; border-left:4px solid #8e24aa; padding:8px 10px; border-radius:4px; white-space:pre-wrap;">${escapeHtml(moveMarker)}</div>`; }
+
                 itemDiv.innerHTML = `
-                    <div class="timeline-content" onclick="openNewsDetail('${data.id}')">
-                        <div class="timeline-date">${date}</div>
-                        <h3 class="timeline-title"><span class="timeline-badge">${cat}</span>${title}</h3>
+                    <div class="timeline-content" onclick="openNewsDetail('${escapeJsAttr(data.id)}')">
+                        <div class="timeline-date">${escapeHtml(date)}</div>
+                        <h3 class="timeline-title"><span class="timeline-badge">${escapeHtml(cat)}</span>${escapeHtml(title)}</h3>
                         ${linkHtml}
                         <div class="text-clamp ${expClass}" onclick="event.stopPropagation()">${content}</div>
                         ${notesHtml}
                         ${commentBadge}
-                        <br><button class="toggle-text-btn" id="toggle-btn-${data.id}" onclick="toggleNewsClamp('${data.id}', event)">${btnText}</button>
+                        ${moveMarkerHtml}
+                        <br><button class="toggle-text-btn" id="toggle-btn-${escapeHtml(data.id)}" onclick="toggleNewsClamp('${escapeJsAttr(data.id)}', event)">${btnText}</button>
                         <div class="timeline-actions" onclick="event.stopPropagation()">
-                            <button class="btn-copy" onclick="copyNewsData('${data.id}', event)">複製</button>
-                            <button class="btn-edit" style="background-color: #ffb300; color:white;" onclick="editNewsData('${data.id}', event)">編輯</button>
-                            <button class="btn-delete" style="background-color: #e53935;" onclick="deleteNewsData('${data.id}', event)">刪除</button>
+                            <button class="btn-copy" onclick="copyNewsData('${escapeJsAttr(data.id)}', event)">複製</button>
+                            <button class="btn-edit" style="background-color: #ffb300; color:white;" onclick="editNewsData('${escapeJsAttr(data.id)}', event)">編輯</button>
+                            <button class="btn-copy" style="background-color: #8e24aa;" onclick="openMoveCopyModal('${escapeJsAttr(data.id)}', event)">📤 複製/移動</button>
+                            <button class="btn-delete" style="background-color: #e53935;" onclick="deleteNewsData('${escapeJsAttr(data.id)}', event)">刪除</button>
                         </div>
                     </div>
                 `;
@@ -1116,14 +1227,14 @@
         function deleteFoodData(id) { if (!confirm('確定刪除此美食紀錄？')) return; foodDataList = foodDataList.filter(d => String(d.id) !== String(id)); renderFoodTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '美食紀錄' }) }); }
         function addFilterKeyword() { handleFilterInput('filterInput', filterKeywords, renderFoodTable, renderKw); }
         function removeKeyword(kw) { filterKeywords = filterKeywords.filter(k => k !== kw); renderKw(); renderFoodTable(); }
-        function renderKw() { const c = document.getElementById('keywordContainer'); if(c) { c.innerHTML = ''; filterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeKeyword('${kw}')">✖</span></div>`; }); } }
+        function renderKw() { const c = document.getElementById('keywordContainer'); if(c) { c.innerHTML = ''; filterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${escapeHtml(kw)} <span onclick="removeKeyword('${escapeJsAttr(kw)}')">✖</span></div>`; }); } }
         function renderFoodTable() {
             const tbody = document.getElementById('tableBody'); if(!tbody) return; tbody.innerHTML = '';
             foodDataList.forEach(data => {
                 if (filterKeywords.length > 0 && !filterKeywords.every(kw => data.fullText.includes(kw))) return;
                 const query = `${safeStr(data.city)} ${safeStr(data.district)} ${safeStr(data.address)} ${safeStr(data.storeName)}`.trim(); const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-                tbody.innerHTML += `<tr><td data-label="縣市"><div class="resizable-cell">${safeStr(data.city)}</div></td><td data-label="區域"><div class="resizable-cell">${safeStr(data.district)}</div></td><td data-label="地址"><div class="resizable-cell">${safeStr(data.address)}</div></td><td data-label="店名"><div class="resizable-cell">${safeStr(data.storeName)}</div></td><td data-label="分類"><div class="resizable-cell">${safeStr(data.category)}</div></td><td data-label="其他"><div class="resizable-cell">${safeStr(data.other)}</div></td><td data-label="地圖"><div class="resizable-cell" style="resize:none;"><a href="${mapUrl}" target="_blank" class="map-link">📍地圖搜尋</a></div></td>
-                <td class="action-cell"><button class="btn-copy" onclick="copyFoodData('${data.id}')">複製</button><button class="btn-edit" onclick="editFoodData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${data.id}')">刪除</button></td></tr>`;
+                tbody.innerHTML += `<tr><td data-label="縣市"><div class="resizable-cell">${escapeHtml(data.city)}</div></td><td data-label="區域"><div class="resizable-cell">${escapeHtml(data.district)}</div></td><td data-label="地址"><div class="resizable-cell">${escapeHtml(data.address)}</div></td><td data-label="店名"><div class="resizable-cell">${escapeHtml(data.storeName)}</div></td><td data-label="分類"><div class="resizable-cell">${escapeHtml(data.category)}</div></td><td data-label="其他"><div class="resizable-cell">${escapeHtml(data.other)}</div></td><td data-label="地圖"><div class="resizable-cell" style="resize:none;"><a href="${mapUrl}" target="_blank" class="map-link">📍地圖搜尋</a></div></td>
+                <td class="action-cell"><button class="btn-copy" onclick="copyFoodData('${escapeJsAttr(data.id)}')">複製</button><button class="btn-edit" onclick="editFoodData('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteFoodData('${escapeJsAttr(data.id)}')">刪除</button></td></tr>`;
             });
         }
 
@@ -1136,8 +1247,8 @@
             const tbody = document.getElementById('sportsTableBody'); if(!tbody) return; tbody.innerHTML = '';
             sportsDataList.forEach(data => {
                 const dateStr = formatDate(data.date);
-                tbody.innerHTML += `<tr><td data-label="日期"><div class="resizable-cell">${dateStr}</div></td><td data-label="運動類型"><div class="resizable-cell">${safeStr(data.type)}</div></td><td data-label="距離 (km)"><div class="resizable-cell">${safeStr(data.distance)}</div></td><td data-label="備註"><div class="resizable-cell">${safeStr(data.notes)}</div></td>
-                <td class="action-cell"><button class="btn-copy" onclick="copySportsData('${data.id}')">複製</button><button class="btn-edit" onclick="editSportsData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteSportsData('${data.id}')">刪除</button></td></tr>`;
+                tbody.innerHTML += `<tr><td data-label="日期"><div class="resizable-cell">${escapeHtml(dateStr)}</div></td><td data-label="運動類型"><div class="resizable-cell">${escapeHtml(data.type)}</div></td><td data-label="距離 (km)"><div class="resizable-cell">${escapeHtml(data.distance)}</div></td><td data-label="備註"><div class="resizable-cell">${escapeHtml(data.notes)}</div></td>
+                <td class="action-cell"><button class="btn-copy" onclick="copySportsData('${escapeJsAttr(data.id)}')">複製</button><button class="btn-edit" onclick="editSportsData('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteSportsData('${escapeJsAttr(data.id)}')">刪除</button></td></tr>`;
             });
         }
 
@@ -1198,7 +1309,7 @@
         
         function addTravelFilterKeyword() { handleFilterInput('travelFilterInput', travelFilterKeywords, renderTravelTable, renderTravelKw); }
         function removeTravelKeyword(kw) { travelFilterKeywords = travelFilterKeywords.filter(k => k !== kw); renderTravelKw(); renderTravelTable(); }
-        function renderTravelKw() { const c = document.getElementById('travelKeywordContainer'); if(c) { c.innerHTML = ''; travelFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeTravelKeyword('${kw}')">✖</span></div>`; }); } }
+        function renderTravelKw() { const c = document.getElementById('travelKeywordContainer'); if(c) { c.innerHTML = ''; travelFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${escapeHtml(kw)} <span onclick="removeTravelKeyword('${escapeJsAttr(kw)}')">✖</span></div>`; }); } }
         
         function renderTravelTable() {
             const tbody = document.getElementById('travelTableBody'); if(!tbody) return; tbody.innerHTML = '';
@@ -1206,10 +1317,10 @@
                 if (travelFilterKeywords.length > 0 && !travelFilterKeywords.every(kw => data.fullText.includes(kw))) return;
                 const tr = document.createElement('tr'); let colsHtml = '';
                 const labels = ['主類別', '名稱', '地點', '地理區域', '彈性標籤', '必訪亮點/筆記', '實用資訊包'];
-                for(let i=1; i<=7; i++) { colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${safeStr(data[`col${i}`])}</div></td>`; }
+                for(let i=1; i<=7; i++) { colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${escapeHtml(data[`col${i}`])}</div></td>`; }
                 const locQuery = `${safeStr(data.col2)} ${safeStr(data.col3)}`.trim(); let mapColHtml = `<td data-label="地圖"><div class="resizable-cell"></div></td>`;
                 if(locQuery !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locQuery)}`; mapColHtml = `<td data-label="地圖"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 地圖搜尋</a></div></td>`; }
-                tr.innerHTML = `${colsHtml}${mapColHtml}<td class="action-cell"><button class="btn-copy" onclick="copyTravelData('${data.id}')">複製</button><button class="btn-edit" onclick="editTravelData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteTravelData('${data.id}')">刪除</button></td>`;
+                tr.innerHTML = `${colsHtml}${mapColHtml}<td class="action-cell"><button class="btn-copy" onclick="copyTravelData('${escapeJsAttr(data.id)}')">複製</button><button class="btn-edit" onclick="editTravelData('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteTravelData('${escapeJsAttr(data.id)}')">刪除</button></td>`;
                 tbody.appendChild(tr);
             });
         }
@@ -1222,7 +1333,7 @@
         
         function addNoteFilterKeyword() { handleFilterInput('noteFilterInput', noteFilterKeywords, renderNoteTable, renderNoteKw); }
         function removeNoteKeyword(kw) { noteFilterKeywords = noteFilterKeywords.filter(k => k !== kw); renderNoteKw(); renderNoteTable(); }
-        function renderNoteKw() { const c = document.getElementById('noteKeywordContainer'); if(c){ c.innerHTML = ''; noteFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeNoteKeyword('${kw}')">✖</span></div>`; }); } }
+        function renderNoteKw() { const c = document.getElementById('noteKeywordContainer'); if(c){ c.innerHTML = ''; noteFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${escapeHtml(kw)} <span onclick="removeNoteKeyword('${escapeJsAttr(kw)}')">✖</span></div>`; }); } }
         
         function renderNoteTable() {
             const tbody = document.getElementById('noteTableBody'); if(!tbody) return; tbody.innerHTML = '';
@@ -1230,8 +1341,8 @@
             noteDataList.forEach(data => {
                 if (noteFilterKeywords.length > 0 && !noteFilterKeywords.every(kw => data.fullText.includes(kw))) return;
                 const tr = document.createElement('tr'); let colsHtml = '';
-                for(let i=1; i<=10; i++) { let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${val}</div></td>`; }
-                tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyNoteData('${data.id}')">複製</button><button class="btn-edit" onclick="editNoteData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteNoteData('${data.id}')">刪除</button></td>`; tbody.appendChild(tr);
+                for(let i=1; i<=10; i++) { let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${escapeHtml(val)}</div></td>`; }
+                tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyNoteData('${escapeJsAttr(data.id)}')">複製</button><button class="btn-edit" onclick="editNoteData('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteNoteData('${escapeJsAttr(data.id)}')">刪除</button></td>`; tbody.appendChild(tr);
             });
         }
 
@@ -1243,7 +1354,7 @@
         
         function addGenericFilterKeyword() { handleFilterInput('genericFilterInput', genericFilterKeywords, renderGenericTable, renderGenericKw); }
         function removeGenericKeyword(kw) { genericFilterKeywords = genericFilterKeywords.filter(k => k !== kw); renderGenericKw(); renderGenericTable(); }
-        function renderGenericKw() { const c = document.getElementById('genericKeywordContainer'); if(c){ c.innerHTML = ''; genericFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${kw} <span onclick="removeGenericKeyword('${kw}')">✖</span></div>`; }); } }
+        function renderGenericKw() { const c = document.getElementById('genericKeywordContainer'); if(c){ c.innerHTML = ''; genericFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${escapeHtml(kw)} <span onclick="removeGenericKeyword('${escapeJsAttr(kw)}')">✖</span></div>`; }); } }
         
         function renderGenericTable() {
             const tbody = document.getElementById('genericTableBody'); if(!tbody) return; tbody.innerHTML = '';
@@ -1252,9 +1363,9 @@
                 const tr = document.createElement('tr'); let colsHtml = '';
                 for(let i=1; i<=10; i++) { 
                     let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); 
-                    if (currentPageName === '擴充預留網頁4' && i === 8 && val.trim() !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val.trim())}`; colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 ${val}</a></div></td>`; } else { colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell">${val}</div></td>`; }
+                    if (currentPageName === '擴充預留網頁4' && i === 8 && val.trim() !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val.trim())}`; colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 ${escapeHtml(val)}</a></div></td>`; } else { colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell">${escapeHtml(val)}</div></td>`; }
                 }
-                tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyGenericData('${data.id}')">複製</button><button class="btn-edit" onclick="editGenericData('${data.id}')">編輯</button><button class="btn-delete" onclick="deleteGenericData('${data.id}')">刪除</button></td>`; tbody.appendChild(tr);
+                tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyGenericData('${escapeJsAttr(data.id)}')">複製</button><button class="btn-edit" onclick="editGenericData('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteGenericData('${escapeJsAttr(data.id)}')">刪除</button></td>`; tbody.appendChild(tr);
             });
         }
     </script>
