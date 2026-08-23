@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>隨手記 · 筆記本</title>
+<style>
+  :root{
+    --paper:      #F0EBDD;
+    --card:       #FBF8F0;
+    --ink:        #22301F;
+    --ink-soft:   #5B6155;
+    --rule:       #CBBFA0;
+    --moss:       #3F6B4A;
+    --moss-dark:  #2E5138;
+    --rust:       #B0503A;
+    --stamp:      #8B7355;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:var(--paper);
+    font-family: 'Courier New', Courier, monospace;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body{
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        transparent, transparent 27px,
+        rgba(203,191,160,0.35) 28px
+      );
+    background-attachment:local;
+  }
+
+  #app{
+    max-width:460px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    padding: max(18px, env(safe-area-inset-top)) 18px 10px;
+    position:sticky; top:0; z-index:20;
+    background:var(--paper);
+    border-bottom:1px dashed var(--rule);
+  }
+  header h1{
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:700;
+    font-size:26px;
+    letter-spacing:0.5px;
+    margin:0 0 2px;
+    color:var(--ink);
+  }
+  header h1 span{
+    display:inline-block;
+    width:9px; height:9px;
+    background:var(--rust);
+    border-radius:50%;
+    margin-right:8px;
+    transform:translateY(-2px);
+  }
+  header .sub{
+    font-size:11px;
+    color:var(--ink-soft);
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+  }
+  .header-row{
+    display:flex; align-items:flex-start; justify-content:space-between;
+  }
+  .header-actions{
+    display:flex; gap:4px; margin-top:2px;
+  }
+  .header-actions .icon-btn{
+    border:1px solid var(--rule);
+    background:var(--card);
+  }
+  .header-actions .icon-btn.spinning svg{
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- Search / filter bar ---------- */
+  .toolbar{
+    padding:12px 18px 14px;
+    position:sticky; top:64px; z-index:19;
+    background:var(--paper);
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .search-row{
+    display:flex; align-items:center; gap:8px;
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:9px 12px;
+  }
+  .search-row svg{ flex-shrink:0; opacity:0.55; }
+  .search-row input{
+    border:none; background:transparent; outline:none;
+    font-family:inherit; font-size:14px; color:var(--ink);
+    width:100%;
+  }
+  .search-row input::placeholder{ color:#9A9484; }
+
+  .tag-filters{
+    display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;
+    scrollbar-width:none;
+  }
+  .tag-filters::-webkit-scrollbar{ display:none; }
+  .tag-chip{
+    flex-shrink:0;
+    font-size:11px;
+    padding:5px 11px;
+    border-radius:20px;
+    border:1px solid var(--rule);
+    background:var(--card);
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .tag-chip.active{
+    background:var(--moss);
+    border-color:var(--moss);
+    color:#fff;
+  }
+
+  /* ---------- Note list ---------- */
+  main{
+    flex:1;
+    padding:6px 18px 140px;
+    overflow-y:auto;
+  }
+  .empty-state{
+    text-align:center;
+    margin-top:70px;
+    color:var(--ink-soft);
+  }
+  .empty-state .glyph{ font-size:34px; margin-bottom:10px; }
+  .empty-state p{ font-size:13px; line-height:1.7; margin:0 auto; max-width:220px; }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:2px 2px 10px 10px;
+    margin:16px 0;
+    padding:16px 16px 14px;
+    position:relative;
+    box-shadow:0 1px 0 rgba(34,48,31,0.04);
+  }
+  .card::before{
+    content:"";
+    position:absolute; top:0; left:14px; right:14px; height:0;
+    border-top:2px dashed var(--rule);
+  }
+  .card-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:10px; margin-bottom:8px;
+  }
+  .stamp{
+    font-size:10.5px;
+    color:var(--stamp);
+    border:1px solid var(--stamp);
+    border-radius:3px;
+    padding:2px 7px;
+    transform:rotate(-2deg);
+    white-space:nowrap;
+    letter-spacing:0.5px;
+    opacity:0.85;
+  }
+  .card-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .icon-btn{
+    background:none; border:none; cursor:pointer;
+    padding:4px; color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+    border-radius:5px;
+    transition:background .15s, color .15s;
+  }
+  .icon-btn:hover{ background:rgba(63,107,74,0.1); color:var(--moss-dark); }
+  .icon-btn.danger:hover{ background:rgba(176,80,58,0.12); color:var(--rust); }
+
+  .card-body{
+    font-size:14.5px;
+    line-height:1.75;
+    white-space:pre-wrap;
+    word-break:break-word;
+    color:var(--ink);
+  }
+  .card-tags{
+    display:flex; flex-wrap:wrap; gap:6px;
+    margin-top:12px;
+  }
+  .pill{
+    font-size:10.5px;
+    padding:3px 9px;
+    border-radius:20px;
+    background:rgba(63,107,74,0.12);
+    color:var(--moss-dark);
+    font-weight:600;
+    letter-spacing:0.3px;
+  }
+  .updated-note{
+    font-size:10px; color:#B3A98F; margin-top:8px; font-style:italic;
+  }
+
+  /* ---------- Composer (bottom sheet) ---------- */
+  .composer-fab{
+    position:fixed;
+    left:50%; transform:translateX(-50%);
+    bottom:max(20px, env(safe-area-inset-bottom));
+    max-width:460px; width:calc(100% - 36px);
+    z-index:30;
+  }
+  .fab-btn{
+    width:100%;
+    background:var(--moss);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:15px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    box-shadow:0 6px 18px rgba(46,81,56,0.35);
+    cursor:pointer;
+  }
+  .fab-btn:active{ transform:scale(0.98); }
+
+  .sheet-backdrop{
+    position:fixed; inset:0; background:rgba(34,48,31,0.45);
+    z-index:40; display:none;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .sheet-backdrop.open{ display:flex; }
+  .sheet{
+    background:var(--paper);
+    width:100%; max-width:460px;
+    border-radius:16px 16px 0 0;
+    padding:16px 18px max(18px, env(safe-area-inset-bottom));
+    max-height:88vh;
+    overflow-y:auto;
+    border-top:1px solid var(--rule);
+  }
+  .sheet-handle{
+    width:38px; height:4px; background:var(--rule);
+    border-radius:3px; margin:0 auto 14px;
+  }
+  .sheet h2{
+    font-family:Georgia, serif; font-size:18px; margin:0 0 12px;
+  }
+  .field-label{
+    font-size:11px; text-transform:uppercase; letter-spacing:1px;
+    color:var(--ink-soft); margin:14px 0 6px;
+  }
+  textarea, .tags-input{
+    width:100%;
+    font-family:inherit;
+    font-size:14.5px;
+    color:var(--ink);
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:8px;
+    padding:12px;
+    resize:vertical;
+    outline:none;
+  }
+  textarea{ min-height:120px; line-height:1.7; }
+  .tags-input{ min-height:auto; }
+  .sheet-buttons{
+    display:flex; gap:10px; margin-top:18px;
+  }
+  .btn{
+    flex:1; padding:13px; border-radius:9px; border:none;
+    font-family:inherit; font-size:14px; font-weight:700;
+    cursor:pointer; letter-spacing:0.3px;
+  }
+  .btn-primary{ background:var(--moss); color:#fff; }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border:1px solid var(--rule); }
+
+  .toast{
+    position:fixed; top:14px; left:50%; transform:translateX(-50%) translateY(-60px);
+    background:var(--ink); color:#F0EBDD;
+    font-size:12.5px; padding:9px 16px; border-radius:20px;
+    z-index:60; opacity:0; transition:transform .25s, opacity .25s;
+    pointer-events:none;
+  }
+  .toast.show{ transform:translateX(-50%) translateY(0); opacity:1; }
+
+  .loading-row{ text-align:center; padding:40px 0; color:var(--ink-soft); font-size:12px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="header-row">
+      <div>
+        <h1><span></span>隨手記</h1>
+        <div class="sub">quick notes · 日期時間自動記錄</div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="refreshBtn" title="重新整理資料">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/>
+            <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="exportBtn" title="匯出備份">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-row">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input id="searchInput" placeholder="搜尋筆記內容或標籤…">
+    </div>
+    <div class="tag-filters" id="tagFilters"></div>
+  </div>
+
+  <main id="mainList">
+    <div class="loading-row">載入中…</div>
+  </main>
+
+  <div class="composer-fab">
+    <button class="fab-btn" id="openComposer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      新增筆記
+    </button>
+  </div>
+
+</div>
+
+<div class="sheet-backdrop" id="sheetBackdrop">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h2 id="sheetTitle">新增筆記</h2>
+
+    <div class="field-label">內容</div>
+    <textarea id="noteText" placeholder="寫下你現在想記錄的事…"></textarea>
+
+    <div class="field-label">標籤（用逗號分隔，例如：工作, 靈感）</div>
+    <input class="tags-input" id="noteTags" placeholder="工作, 靈感, 待辦">
+
+    <div class="sheet-buttons">
+      <button class="btn btn-ghost" id="cancelBtn">取消</button>
+      <button class="btn btn-primary" id="saveBtn">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'notes-store';
+  let notes = [];
+  let editingId = null;
+  let activeTagFilter = null;
+  let searchQuery = '';
+
+  const mainList = document.getElementById('mainList');
+  const tagFilters = document.getElementById('tagFilters');
+  const sheetBackdrop = document.getElementById('sheetBackdrop');
+  const sheetTitle = document.getElementById('sheetTitle');
+  const noteText = document.getElementById('noteText');
+  const noteTags = document.getElementById('noteTags');
+  const toast = document.getElementById('toast');
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 1600);
+  }
+
+  function uid(){
+    return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  }
+
+  function fmtStamp(ts){
+    const d = new Date(ts);
+    const weekdays = ['週日','週一','週二','週三','週四','週五','週六'];
+    const pad = n => n.toString().padStart(2,'0');
+    return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())} ${weekdays[d.getDay()]} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  // 獨立部署版：改用瀏覽器內建的 localStorage
+  // 資料只會存在「這一台裝置的這個瀏覽器」裡，不會跨裝置同步
+  async function loadNotes(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      notes = raw ? JSON.parse(raw) : [];
+    }catch(e){
+      notes = [];
+    }
+    render();
+  }
+
+  async function persist(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    }catch(e){
+      showToast('儲存發生錯誤（可能是瀏覽器儲存空間已滿）');
+      console.error(e);
+    }
+  }
+
+  function allTags(){
+    const set = new Set();
+    notes.forEach(n => (n.tags||[]).forEach(t => set.add(t)));
+    return Array.from(set).sort();
+  }
+
+  function renderTagFilters(){
+    const tags = allTags();
+    tagFilters.innerHTML = '';
+    if(tags.length === 0) return;
+    tags.forEach(tag => {
+      const chip = document.createElement('div');
+      chip.className = 'tag-chip' + (activeTagFilter === tag ? ' active' : '');
+      chip.textContent = tag;
+      chip.onclick = () => {
+        activeTagFilter = (activeTagFilter === tag) ? null : tag;
+        render();
+      };
+      tagFilters.appendChild(chip);
+    });
+  }
+
+  function filteredNotes(){
+    let list = notes.slice().sort((a,b) => b.updatedAt - a.updatedAt);
+    if(activeTagFilter){
+      list = list.filter(n => (n.tags||[]).includes(activeTagFilter));
+    }
+    if(searchQuery.trim()){
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter(n =>
+        (n.text||'').toLowerCase().includes(q) ||
+        (n.tags||[]).some(t => t.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }
+
+  function render(){
+    renderTagFilters();
+    const list = filteredNotes();
+    mainList.innerHTML = '';
+
+    if(notes.length === 0){
+      mainList.innerHTML = `
+        <div class="empty-state">
+          <div class="glyph">✎</div>
+          <p>還沒有任何筆記。<br>點下方「新增筆記」，寫下第一筆吧。</p>
+        </div>`;
+      return;
+    }
+    if(list.length === 0){
+      mainList.innerHTML = `
+        <div class="empty-state">
+          <div class="glyph">🔍</div>
+          <p>找不到符合的筆記，<br>換個關鍵字或標籤試試。</p>
+        </div>`;
+      return;
+    }
+
+    list.forEach(note => {
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const edited = note.updatedAt !== note.createdAt;
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="stamp">${fmtStamp(note.createdAt)}</div>
+          <div class="card-actions">
+            <button class="icon-btn" data-action="edit" title="修改">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+              </svg>
+            </button>
+            <button class="icon-btn danger" data-action="delete" title="刪除">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="card-body"></div>
+        ${(note.tags && note.tags.length) ? `<div class="card-tags">${note.tags.map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+        ${edited ? `<div class="updated-note">最後修改於 ${fmtStamp(note.updatedAt)}</div>` : ''}
+      `;
+      card.querySelector('.card-body').textContent = note.text;
+
+      card.querySelector('[data-action="edit"]').onclick = () => openComposer(note);
+      card.querySelector('[data-action="delete"]').onclick = () => deleteNote(note.id);
+
+      mainList.appendChild(card);
+    });
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function openComposer(note){
+    editingId = note ? note.id : null;
+    sheetTitle.textContent = note ? '修改筆記' : '新增筆記';
+    noteText.value = note ? note.text : '';
+    noteTags.value = note && note.tags ? note.tags.join(', ') : '';
+    sheetBackdrop.classList.add('open');
+    setTimeout(()=> noteText.focus(), 150);
+  }
+
+  function closeComposer(){
+    sheetBackdrop.classList.remove('open');
+    editingId = null;
+  }
+
+  async function saveNote(){
+    const text = noteText.value.trim();
+    if(!text){
+      showToast('筆記內容不能是空的');
+      return;
+    }
+    const tags = noteTags.value.split(',').map(t=>t.trim()).filter(Boolean);
+    const now = Date.now();
+
+    if(editingId){
+      const idx = notes.findIndex(n => n.id === editingId);
+      if(idx > -1){
+        notes[idx].text = text;
+        notes[idx].tags = tags;
+        notes[idx].updatedAt = now;
+      }
+      showToast('已更新筆記');
+    }else{
+      notes.push({ id: uid(), text, tags, createdAt: now, updatedAt: now });
+      showToast('已新增筆記');
+    }
+
+    closeComposer();
+    render();
+    await persist();
+  }
+
+  async function deleteNote(id){
+    notes = notes.filter(n => n.id !== id);
+    render();
+    showToast('已刪除筆記');
+    await persist();
+  }
+
+  document.getElementById('openComposer').onclick = () => openComposer(null);
+  document.getElementById('cancelBtn').onclick = closeComposer;
+  document.getElementById('saveBtn').onclick = saveNote;
+  sheetBackdrop.onclick = (e) => { if(e.target === sheetBackdrop) closeComposer(); };
+
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    render();
+  });
+
+  // ---------- 重新整理：從雲端儲存重新讀取一次最新資料 ----------
+  const refreshBtn = document.getElementById('refreshBtn');
+  refreshBtn.onclick = async () => {
+    refreshBtn.classList.add('spinning');
+    await loadNotes();
+    refreshBtn.classList.remove('spinning');
+    showToast('已更新為最新資料');
+  };
+
+  // ---------- 匯出備份：把所有筆記包成 JSON 檔，觸發瀏覽器下載 ----------
+  document.getElementById('exportBtn').onclick = () => {
+    if(notes.length === 0){
+      showToast('目前沒有筆記可以匯出');
+      return;
+    }
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      count: notes.length,
+      notes: notes
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const pad = n => n.toString().padStart(2,'0');
+    const d = new Date();
+    const filename = `notes-backup-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    showToast(`已匯出 ${notes.length} 筆筆記`);
+  };
+
+  loadNotes();
+})();
+</script>
+</body>
+</html>
