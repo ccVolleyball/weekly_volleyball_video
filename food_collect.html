@@ -175,6 +175,38 @@
             .timeline-item.left, .timeline-item.right { left: 0; }
             .timeline-item::after, .timeline-item.right::after { left: 10px; }
         }
+
+        /* ====================================================
+           🌟 v1.05：連結(3) 卡片式呈現
+        ==================================================== */
+        .link-card-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; align-items: flex-start; }
+        .link-card {
+            box-sizing: border-box; border-radius: 12px; padding: 16px;
+            border: 1px solid rgba(0,0,0,0.12); box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            transition: transform .15s, box-shadow .15s; overflow-wrap: anywhere;
+        }
+        .link-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.20); }
+        .link-card .lc-title { font-weight: bold; margin-bottom: 8px; line-height: 1.4; }
+        .link-card .lc-row { margin: 4px 0; line-height: 1.5; }
+        .link-card .lc-meta { margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(0,0,0,0.2); font-size: 12px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .link-card .lc-count { font-weight: bold; }
+        .link-card a { color: inherit; text-decoration: underline; word-break: break-all; font-weight: bold; }
+        .link-card .lc-actions button { margin: 0 0 0 4px; }
+        /* v1.06：欄位3 分組標題（在 flex 版面中佔整行，達到分隔群組的效果） */
+        .link-card-grid .lc-group-head { width: 100%; flex: 0 0 100%; font-weight: bold; color: var(--theme-dark); font-size: 15px; margin: 16px 0 2px; padding-bottom: 4px; border-bottom: 2px solid var(--theme-light); }
+        .link-card-grid .lc-group-head:first-child { margin-top: 0; }
+        .link-card-grid .lc-group-head span { font-weight: normal; color: #999; font-size: 13px; }
+        /* v1.08：卡片就地展開的子項目（帳號內容） */
+        .link-card .lc-subtoggle { margin-top: 10px; font-size: 13px; font-weight: bold; cursor: pointer; user-select: none; opacity: .85; }
+        .link-card .lc-subtoggle:hover { opacity: 1; text-decoration: underline; }
+        .link-card .lc-subpanel { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.15); }
+        .link-card .lc-sub-item { background: rgba(255,255,255,0.9); color: #222; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 13px; }
+        .link-card .lc-sub-line { margin: 2px 0; word-break: break-all; }
+        .link-card .lc-sub-item a { color: #0056b3; }
+        .link-card .lc-sub-foot { margin-top: 4px; font-size: 11px; color: #666; }
+        .link-card .lc-sub-add { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .link-card .lc-sub-add input { flex: 1 1 90px; min-width: 0; padding: 5px 7px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-family: inherit; background: #fff; color: #222; }
+        @media screen and (max-width: 768px) { .link-card { width: 100% !important; } }
     </style>
 </head>
 <body>
@@ -184,6 +216,8 @@
             <span>切換資料庫分頁：</span>
             <div>
                 <span id="loadingMsg" style="color: var(--theme-primary); font-size: 14px; display: none; margin-right: 15px;">⏳ 資料載入與同步中...</span>
+                <span id="syncStatus" style="color: #dc3545; font-size: 14px; display: none; margin-right: 15px; font-weight: bold;"></span>
+                <button class="btn-edit" style="margin: 0; background-color: #607d8b; color: #fff;" onclick="ensureAccessToken(true)">🔑 設定權杖</button>
                 <button class="btn-edit" style="margin: 0; background-color: #ff9800; color: #fff;" onclick="openLogModal()">🕒 檢視系統操作紀錄</button>
             </div>
         </div>
@@ -235,22 +269,6 @@
                     </thead>
                     <tbody id="logTableBody"></tbody>
                 </table>
-            </div>
-        </div>
-    </div>
-
-    <div id="moveCopyModal" class="modal-overlay" onclick="if(event.target===this) closeMoveCopyModal()">
-        <div class="modal-content" style="max-width: 480px;">
-            <h3 class="theme-text">📤 複製 / 移動紀錄到其他分頁</h3>
-            <div style="font-size: 13px; color: #666; margin-bottom: 15px;">只能選擇與目前分頁相同欄位格式的分頁。「移動」不會刪除原本這筆資料，只會在原始卡片上標記已移至的分頁。</div>
-            <div class="form-group" style="width: 100%;">
-                <label>目標分頁</label>
-                <select id="moveCopyTargetSelect" style="width: 100%; max-width: 100%;"></select>
-            </div>
-            <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px;">
-                <button class="btn-cancel" style="display: inline-block;" onclick="closeMoveCopyModal()">取消</button>
-                <button class="btn-copy" onclick="submitMoveCopy('copy')">📋 複製到此分頁</button>
-                <button class="btn-add" onclick="submitMoveCopy('move')">➡️ 移動到此分頁</button>
             </div>
         </div>
     </div>
@@ -462,11 +480,11 @@
         <div class="section">
             <h2 id="genericTableTitle">資料總覽</h2>
             <div style="margin-bottom: 15px;"><input type="text" id="genericFilterInput" placeholder="可用空白分隔多關鍵字" onkeypress="if(event.key === 'Enter') addGenericFilterKeyword()"><button class="btn-filter" onclick="addGenericFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="genericKeywordContainer"></div></div>
-            <div class="col-toggle-box">
+            <div class="col-toggle-box" id="genericColToggle">
                 <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
                 <script>for(let i=1; i<=10; i++){ document.write(`<label><input type="checkbox" checked onchange="toggleCol('genericTable', ${i}, this)">欄位 ${i}</label>`); }</script>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive" id="genericTableWrap">
                 <table id="genericTable">
                     <thead><tr id="genericTableHeader">
                         <script>for(let i=1; i<=10; i++){ document.write(`<th onclick="handleHeaderSort('col${i}')">欄位 ${i} ↕</th>`); } document.write(`<th>操作</th>`);</script>
@@ -474,40 +492,289 @@
                     <tbody id="genericTableBody"></tbody>
                 </table>
             </div>
+            <!-- v1.05：卡片式呈現容器（僅 viewMode:'card' 的頁面使用，例如 連結(3)） -->
+            <div id="genericCardContainer" class="link-card-grid" style="display:none;"></div>
         </div>
     </div>
 
 
     <script>
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
-        const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
+        // const API_URL = "https://script.google.com/macros/s/AKfycbworoIMCfLuYQ3UseLC0YNbzrWtT9IFmTXbEOcU1O5-U3PyUbpmt1m71jjgkB4Gp9Uk/exec";
+        // const API_URL = "https://script.google.com/macros/s/AKfycbwB2zSqKlHfk0RBBONpgIGgJx6VUVaRg-_D0qrq0sXCxjGwkDOnyo5qtbtCrw72sy0P/exec"; // V1.02
+        const API_URL = "https://script.google.com/macros/s/AKfycbwB2zSqKlHfk0RBBONpgIGgJx6VUVaRg-_D0qrq0sXCxjGwkDOnyo5qtbtCrw72sy0P/exec"; // V1.04
 
+        /* ====================================================================
+           🔒 v1.02 強化模組：存取權杖 / 序列化寫入佇列 / 重試 / Toast / fullText
+           （對應 README readme_v1.02.md 的 item 1~4）
+        ==================================================================== */
+
+        // ---------- item 1：存取權杖 (Access Token) ----------
+        // 權杖只存在本機瀏覽器 localStorage，不寫進 HTML 檔；每次請求隨附。
+        // 後端 Apps Script 需驗證 token，不符時回傳 { error: "unauthorized" }。
+        let ACCESS_TOKEN = '';
+        const TOKEN_STORAGE_KEY = 'food_collect_access_token';
+
+        function loadAccessToken() {
+            try { ACCESS_TOKEN = localStorage.getItem(TOKEN_STORAGE_KEY) || ''; } catch (e) { ACCESS_TOKEN = ''; }
+            return ACCESS_TOKEN;
+        }
+        function saveAccessToken(t) {
+            ACCESS_TOKEN = (t || '').trim();
+            try { localStorage.setItem(TOKEN_STORAGE_KEY, ACCESS_TOKEN); } catch (e) {}
+        }
+        function ensureAccessToken(forcePrompt) {
+            if (!ACCESS_TOKEN) loadAccessToken();
+            if (forcePrompt || !ACCESS_TOKEN) {
+                try {
+                    const input = window.prompt('請輸入資料庫存取權杖 (Access Token)：\n（權杖只會存在這台瀏覽器，不會寫進 HTML 檔）', ACCESS_TOKEN || '');
+                    if (input !== null) saveAccessToken(input);
+                } catch (e) {
+                    // 少數環境（沙箱 iframe 等）不支援 prompt()，忽略即可，
+                    // 使用者仍可先在 localStorage 預先寫入權杖。
+                    console.warn('prompt() 不可用，略過權杖輸入', e);
+                }
+            }
+            return ACCESS_TOKEN;
+        }
+
+        class ApiAuthError extends Error {
+            constructor(msg) { super(msg || 'unauthorized'); this.name = 'ApiAuthError'; }
+        }
+
+        const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+        // 統一的 GET：帶 token；偵測到未授權會重新詢問一次後重試
+        async function apiGet(sheetName, _retried) {
+            ensureAccessToken();
+            const url = `${API_URL}?sheetName=${encodeURIComponent(sheetName)}&token=${encodeURIComponent(ACCESS_TOKEN)}`;
+            const res = await fetch(url);
+            let json;
+            try { json = await res.json(); } catch (e) { throw new Error('伺服器回應解析失敗'); }
+            if (json && json.error === 'unauthorized') {
+                if (!_retried) { ensureAccessToken(true); return apiGet(sheetName, true); }
+                throw new ApiAuthError();
+            }
+            return json;
+        }
+
+        // 統一的 POST：把 token 併入 body（不加自訂 header，避免觸發 CORS preflight）
+        async function apiPost(payload) {
+            ensureAccessToken();
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ ...payload, token: ACCESS_TOKEN }) });
+            let json = {};
+            try { json = await res.json(); } catch (e) { json = {}; }
+            if (json && json.error === 'unauthorized') throw new ApiAuthError();
+            return json;
+        }
+
+        // ---------- item 2：寫入序列化佇列 ----------
+        // 所有寫入 (add/edit/delete/update_desc) 依序送出，
+        // 確保「同一筆資料的先後操作」不會在後端亂序執行。
+        let __writeQueue = Promise.resolve();
+        function enqueueWrite(taskFn) {
+            const run = __writeQueue.then(() => taskFn());
+            __writeQueue = run.catch(() => {}); // 單筆失敗不卡住整條佇列
+            return run;
+        }
+
+        // ---------- item 3 + item 7：重試 + 失敗提示 + 離線緩衝（localStorage）+ 自動重播 ----------
+        // failedWrites 是「尚未成功送出的寫入」清單，同時鏡射到 localStorage，
+        // 重新整理、關瀏覽器後仍在；恢復連線 / 開啟頁面 / 按「重試」時會自動補送。
+        const PENDING_KEY = 'food_collect_pending_writes';
+        let failedWrites = []; // { _wid, payload, label, ts }
+        let __flushing = false;
+
+        function persistPending() {
+            try { localStorage.setItem(PENDING_KEY, JSON.stringify(failedWrites)); } catch (e) {}
+        }
+        function hydratePending() {
+            try {
+                const raw = localStorage.getItem(PENDING_KEY);
+                const arr = raw ? JSON.parse(raw) : [];
+                failedWrites = Array.isArray(arr) ? arr.filter(w => w && w.payload) : [];
+            } catch (e) { failedWrites = []; }
+            updateSyncStatusUI();
+        }
+        function newWid() { return Date.now() + '_' + Math.random().toString(36).slice(2, 8); }
+
+        // 🌟 v1.04 (item 6)：資料列的永久主鍵改用 UUID。
+        // 好處：前端產生、全域唯一、重試/離線補送不會撞號；搭配後端 upsert 後，
+        //       「新增」重送不會產生重複列。
+        // 後備：http://（非 localhost）等非安全內容沒有 crypto.randomUUID，改用時間+亂數。
+        function newId() {
+            try {
+                if (window.crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+            } catch (e) {}
+            return 'id-' + Date.now().toString(36) + '-' +
+                   Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 6);
+        }
+
+        function registerFailedWrite(payload, label, wid) {
+            wid = wid || newWid();
+            if (failedWrites.some(w => w._wid === wid)) return;      // 去重（重試同一筆不會重複堆積）
+            failedWrites.push({ _wid: wid, payload, label: label || '資料', ts: Date.now() });
+            persistPending(); updateSyncStatusUI();
+        }
+        function clearFailedWrite(wid) {
+            const before = failedWrites.length;
+            failedWrites = failedWrites.filter(w => w._wid !== wid);
+            if (failedWrites.length !== before) { persistPending(); updateSyncStatusUI(); }
+        }
+        function updateSyncStatusUI() {
+            const el = document.getElementById('syncStatus'); if (!el) return;
+            if (failedWrites.length === 0) { el.style.display = 'none'; el.innerHTML = ''; return; }
+            el.style.display = 'inline-block';
+            el.innerHTML = `⚠️ ${failedWrites.length} 筆變更未同步 ` +
+                `<button onclick="retryFailedWrites()" style="margin-left:4px; padding:2px 8px; font-size:12px; background:#dc3545; color:#fff; border:none; border-radius:4px; cursor:pointer;">重試</button>`;
+        }
+
+        // 補送緩衝區內所有未同步寫入。online 事件、頁面載入、手動按鈕都會呼叫。
+        async function retryFailedWrites(reloadAfter) {
+            if (__flushing || failedWrites.length === 0) return;
+            __flushing = true;
+            const pending = failedWrites.slice();
+            let ok = 0;
+            try {
+                for (const w of pending) {
+                    const r = await queuedPost(w.payload, { label: w.label, _wid: w._wid, _fromBuffer: true });
+                    if (r.ok) { clearFailedWrite(w._wid); ok++; }
+                    else if (r.auth) break; // 權杖問題，先停，等使用者重設後再補
+                }
+            } finally { __flushing = false; }
+            if (ok > 0) {
+                showToast(`✅ 已補送 ${ok} 筆變更`, 'success');
+                if (reloadAfter) switchPage(currentPageId); // 載入時補送成功 → 重新抓當前頁對齊畫面
+            }
+        }
+
+        async function postWithRetry(payload, opts) {
+            opts = opts || {};
+            const label = opts.label || '資料';
+            // v1.04 (item 6)：id 為 UUID + 後端 upsert，重送同一筆 add 不會產生重複列，
+            // 因此 add/edit/delete 一律重試 3 次。
+            const retries = (opts.retries != null) ? opts.retries : 3;
+            let attempt = 0, delay = 800;
+            while (true) {
+                attempt++;
+                try {
+                    return await apiPost(payload);
+                } catch (err) {
+                    if (err instanceof ApiAuthError) {
+                        showToast('❌ 存取權杖無效，請重新輸入後按「重試」', 'error', 6000);
+                        ensureAccessToken(true);
+                        if (!opts._fromBuffer) registerFailedWrite(payload, label, opts._wid);
+                        throw err;
+                    }
+                    if (attempt > retries) {
+                        if (!opts._fromBuffer) registerFailedWrite(payload, label, opts._wid);
+                        showToast(`⚠️ ${label}同步失敗，已存入待補送佇列（可按上方「重試」或恢復連線後自動補送）`, 'error', 6000);
+                        throw err;
+                    }
+                    await sleep(delay); delay *= 2;
+                }
+            }
+        }
+
+        // 對外主要入口：進佇列 → 重試 → 回傳 { ok, data } 或 { ok:false, ... }
+        // 一律 resolve（不 reject），呼叫端可 await 也可 fire-and-forget。
+        async function queuedPost(payload, opts) {
+            opts = opts || {};
+            if (!opts._wid) opts._wid = newWid();
+            try {
+                const data = await enqueueWrite(() => postWithRetry(payload, opts));
+                return { ok: true, data };
+            } catch (err) {
+                return { ok: false, auth: err instanceof ApiAuthError, error: err };
+            }
+        }
+
+        // ---------- 小型 Toast 提示 ----------
+        function showToast(msg, type, ms) {
+            type = type || 'info'; ms = ms || 4000;
+            let box = document.getElementById('toastBox');
+            if (!box) {
+                box = document.createElement('div');
+                box.id = 'toastBox';
+                box.style.cssText = 'position:fixed; right:20px; bottom:20px; z-index:3000; display:flex; flex-direction:column; gap:8px; max-width:340px;';
+                document.body.appendChild(box);
+            }
+            const t = document.createElement('div');
+            const bg = type === 'error' ? '#dc3545' : (type === 'success' ? '#28a745' : '#37474f');
+            t.style.cssText = `background:${bg}; color:#fff; padding:12px 16px; border-radius:8px; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.25); opacity:0; transition:opacity 0.2s; white-space:pre-wrap;`;
+            t.textContent = msg;
+            box.appendChild(t);
+            requestAnimationFrame(() => { t.style.opacity = '1'; });
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 250); }, ms);
+        }
+
+        // ---------- item 4：fullText 只用「資料欄位」組合 ----------
+        // 排除 id / action / sheetName / token / fullText / isDetailed 等非資料欄位，
+        // 避免這些內容混進前端搜尋字串造成誤命中。
+        function buildFullText(obj, opts) {
+            opts = opts || {};
+            const cols = (opts.cols != null) ? opts.cols : 10;
+            const named = opts.named || [];
+            const parts = [];
+            named.forEach(k => parts.push(safeStr(obj[k])));
+            for (let i = 1; i <= cols; i++) parts.push(safeStr(obj['col' + i]));
+            if (opts.extra) parts.push(opts.extra);
+            return parts.join(' ').toLowerCase();
+        }
+
+        // 🌟 v1.03 (item 5)：新增 type 欄位，程式分流一律看 type，不再比對中文分頁名。
+        //   type: 'food' | 'sports' | 'travel' | 'timeline' | 'note' | 'generic'
+        //   mapCol: 該欄位值要在總覽表格轉成 Google 地圖連結（目前僅東京旅遊(4) 用第 8 欄）
+        //   之後若要改分頁名稱，只需改這裡的 sheet 值，其它邏輯不受影響。
         const PAGE_CONFIG = {
-            'foodPage':   { sheet: '美食紀錄', name: '美食記錄', label: '🍔 (1)美食記錄', color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
-            'sportsPage': { sheet: '運動紀錄', name: '運動記錄', label: '🏃‍♂️ (2)運動記錄', color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
-            'travelPage': { sheet: '擴充預留網頁7', name: '旅遊', label: '✈️ (3)旅遊', color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
-            'newsPage':   { sheet: '擴充預留網頁5', name: '時事', label: '📰 (4)時事', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
-            'notePage':   { sheet: '擴充預留網頁1', name: '筆記', label: '📝 (5)筆記', color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
-            'extPage2':   { sheet: '擴充預留網頁2', name: '飲食', label: '🍽️ (6)飲食', color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
-            'extPage3':   { sheet: '擴充預留網頁3', name: '連結', label: '🔗 (7)連結', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
-            'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊', label: '🗼 (8)東京旅遊', color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
-            'extPage6':   { sheet: '擴充預留網頁6', name: '網頁6', label: '📄 (9)網頁6', color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
-            'extPage8':   { sheet: '擴充預留網頁8', name: '政治', label: '📰 (10)政治', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
-            'extPage9':   { sheet: '擴充預留網頁9', name: '經濟|科技', label: '📰 (11)經濟|科技', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
-            'extPage10':  { sheet: '擴充預留網頁10', name: 'Code議題', label: '📰 (12)Code議題', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
-            'extPage11':  { sheet: '擴充預留網頁11', name: '日本旅遊', label: '📰 (13)日本旅遊', color: '#8e24aa', light: '#f3e5f5', dark: '#4a148c' },
-            'extPage12':  { sheet: '擴充預留網頁12', name: '好文分享', label: '📰 (14)好文分享', color: '#e53935', light: '#ffebee', dark: '#b71c1c' },
-            'extPage13':  { sheet: '擴充預留網頁13', name: '專業結合英文', label: '📰 (15)專業結合英文', color: '#d81b60', light: '#fce4ec', dark: '#880e4f' },
-            'extPage14':  { sheet: '擴充預留網頁14', name: '網頁14', label: '📰 (16)網頁', color: '#3949ab', light: '#e8eaf6', dark: '#1a237e' },
-            'extPage15':  { sheet: '擴充預留網頁15', name: '網頁15', label: '📰 (17)網頁', color: '#039be5', light: '#e0f7fa', dark: '#01579b' },
-            'extPage16':  { sheet: '擴充預留網頁16', name: '網頁16', label: '📰 (18)網頁', color: '#00897b', light: '#e0f2f1', dark: '#004d40' },
-            'extPage17':  { sheet: '擴充預留網頁17', name: '網頁17', label: '📰 (19)網頁', color: '#7cb342', light: '#f1f8e9', dark: '#33691e' },
-            'extPage18':  { sheet: '擴充預留網頁18', name: '網頁18', label: '📰 (20)網頁', color: '#fdd835', light: '#fffde7', dark: '#f57f17' },
-            'extPage19':  { sheet: '擴充預留網頁19', name: '網頁19', label: '📰 (21)網頁', color: '#fb8c00', light: '#fff3e0', dark: '#e65100' },
-            'extPage20':  { sheet: '擴充預留網頁20', name: '網頁20', label: '📰 (22)網頁', color: '#6d4c41', light: '#efebe9', dark: '#3e2723' }
+            'foodPage':   { sheet: '美食紀錄', name: '美食店家地圖', label: '🍔 美食紀錄', type: 'food',     color: '#ff5722', light: '#fff3e0', dark: '#e65100' },
+            'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', label: '🏃‍♂️ 運動紀錄', type: 'sports',   color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
+            'travelPage': { sheet: '擴充預留網頁7', name: '旅遊行程筆記', label: '✈️ 旅遊(7)', type: 'travel',   color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
+            'newsPage':   { sheet: '擴充預留網頁5', name: '時事焦點紀錄', label: '📰 時事(5)', type: 'timeline', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
+            'notePage':   { sheet: '擴充預留網頁1', name: '隨身綜合筆記', label: '📝 筆記(1)', type: 'note',     color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
+            'extPage2':   { sheet: '擴充預留網頁2', name: '飲食日常紀錄', label: '🍽️ 飲食(2)', type: 'generic',  color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
+            'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', label: '🔗 連結(3)', type: 'generic',
+                            viewMode: 'card',        // v1.05：改用卡片式呈現
+                            // v1.07：欄位語意 → 3=整類、4=連結、5=名稱、6=更多說明
+                            fieldLabels: { 1: '流水號', 2: '日期', 3: '整類', 4: '連結', 5: '名稱', 6: '更多說明' },
+                            cardFields: [5, 4, 6],   // 卡片內文顯示順序：名稱(標題) → 連結 → 更多說明
+                            dateField: 2,            // 這一欄視為「日期」，放在卡片footer而非標題
+                            groupField: 3,           // v1.06：以「整類」分組，顯示為群組標題
+                            countCol: 7,             // 連結開啟次數存這一欄（自動維護）
+                            lastOpenCol: 8,          // 上次開啟日期存這一欄（自動維護）
+                            subCol: 10,              // v1.08：卡片子項目(帳號內容) 以 JSON 陣列存這一欄（自動維護）
+                            color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊紀錄', label: '🗼 東京旅遊(4)', type: 'generic', mapCol: 8, color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
+            'extPage6':   { sheet: '擴充預留網頁6', name: '擴充預留網頁6', label: '📄 網頁6', type: 'generic',  color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
+            'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', label: '📰 網頁8', type: 'timeline', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
+            'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', label: '📰 網頁9', type: 'timeline', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
+            'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', label: '📰 網頁10', type: 'timeline', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
+            'extPage11':  { sheet: '擴充預留網頁11', name: '擴充預留網頁11', label: '📰 網頁11', type: 'timeline', color: '#8e24aa', light: '#f3e5f5', dark: '#4a148c' },
+            'extPage12':  { sheet: '擴充預留網頁12', name: '擴充預留網頁12', label: '📰 網頁12', type: 'timeline', color: '#e53935', light: '#ffebee', dark: '#b71c1c' },
+            'extPage13':  { sheet: '擴充預留網頁13', name: '擴充預留網頁13', label: '📰 網頁13', type: 'timeline', color: '#d81b60', light: '#fce4ec', dark: '#880e4f' },
+            'extPage14':  { sheet: '擴充預留網頁14', name: '擴充預留網頁14', label: '📰 網頁14', type: 'timeline', color: '#3949ab', light: '#e8eaf6', dark: '#1a237e' },
+            'extPage15':  { sheet: '擴充預留網頁15', name: '擴充預留網頁15', label: '📰 網頁15', type: 'timeline', color: '#039be5', light: '#e0f7fa', dark: '#01579b' },
+            'extPage16':  { sheet: '擴充預留網頁16', name: '擴充預留網頁16', label: '📰 網頁16', type: 'timeline', color: '#00897b', light: '#e0f2f1', dark: '#004d40' },
+            'extPage17':  { sheet: '擴充預留網頁17', name: '擴充預留網頁17', label: '📰 網頁17', type: 'timeline', color: '#7cb342', light: '#f1f8e9', dark: '#33691e' },
+            'extPage18':  { sheet: '擴充預留網頁18', name: '擴充預留網頁18', label: '📰 網頁18', type: 'timeline', color: '#fdd835', light: '#fffde7', dark: '#f57f17' },
+            'extPage19':  { sheet: '擴充預留網頁19', name: '擴充預留網頁19', label: '📰 網頁19', type: 'timeline', color: '#fb8c00', light: '#fff3e0', dark: '#e65100' },
+            'extPage20':  { sheet: '擴充預留網頁20', name: '擴充預留網頁20', label: '📰 網頁20', type: 'timeline', color: '#6d4c41', light: '#efebe9', dark: '#3e2723' }
         };
 
-        const TIMELINE_PAGES = ['擴充預留網頁5', '擴充預留網頁8', '擴充預留網頁9', '擴充預留網頁10', '擴充預留網頁11', '擴充預留網頁12', '擴充預留網頁13', '擴充預留網頁14', '擴充預留網頁15', '擴充預留網頁16', '擴充預留網頁17', '擴充預留網頁18', '擴充預留網頁19', '擴充預留網頁20'];
+        // 由目前分頁 id 取得類型；找不到就當 generic。
+        function pageType(pageId) {
+            const c = PAGE_CONFIG[pageId || currentPageId];
+            return (c && c.type) ? c.type : 'generic';
+        }
+        // 由分頁名稱反查類型（少數只有 sheetName 的情境用）。
+        function pageTypeBySheet(sheetName) {
+            for (const k in PAGE_CONFIG) { if (PAGE_CONFIG[k].sheet === sheetName) return PAGE_CONFIG[k].type || 'generic'; }
+            return 'generic';
+        }
+        // 仍保留 TIMELINE_PAGES，但改為「由 PAGE_CONFIG 自動衍生」，不再手動維護，避免兩份清單走鐘。
+        const TIMELINE_PAGES = Object.keys(PAGE_CONFIG)
+            .filter(k => PAGE_CONFIG[k].type === 'timeline')
+            .map(k => PAGE_CONFIG[k].sheet);
 
         let currentPageId = 'foodPage';
         let currentPageName = '美食紀錄';
@@ -519,7 +786,8 @@
         let foodDataList = []; let editingFoodId = null; 
         let sportsDataList = []; let editingSportsId = null;
         let noteDataList = []; let editingNoteId = null; let noteFilterKeywords = []; 
-        let genericDataList = []; let editingGenericId = null; let genericFilterKeywords = []; 
+        let genericDataList = []; let editingGenericId = null; let genericFilterKeywords = [];
+        let expandedLinkCards = new Set(); // v1.08：目前展開的連結卡片 id
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
         let newsDataList = []; let editingNewsId = null; 
 
@@ -564,14 +832,27 @@
         }
 
         window.onload = function() {
-            renderSortOptionsUI(); 
+            ensureAccessToken(); // 🔑 確保有存取權杖（沒有就跳出輸入框）
+            hydratePending();    // 💾 item 7：讀回上次未同步的寫入
+            renderSortOptionsUI();
             renderNavButtons();
-            
+
             const today = new Date().toISOString().split('T')[0];
             safeSet('sportDate', today); safeSet('noteCol2', today); safeSet('genCol2', today); safeSet('newsCol2', today);
-            
-            switchPage('foodPage'); 
+
+            switchPage('foodPage');
+
+            // 💾 item 7：載入後先嘗試補送一次；成功會重新抓當前頁對齊畫面
+            if (failedWrites.length > 0) setTimeout(() => retryFailedWrites(true), 1200);
         };
+
+        // 💾 item 7：恢復網路連線時自動補送待同步的寫入
+        window.addEventListener('online', function() {
+            if (failedWrites.length > 0) {
+                showToast('🌐 已恢復連線，嘗試補送未同步的變更…', 'info');
+                retryFailedWrites(false);
+            }
+        });
 
         // 🌟 操作紀錄檢視視窗相關 🌟
         let logDataList = [];
@@ -579,13 +860,12 @@
             safeDisplay('logModal', 'flex'); safeDisplay('logLoading', 'block');
             document.getElementById('logTableBody').innerHTML = '';
             try {
-                const response = await fetch(`${API_URL}?sheetName=${encodeURIComponent('操作紀錄表')}`);
-                const json = await response.json();
+                const json = await apiGet('操作紀錄表');
                 logDataList = Array.isArray(json.data) ? json.data : [];
                 logDataList.sort((a, b) => new Date(b.actionTime || b.logId || 0) - new Date(a.actionTime || a.logId || 0));
                 renderLogTable();
             } catch (e) {
-                alert("無法載入紀錄，請確認您的 Google Sheet 中是否已建立「操作紀錄表」分頁！");
+                if (!(e instanceof ApiAuthError)) alert("無法載入紀錄，請確認您的 Google Sheet 中是否已建立「操作紀錄表」分頁！");
             } finally { safeDisplay('logLoading', 'none'); }
         }
         function closeLogModal() { safeDisplay('logModal', 'none'); }
@@ -625,7 +905,7 @@
             if(!confirm('確定要移除這筆操作紀錄嗎？\n(注意：這只會移除紀錄，不會刪除真實資料)')) return;
             logDataList = logDataList.filter(l => (l.logId || l.id || l.col1 || l[Object.keys(l)[0]]) !== logId);
             renderLogTable();
-            try { fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'delete', id: logId, sheetName: '操作紀錄表' }) }); } catch(e) {}
+            queuedPost({ action: 'delete', id: logId, sheetName: '操作紀錄表' }, { label: '刪除操作紀錄' });
         }
 
         function goToLogItem(sheetName, targetId) {
@@ -683,17 +963,18 @@
             const el = document.getElementById('descModalInput'); if(!el) return;
             const newDesc = el.value.trim(); currentDescription = newDesc;
             safeText('descDisplay', newDesc || '目前無說明，請點擊「編輯說明」來新增內容或欄位定義。'); closeDescModal();
-            try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ sheetName: currentPageName, action: 'update_desc', description: newDesc }) }); } catch(e) {}
+            queuedPost({ sheetName: currentPageName, action: 'update_desc', description: newDesc }, { label: '頁面說明' });
         }
         async function deleteDescription() { if(!confirm('確定要清除此頁面的說明嗎？')) return; safeSet('descModalInput', ''); saveDescription(); }
 
         function updateSortOptions() {
             let options = [{val: '', text: '-- 無 --'}];
-            if (currentPageName === '美食紀錄') { options.push({val: 'city', text: '縣市'}, {val: 'district', text: '區域'}, {val: 'address', text: '地址'}, {val: 'storeName', text: '店名'}, {val: 'category', text: '分類'}, {val: 'other', text: '其他'});
-            } else if (currentPageName === '運動紀錄') { options.push({val: 'date', text: '日期'}, {val: 'type', text: '運動類型'}, {val: 'distance', text: '距離(km)'}, {val: 'notes', text: '備註'});
-            } else if (currentPageName === '擴充預留網頁1') { options.push({val: 'col1', text: '流水號'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '分類'}, {val: 'col4', text: '內容'}); for(let i=5; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i});
-            } else if (currentPageName === '擴充預留網頁7') { options.push({val: 'col1', text: '主類別'}, {val: 'col2', text: '名稱'}, {val: 'col3', text: '地點'}, {val: 'col4', text: '地理區域'}, {val: 'col5', text: '彈性標籤'}, {val: 'col6', text: '必訪亮點/筆記'}, {val: 'col7', text: '實用資訊包'});
-            } else if (TIMELINE_PAGES.includes(currentPageName)) { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
+            const t = pageType();
+            if (t === 'food') { options.push({val: 'city', text: '縣市'}, {val: 'district', text: '區域'}, {val: 'address', text: '地址'}, {val: 'storeName', text: '店名'}, {val: 'category', text: '分類'}, {val: 'other', text: '其他'});
+            } else if (t === 'sports') { options.push({val: 'date', text: '日期'}, {val: 'type', text: '運動類型'}, {val: 'distance', text: '距離(km)'}, {val: 'notes', text: '備註'});
+            } else if (t === 'note') { options.push({val: 'col1', text: '流水號'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '分類'}, {val: 'col4', text: '內容'}); for(let i=5; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i});
+            } else if (t === 'travel') { options.push({val: 'col1', text: '主類別'}, {val: 'col2', text: '名稱'}, {val: 'col3', text: '地點'}, {val: 'col4', text: '地理區域'}, {val: 'col5', text: '彈性標籤'}, {val: 'col6', text: '必訪亮點/筆記'}, {val: 'col7', text: '實用資訊包'});
+            } else if (t === 'timeline') { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
             } else { for(let i=1; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i}); }
 
             for(let i=1; i<=5; i++) {
@@ -716,14 +997,20 @@
                 let colEl = document.getElementById(`sortCol${i}`); let dirEl = document.getElementById(`sortDir${i}`); 
                 if(colEl && dirEl && colEl.value) sortConfigs.push({col: colEl.value, dir: dirEl.value}); 
             }
-            if (TIMELINE_PAGES.includes(currentPageName) && sortConfigs.length === 0) { sortConfigs.push({col: 'col2', dir: 'desc'}); }
+            const t = pageType();
+            if (t === 'timeline' && sortConfigs.length === 0) { sortConfigs.push({col: 'col2', dir: 'desc'}); }
+            // v1.06：連結卡片頁預設「每次載入依開啟次數降冪」
+            const __cfg = PAGE_CONFIG[currentPageId] || {};
+            if (t === 'generic' && __cfg.viewMode === 'card' && sortConfigs.length === 0) {
+                sortConfigs.push({ col: 'col' + (__cfg.countCol || 7), dir: 'desc' });
+            }
 
             let targetList = []; let renderFn = null;
-            if(currentPageName === '美食紀錄') { targetList = foodDataList; renderFn = renderFoodTable; } 
-            else if(currentPageName === '運動紀錄') { targetList = sportsDataList; renderFn = renderSportsTable; } 
-            else if(currentPageName === '擴充預留網頁1') { targetList = noteDataList; renderFn = renderNoteTable; } 
-            else if(currentPageName === '擴充預留網頁7') { targetList = travelDataList; renderFn = renderTravelTable; } 
-            else if(TIMELINE_PAGES.includes(currentPageName)) { targetList = newsDataList; renderFn = renderNewsTimeline; } 
+            if(t === 'food') { targetList = foodDataList; renderFn = renderFoodTable; }
+            else if(t === 'sports') { targetList = sportsDataList; renderFn = renderSportsTable; }
+            else if(t === 'note') { targetList = noteDataList; renderFn = renderNoteTable; }
+            else if(t === 'travel') { targetList = travelDataList; renderFn = renderTravelTable; }
+            else if(t === 'timeline') { targetList = newsDataList; renderFn = renderNewsTimeline; }
             else { targetList = genericDataList; renderFn = renderGenericTable; }
 
             targetList.sort((a, b) => {
@@ -740,7 +1027,10 @@
                         }
                     }
                 }
-                return parseFloat(a.id) - parseFloat(b.id); 
+                // v1.04 (item 6)：id 改為 UUID 字串，tiebreak 改用字典序（穩定、確定性）。
+                // 舊的數字 id 用字串比較同樣穩定，不影響既有資料。
+                const ia = String(a.id), ib = String(b.id);
+                return ia < ib ? -1 : (ia > ib ? 1 : 0);
             });
             if(renderFn) renderFn();
         }
@@ -794,12 +1084,13 @@
             const newsCatFilters = document.getElementById('newsCategoryFilters');
             if(newsCatFilters) newsCatFilters.innerHTML = '';
 
-            if (selectedPageId === 'foodPage') { safeDisplay('foodPage', 'block'); } 
-            else if (selectedPageId === 'sportsPage') { safeDisplay('sportsPage', 'block'); } 
-            else if (selectedPageId === 'notePage') { safeDisplay('notePage', 'block'); } 
-            else if (selectedPageId === 'travelPage') { safeDisplay('travelPage', 'block'); }
-            else if (TIMELINE_PAGES.includes(config.sheet)) { 
-                safeDisplay('newsPage', 'block'); 
+            // v1.03 (item 5)：依 config.type 分流，不再比對 selectedPageId / 分頁名
+            if (config.type === 'food') { safeDisplay('foodPage', 'block'); }
+            else if (config.type === 'sports') { safeDisplay('sportsPage', 'block'); }
+            else if (config.type === 'note') { safeDisplay('notePage', 'block'); }
+            else if (config.type === 'travel') { safeDisplay('travelPage', 'block'); }
+            else if (config.type === 'timeline') {
+                safeDisplay('newsPage', 'block');
                 safeText('newsFormTitle', `新增 ${config.name}`);
                 safeText('newsTableTitle', `${config.name} 時間軸總覽`);
                 safeSet('newsFilterInput', ''); safeSet('newsStartDate', ''); safeSet('newsEndDate', '');
@@ -810,6 +1101,22 @@
                 safeText('genericFormTitle', `新增 ${config.name} 資料`);
                 safeText('genericTableTitle', `${config.name} 總覽`);
                 genericFilterKeywords = []; renderGenericKw();
+
+                // v1.05：卡片模式（連結(3)）↔ 一般表格模式 的容器切換與表單標籤
+                const isCard = config.viewMode === 'card';
+                expandedLinkCards.clear(); // v1.08：換頁時收合所有卡片
+                safeDisplay('genericColToggle', isCard ? 'none' : '');
+                safeDisplay('genericTableWrap', isCard ? 'none' : '');
+                safeDisplay('genericCardContainer', isCard ? 'flex' : 'none');
+                // v1.07：表單欄位標籤依 config.fieldLabels 套用；卡片模式隱藏自動欄位(col7 以後)
+                for (let i = 1; i <= 10; i++) {
+                    const dl = (i === 1) ? '流水號 (col1)' : (i === 2) ? '日期 (col2)' : `欄位 ${i}`;
+                    const lbl = (config.fieldLabels && config.fieldLabels[i]) ? config.fieldLabels[i] : dl;
+                    safeText(`genLabel${i}`, lbl);
+                    const inp = document.getElementById(`genCol${i}`);
+                    const fg = inp && inp.closest ? inp.closest('.form-group') : null;
+                    if (fg) fg.style.display = (isCard && i >= 7) ? 'none' : '';
+                }
             }
             loadData(currentPageName, targetIdToOpen);
         }
@@ -817,9 +1124,8 @@
         async function loadData(sheetName, targetIdToOpen = null) {
             toggleLoading(true, '⏳ 資料載入與同步中...');
             try {
-                const response = await fetch(`${API_URL}?sheetName=${encodeURIComponent(sheetName)}`);
-                const json = await response.json();
-                const data = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []); 
+                const json = await apiGet(sheetName);
+                const data = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
                 
                 currentPageName = sheetName;
                 currentDescription = json.description || '';
@@ -829,11 +1135,12 @@
                 
                 const todayStr = new Date().toISOString().split('T')[0];
 
-                if (sheetName === '美食紀錄') { foodDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.city)} ${safeStr(item.district)} ${safeStr(item.address)} ${safeStr(item.storeName)} ${safeStr(item.category)} ${safeStr(item.other)}`.toLowerCase() })); } 
-                else if (sheetName === '運動紀錄') { sportsDataList = data; } 
-                else if (sheetName === '擴充預留網頁1') { noteDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); } 
-                else if (sheetName === '擴充預留網頁7') { travelDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)}`.toLowerCase() })); } 
-                else if (TIMELINE_PAGES.includes(sheetName)) { 
+                const pt = pageTypeBySheet(sheetName);
+                if (pt === 'food') { foodDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.city)} ${safeStr(item.district)} ${safeStr(item.address)} ${safeStr(item.storeName)} ${safeStr(item.category)} ${safeStr(item.other)}`.toLowerCase() })); }
+                else if (pt === 'sports') { sportsDataList = data; }
+                else if (pt === 'note') { noteDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); }
+                else if (pt === 'travel') { travelDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)}`.toLowerCase() })); }
+                else if (pt === 'timeline') {
                     newsDataList = data.map(item => {
                         let commentsText = '';
                         try { let cArr = JSON.parse(safeStr(item.col10) || '[]'); commentsText = cArr.map(c => c.text).join(' '); } catch(e){}
@@ -841,8 +1148,8 @@
                         // 🌟 新增：預設只展開「今天」的資料 🌟
                         let isDetailed = (formatDate(item.col2) === todayStr);
 
-                        return { ...item,
-                            fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col9)} ${commentsText}`.toLowerCase(),
+                        return { ...item, 
+                            fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${commentsText}`.toLowerCase(),
                             isDetailed: isDetailed 
                         };
                     }); 
@@ -850,11 +1157,11 @@
                 } 
                 else { genericDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); }
                 
-                applyGlobalMultiSort(); 
-            } catch (error) { alert("資料讀取失敗！請確認 API 是否已更新。"); } 
-            finally { 
+                applyGlobalMultiSort();
+            } catch (error) { if (!(error instanceof ApiAuthError)) alert("資料讀取失敗！請確認 API 是否已更新。"); }
+            finally {
                 toggleLoading(false);
-                if (targetIdToOpen && TIMELINE_PAGES.includes(sheetName)) {
+                if (targetIdToOpen && pageTypeBySheet(sheetName) === 'timeline') {
                     // 如果有指定要開啟的 ID，強制設為展開
                     newsDataList.forEach(d => { if(String(d.id) === String(targetIdToOpen)) d.isDetailed = true; });
                     renderNewsTimeline();
@@ -885,9 +1192,11 @@
         }
 
         async function submitNewsData() {
-            const payload = { sheetName: currentPageName, id: editingNewsId || Date.now(), action: editingNewsId ? 'edit' : 'add' };
+            const payload = { sheetName: currentPageName, id: editingNewsId || newId(), action: editingNewsId ? 'edit' : 'add' };
             for(let i=1; i<=10; i++) { let el = document.getElementById(`newsCol${i}`); payload[`col${i}`] = el ? el.value : ''; }
-            const fullText = Object.values(payload).join(' ').toLowerCase();
+            let __cmtText = '';
+            try { __cmtText = (JSON.parse(safeStr(payload.col10) || '[]')).map(c => c.text).join(' '); } catch(e) {}
+            const fullText = buildFullText(payload, { cols: 6, extra: __cmtText });
             if (editingNewsId) { 
                 const idx = newsDataList.findIndex(d => String(d.id) === String(editingNewsId)); 
                 if (idx > -1) {
@@ -898,8 +1207,8 @@
                 newsDataList.push({ ...payload, fullText, isDetailed: true }); // 新增預設展開
             }
             
-            updateNewsCategoryCheckboxes(); applyGlobalMultiSort(); cancelNewsEdit(); 
-            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+            updateNewsCategoryCheckboxes(); applyGlobalMultiSort(); cancelNewsEdit();
+            queuedPost(payload, { label: payload.action === 'edit' ? '修改時事紀錄' : '新增時事紀錄' });
         }
 
         async function submitComment(id) {
@@ -915,21 +1224,22 @@
 
             comments.push({ time: timeStr, text: text });
             item.col10 = JSON.stringify(comments);
-            
-            let commentText = comments.map(c => c.text).join(' ');
-            item.fullText = Object.values(item).join(' ').toLowerCase() + ' ' + commentText.toLowerCase();
 
-            inputEl.value = ''; openNewsDetail(id); renderNewsTimeline(); 
+            let commentText = comments.map(c => c.text).join(' ');
+            item.fullText = buildFullText(item, { cols: 6, extra: commentText });
+
+            inputEl.value = ''; openNewsDetail(id); renderNewsTimeline();
             const payload = { ...item, sheetName: currentPageName, action: 'edit' };
-            try { fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); } catch(e) { console.error("留言儲存失敗", e); }
+            delete payload.fullText; delete payload.isDetailed;
+            queuedPost(payload, { label: '新增追蹤留言' });
         }
 
         function copyNewsData(id, event) {
             if(event) event.stopPropagation();
             const item = newsDataList.find(d => String(d.id) === String(id)); if (!item) return;
             for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`newsCol${i}`, val); }
-            safeSet('newsCol9', ''); safeSet('newsCol10', '');
-            editingNewsId = null;
+            safeSet('newsCol10', ''); 
+            editingNewsId = null; 
             const configName = PAGE_CONFIG[currentPageId].name;
             safeText('newsFormTitle', `新增 ${configName} (複製現有)`); safeText('submitNewsBtn', '儲存紀錄'); safeClass('submitNewsBtn', 'btn-add'); safeDisplay('cancelNewsBtn', 'inline-block'); 
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
@@ -945,76 +1255,14 @@
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
-        function deleteNewsData(id, event) {
-            if(event) event.stopPropagation();
-            if (!confirm('確定刪除此紀錄？')) return;
+        function deleteNewsData(id, event) { 
+            if(event) event.stopPropagation(); 
+            if (!confirm('確定刪除此紀錄？')) return; 
             newsDataList = newsDataList.filter(d => String(d.id) !== String(id));
             updateNewsCategoryCheckboxes(); renderNewsTimeline();
-            fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) });
+            queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除時事紀錄' });
         }
-
-        // ================= 📤 複製 / 移動到其他分頁 (時事5 ~ 網頁20 共用格式) =================
-        let moveCopyItemId = null;
-
-        function findPageKeyBySheet(sheetName) {
-            for (let key in PAGE_CONFIG) { if (PAGE_CONFIG[key].sheet === sheetName) return key; }
-            return null;
-        }
-
-        function openMoveCopyModal(id, event) {
-            if (event) event.stopPropagation();
-            moveCopyItemId = id;
-            const sel = document.getElementById('moveCopyTargetSelect'); if (!sel) return;
-            sel.innerHTML = '';
-            TIMELINE_PAGES.forEach(sheetName => {
-                if (sheetName === currentPageName) return;
-                const key = findPageKeyBySheet(sheetName); if (!key) return;
-                const opt = document.createElement('option');
-                opt.value = sheetName; opt.textContent = PAGE_CONFIG[key].label;
-                sel.appendChild(opt);
-            });
-            if (sel.options.length === 0) { alert('沒有其他可用的目標分頁！'); return; }
-            safeDisplay('moveCopyModal', 'flex');
-        }
-        function closeMoveCopyModal() { moveCopyItemId = null; safeDisplay('moveCopyModal', 'none'); }
-
-        async function submitMoveCopy(mode) {
-            const sel = document.getElementById('moveCopyTargetSelect'); if (!sel || !sel.value) return;
-            const targetSheet = sel.value;
-            const targetKey = findPageKeyBySheet(targetSheet);
-            const targetLabel = targetKey ? PAGE_CONFIG[targetKey].name : targetSheet;
-
-            const idx = newsDataList.findIndex(d => String(d.id) === String(moveCopyItemId));
-            if (idx === -1) { closeMoveCopyModal(); return; }
-            const item = newsDataList[idx];
-
-            const newId = Date.now() + Math.floor(Math.random() * 10000);
-            const copyPayload = { sheetName: targetSheet, id: newId, action: 'add' };
-            for (let i = 1; i <= 10; i++) { copyPayload[`col${i}`] = safeStr(item[`col${i}`]); }
-
-            try {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify(copyPayload) });
-            } catch (e) { alert('複製失敗，請檢查網路連線！'); return; }
-
-            if (mode === 'move') {
-                const now = new Date(); const pad = n => n.toString().padStart(2, '0');
-                const timeStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-                const marker = `📤 已移動至：${targetLabel} (${timeStr})`;
-                const oldMarker = safeStr(item.col9).trim();
-                item.col9 = oldMarker ? `${oldMarker}\n${marker}` : marker;
-                item.fullText = `${item.fullText} ${marker}`.toLowerCase();
-                const editPayload = { sheetName: currentPageName, id: item.id, action: 'edit' };
-                for (let i = 1; i <= 10; i++) { editPayload[`col${i}`] = safeStr(item[`col${i}`]); }
-                fetch(API_URL, { method: 'POST', body: JSON.stringify(editPayload) });
-            }
-
-            closeMoveCopyModal();
-            renderNewsTimeline();
-            const detailPanel = document.getElementById('newsDetailPanel');
-            if (detailPanel && detailPanel.style.display === 'block') openNewsDetail(item.id);
-            alert(mode === 'move' ? `已標記移動至「${targetLabel}」，並在該分頁新增一筆複本（原資料仍保留在此分頁）。` : `已複製到「${targetLabel}」！`);
-        }
-
+        
         function clearNewsFilters() {
             safeSet('newsFilterInput', ''); safeSet('newsStartDate', ''); safeSet('newsEndDate', '');
             document.querySelectorAll('.news-cat-cb').forEach(cb => cb.checked = true); renderNewsTimeline();
@@ -1081,17 +1329,12 @@
             if (comments.length === 0) { commentsHtml = `<div style="color:#aaa; font-size:13px; text-align:center; padding:15px 0; background:#f9f9f9; border-radius:8px; border:1px dashed #ccc;">👻 目前尚無追蹤留言，在下方新增第一筆吧！</div>`; }
             else { commentsHtml = comments.map(c => `<div class="chat-bubble"><div class="chat-time">🕒 ${escapeHtml(c.time)}</div><div style="white-space: pre-wrap; line-height: 1.5;">${linkify(c.text)}</div></div>`).join(''); }
 
-            const moveMarker = safeStr(item.col9).trim();
-            const moveMarkerHtml = moveMarker ? `<div style="margin-top:15px; font-size:13px; color:#6a1b9a; background:#f3e5f5; border-left:4px solid #8e24aa; padding:8px 10px; border-radius:4px; white-space:pre-wrap;">${escapeHtml(moveMarker)}</div>` : '';
-
             content.innerHTML = `
                 <div style="margin-bottom:10px;"><span style="background:var(--theme-primary); color:#fff; padding:2px 6px; border-radius:4px; font-size:12px;">${escapeHtml(cat)}</span> <span style="color:#666; font-size:12px;">${escapeHtml(date)}</span></div>
                 <h4 style="margin:0 0 10px 0; font-size:18px; color:#333;">${escapeHtml(title)}</h4>
                 <p style="white-space: pre-wrap; font-size:14px; line-height:1.6; color:#444; border-bottom:1px dashed #ddd; padding-bottom:10px;">${desc}</p>
                 <div style="margin-top:15px; background:#f4f4f4; padding:10px; border-radius:5px;"><strong style="font-size:13px; color:#555;">🔗 相關連結：</strong><br>${linkHtml}</div>
                 ${notes ? `<div style="margin-top:15px; border-left:4px solid #ffb300; padding-left:10px; font-size:14px; white-space:pre-wrap; color:#555;"><strong>💡 初始筆記：</strong><br>${notes}</div>` : ''}
-                ${moveMarkerHtml}
-                <div style="margin-top:15px; text-align:right;"><button class="btn-copy" style="background-color:#8e24aa;" onclick="openMoveCopyModal('${escapeJsAttr(item.id)}')">📤 複製 / 移動到其他分頁</button></div>
                 <div style="margin-top:25px; font-weight:bold; color:var(--theme-dark); font-size:15px; border-bottom:2px solid #eee; padding-bottom:5px;">💬 追蹤留言紀錄 (${comments.length})</div>
                 <div class="chat-container" id="chatContainer_${escapeHtml(item.id)}">${commentsHtml}</div>
                 <div class="chat-input-area"><textarea id="newCommentInput_${escapeHtml(item.id)}" placeholder="⌨️ 輸入新的追蹤心得或留言..."></textarea><button class="btn-add" style="width:100%; text-align:center; padding:10px; font-size:15px; margin:0;" onclick="submitComment('${escapeJsAttr(item.id)}')">🚀 送出留言</button></div>
@@ -1194,10 +1437,6 @@
                 let commentBadge = '';
                 if(comments.length > 0) { commentBadge = `<div style="margin-top:10px; font-size:13px; color:var(--theme-primary); font-weight:bold; background:var(--theme-light); display:inline-block; padding:4px 12px; border-radius:15px; border:1px solid #cce5ff;">💬 ${comments.length} 則追蹤留言</div>`; }
 
-                let moveMarkerHtml = '';
-                const moveMarker = safeStr(data.col9).trim();
-                if (moveMarker !== '') { moveMarkerHtml = `<div style="margin-top:10px; font-size:12.5px; color:#6a1b9a; background:#f3e5f5; border-left:4px solid #8e24aa; padding:8px 10px; border-radius:4px; white-space:pre-wrap;">${escapeHtml(moveMarker)}</div>`; }
-
                 itemDiv.innerHTML = `
                     <div class="timeline-content" onclick="openNewsDetail('${escapeJsAttr(data.id)}')">
                         <div class="timeline-date">${escapeHtml(date)}</div>
@@ -1206,12 +1445,10 @@
                         <div class="text-clamp ${expClass}" onclick="event.stopPropagation()">${content}</div>
                         ${notesHtml}
                         ${commentBadge}
-                        ${moveMarkerHtml}
                         <br><button class="toggle-text-btn" id="toggle-btn-${escapeHtml(data.id)}" onclick="toggleNewsClamp('${escapeJsAttr(data.id)}', event)">${btnText}</button>
                         <div class="timeline-actions" onclick="event.stopPropagation()">
                             <button class="btn-copy" onclick="copyNewsData('${escapeJsAttr(data.id)}', event)">複製</button>
                             <button class="btn-edit" style="background-color: #ffb300; color:white;" onclick="editNewsData('${escapeJsAttr(data.id)}', event)">編輯</button>
-                            <button class="btn-copy" style="background-color: #8e24aa;" onclick="openMoveCopyModal('${escapeJsAttr(data.id)}', event)">📤 複製/移動</button>
                             <button class="btn-delete" style="background-color: #e53935;" onclick="deleteNewsData('${escapeJsAttr(data.id)}', event)">刪除</button>
                         </div>
                     </div>
@@ -1221,10 +1458,10 @@
         }
 
         // ================= 美食功能 =================
-        async function submitFoodData() { const city = document.getElementById('city').value, district = document.getElementById('district').value, address = document.getElementById('address').value, storeName = document.getElementById('storeName').value, category = document.getElementById('category').value, other = document.getElementById('other').value; if (!storeName.trim()) return alert('店名為必填！'); const payload = { sheetName: '美食紀錄', id: editingFoodId || Date.now(), action: editingFoodId ? 'edit' : 'add', city, district, address, storeName, category, other }; const fullText = `${city} ${district} ${address} ${storeName} ${category} ${other}`.toLowerCase(); if (editingFoodId) { const idx = foodDataList.findIndex(d => String(d.id) === String(editingFoodId)); if (idx > -1) foodDataList[idx] = { ...payload, fullText }; } else { foodDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelFoodEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
+        async function submitFoodData() { const city = document.getElementById('city').value, district = document.getElementById('district').value, address = document.getElementById('address').value, storeName = document.getElementById('storeName').value, category = document.getElementById('category').value, other = document.getElementById('other').value; if (!storeName.trim()) return alert('店名為必填！'); const payload = { sheetName: PAGE_CONFIG.foodPage.sheet, id: editingFoodId || newId(), action: editingFoodId ? 'edit' : 'add', city, district, address, storeName, category, other }; const fullText = `${city} ${district} ${address} ${storeName} ${category} ${other}`.toLowerCase(); if (editingFoodId) { const idx = foodDataList.findIndex(d => String(d.id) === String(editingFoodId)); if (idx > -1) foodDataList[idx] = { ...payload, fullText }; } else { foodDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelFoodEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改美食紀錄' : '新增美食紀錄' }); }
         function copyFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('city', item.city); safeSet('district', item.district); safeSet('address', item.address); safeSet('storeName', item.storeName); safeSet('category', item.category); safeSet('other', item.other); editingFoodId = null; safeText('foodFormTitle', '新增美食店家 (複製現有)'); safeText('submitFoodBtn', '新增資料'); safeClass('submitFoodBtn', 'btn-add'); safeDisplay('cancelFoodBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function editFoodData(id) { const item = foodDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('city', item.city); safeSet('district', item.district); safeSet('address', item.address); safeSet('storeName', item.storeName); safeSet('category', item.category); safeSet('other', item.other); editingFoodId = id; safeText('foodFormTitle', '編輯美食資料'); safeText('submitFoodBtn', '儲存修改'); safeClass('submitFoodBtn', 'btn-edit'); safeDisplay('cancelFoodBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function deleteFoodData(id) { if (!confirm('確定刪除此美食紀錄？')) return; foodDataList = foodDataList.filter(d => String(d.id) !== String(id)); renderFoodTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '美食紀錄' }) }); }
+        function deleteFoodData(id) { if (!confirm('確定刪除此美食紀錄？')) return; foodDataList = foodDataList.filter(d => String(d.id) !== String(id)); renderFoodTable(); queuedPost({ id: id, action: 'delete', sheetName: PAGE_CONFIG.foodPage.sheet }, { label: '刪除美食紀錄' }); }
         function addFilterKeyword() { handleFilterInput('filterInput', filterKeywords, renderFoodTable, renderKw); }
         function removeKeyword(kw) { filterKeywords = filterKeywords.filter(k => k !== kw); renderKw(); renderFoodTable(); }
         function renderKw() { const c = document.getElementById('keywordContainer'); if(c) { c.innerHTML = ''; filterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${escapeHtml(kw)} <span onclick="removeKeyword('${escapeJsAttr(kw)}')">✖</span></div>`; }); } }
@@ -1239,10 +1476,10 @@
         }
 
         // ================= 運動功能 =================
-        async function submitSportsData() { const date = document.getElementById('sportDate').value, type = document.getElementById('sportType').value, distance = document.getElementById('sportDistance').value, notes = document.getElementById('sportNotes').value; if (!date) return alert('請選擇日期！'); const payload = { sheetName: '運動紀錄', id: editingSportsId || Date.now(), action: editingSportsId ? 'edit' : 'add', date, type, distance: distance || '-', notes: notes || '-' }; if (editingSportsId) { const idx = sportsDataList.findIndex(d => String(d.id) === String(editingSportsId)); if (idx > -1) sportsDataList[idx] = payload; } else { sportsDataList.push(payload); } applyGlobalMultiSort(); cancelSportsEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
+        async function submitSportsData() { const date = document.getElementById('sportDate').value, type = document.getElementById('sportType').value, distance = document.getElementById('sportDistance').value, notes = document.getElementById('sportNotes').value; if (!date) return alert('請選擇日期！'); const payload = { sheetName: PAGE_CONFIG.sportsPage.sheet, id: editingSportsId || newId(), action: editingSportsId ? 'edit' : 'add', date, type, distance: distance || '-', notes: notes || '-' }; if (editingSportsId) { const idx = sportsDataList.findIndex(d => String(d.id) === String(editingSportsId)); if (idx > -1) sportsDataList[idx] = payload; } else { sportsDataList.push(payload); } applyGlobalMultiSort(); cancelSportsEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改運動紀錄' : '新增運動紀錄' }); }
         function copySportsData(id) { const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('sportDate', formatDate(item.date)); safeSet('sportType', item.type || '跑步'); safeSet('sportDistance', item.distance === '-' ? '' : item.distance); safeSet('sportNotes', item.notes === '-' ? '' : item.notes); editingSportsId = null; safeText('sportsFormTitle', '新增運動紀錄 (複製現有)'); safeText('submitSportsBtn', '新增紀錄'); safeClass('submitSportsBtn', 'btn-add'); safeDisplay('cancelSportsBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function editSportsData(id) { const item = sportsDataList.find(d => String(d.id) === String(id)); if (!item) return; safeSet('sportDate', formatDate(item.date)); safeSet('sportType', item.type || '跑步'); safeSet('sportDistance', item.distance === '-' ? '' : item.distance); safeSet('sportNotes', item.notes === '-' ? '' : item.notes); editingSportsId = id; safeText('sportsFormTitle', '編輯運動紀錄'); safeText('submitSportsBtn', '儲存修改'); safeClass('submitSportsBtn', 'btn-edit'); safeDisplay('cancelSportsBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function deleteSportsData(id) { if (!confirm('確定刪除此運動紀錄？')) return; sportsDataList = sportsDataList.filter(d => String(d.id) !== String(id)); renderSportsTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '運動紀錄' }) }); }
+        function deleteSportsData(id) { if (!confirm('確定刪除此運動紀錄？')) return; sportsDataList = sportsDataList.filter(d => String(d.id) !== String(id)); renderSportsTable(); queuedPost({ id: id, action: 'delete', sheetName: PAGE_CONFIG.sportsPage.sheet }, { label: '刪除運動紀錄' }); }
         function renderSportsTable() {
             const tbody = document.getElementById('sportsTableBody'); if(!tbody) return; tbody.innerHTML = '';
             sportsDataList.forEach(data => {
@@ -1269,7 +1506,7 @@
                 const cols = [tr.querySelector('.b-col1').value, tr.querySelector('.b-col2').value.trim(), tr.querySelector('.b-col3').value, tr.querySelector('.b-col4').value, tr.querySelector('.b-col5').value, tr.querySelector('.b-col6').value, tr.querySelector('.b-col7').value];
                 if (cols[1]) {
                     let existingItem = travelDataList.find(d => String(d.col2).trim() === cols[1]);
-                    let item = { sheetName: '擴充預留網頁7', id: existingItem ? existingItem.id : (Date.now() + Math.floor(Math.random() * 10000)), action: existingItem ? 'edit' : 'add', col8: '', col9: '', col10: '' };
+                    let item = { sheetName: PAGE_CONFIG.travelPage.sheet, id: existingItem ? existingItem.id : newId(), action: existingItem ? 'edit' : 'add', col8: '', col9: '', col10: '' };
                     for(let i=1; i<=7; i++) { let pasteVal = cols[i-1]; if (existingItem && pasteVal.trim() === '') { item[`col${i}`] = existingItem[`col${i}`]; } else { item[`col${i}`] = pasteVal; } }
                     newItems.push(item);
                 }
@@ -1279,11 +1516,12 @@
             toggleLoading(true, `多筆處理中... (0/${newItems.length})`); let successCount = 0;
             for (let i = 0; i < newItems.length; i++) {
                 const item = newItems[i];
-                try {
-                    const fullText = Object.values(item).join(' ').toLowerCase(); const idx = travelDataList.findIndex(d => String(d.id) === String(item.id));
-                    if (idx > -1) travelDataList[idx] = { ...item, fullText }; else travelDataList.push({ ...item, fullText });
-                    await fetch(API_URL, { method: 'POST', body: JSON.stringify(item) }); successCount++; toggleLoading(true, `多筆處理中... (${successCount}/${newItems.length})`);
-                } catch (e) { console.error(e); }
+                const fullText = buildFullText(item, { cols: 7 });
+                const idx = travelDataList.findIndex(d => String(d.id) === String(item.id));
+                if (idx > -1) travelDataList[idx] = { ...item, fullText }; else travelDataList.push({ ...item, fullText });
+                const r = await queuedPost(item, { label: '旅遊批次匯入' });
+                if (r.ok) successCount++;
+                toggleLoading(true, `多筆處理中... (${successCount}/${newItems.length})`);
             }
             renderTravelBatchRows(3); toggleLoading(false); 
             const rd = document.querySelector('input[name="travelAddMode"][value="single"]'); if(rd) { rd.checked = true; toggleTravelAddMode(); }
@@ -1294,18 +1532,18 @@
             if (!nameInput) return alert('名稱 (col2) 為必填，才能進行儲存或合併！');
             let isEdit = editingTravelId !== null; let targetId = editingTravelId; let existingItem = null;
             if (!isEdit) { existingItem = travelDataList.find(d => String(d.col2).trim() === nameInput); if (existingItem) { targetId = existingItem.id; isEdit = true; } } else { existingItem = travelDataList.find(d => String(d.id) === String(targetId)); }
-            const payload = { sheetName: '擴充預留網頁7', id: targetId || Date.now(), action: isEdit ? 'edit' : 'add', col8: '', col9: '', col10: '' };
+            const payload = { sheetName: PAGE_CONFIG.travelPage.sheet, id: targetId || newId(), action: isEdit ? 'edit' : 'add', col8: '', col9: '', col10: '' };
             for(let i=1; i<=7; i++) { 
                 let tEl = document.getElementById(`travelCol${i}`); let formVal = tEl ? tEl.value : ''; 
                 if (!editingTravelId && existingItem && formVal.trim() === '') { payload[`col${i}`] = existingItem[`col${i}`]; } else { payload[`col${i}`] = formVal; } 
             }
-            const fullText = Object.values(payload).join(' ').toLowerCase();
+            const fullText = buildFullText(payload, { cols: 7 });
             if (isEdit) { const idx = travelDataList.findIndex(d => String(d.id) === String(targetId)); if (idx > -1) travelDataList[idx] = { ...payload, fullText }; } else { travelDataList.push({ ...payload, fullText }); }
-            applyGlobalMultiSort(); cancelTravelEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+            applyGlobalMultiSort(); cancelTravelEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改/合併旅遊筆記' : '新增旅遊筆記' });
         }
         function copyTravelData(id) { const item = travelDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=7; i++) { safeSet(`travelCol${i}`, safeStr(item[`col${i}`])); } editingTravelId = null; safeText('travelFormTitle', '新增旅遊筆記 (複製現有)'); safeText('submitTravelBtn', '儲存/合併筆記'); safeClass('submitTravelBtn', 'btn-add'); safeDisplay('cancelTravelBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function editTravelData(id) { const item = travelDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=7; i++) { safeSet(`travelCol${i}`, safeStr(item[`col${i}`])); } editingTravelId = id; safeText('travelFormTitle', '編輯旅遊筆記'); safeText('submitTravelBtn', '儲存修改'); safeClass('submitTravelBtn', 'btn-edit'); safeDisplay('cancelTravelBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function deleteTravelData(id) { if (!confirm('確定刪除此筆記？')) return; travelDataList = travelDataList.filter(d => String(d.id) !== String(id)); renderTravelTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁7' }) }); }
+        function deleteTravelData(id) { if (!confirm('確定刪除此筆記？')) return; travelDataList = travelDataList.filter(d => String(d.id) !== String(id)); renderTravelTable(); queuedPost({ id: id, action: 'delete', sheetName: PAGE_CONFIG.travelPage.sheet }, { label: '刪除旅遊筆記' }); }
         
         function addTravelFilterKeyword() { handleFilterInput('travelFilterInput', travelFilterKeywords, renderTravelTable, renderTravelKw); }
         function removeTravelKeyword(kw) { travelFilterKeywords = travelFilterKeywords.filter(k => k !== kw); renderTravelKw(); renderTravelTable(); }
@@ -1326,10 +1564,10 @@
         }
 
         // ================= 綜合筆記 (擴充1) =================
-        async function submitNoteData() { const payload = { sheetName: '擴充預留網頁1', id: editingNoteId || Date.now(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`noteCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
+        async function submitNoteData() { const payload = { sheetName: PAGE_CONFIG.notePage.sheet, id: editingNoteId || newId(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`noteCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = buildFullText(payload, { cols: 10 }); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改綜合筆記' : '新增綜合筆記' }); }
         function copyNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = null; safeText('noteFormTitle', '新增筆記 / 事件 (複製現有)'); safeText('submitNoteBtn', '儲存筆記'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function editNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = id; safeText('noteFormTitle', '編輯筆記 / 事件'); safeText('submitNoteBtn', '儲存修改'); safeClass('submitNoteBtn', 'btn-edit'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function deleteNoteData(id) { if (!confirm('確定刪除此筆記？')) return; noteDataList = noteDataList.filter(d => String(d.id) !== String(id)); renderNoteTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: '擴充預留網頁1' }) }); }
+        function deleteNoteData(id) { if (!confirm('確定刪除此筆記？')) return; noteDataList = noteDataList.filter(d => String(d.id) !== String(id)); renderNoteTable(); queuedPost({ id: id, action: 'delete', sheetName: PAGE_CONFIG.notePage.sheet }, { label: '刪除綜合筆記' }); }
         
         function addNoteFilterKeyword() { handleFilterInput('noteFilterInput', noteFilterKeywords, renderNoteTable, renderNoteKw); }
         function removeNoteKeyword(kw) { noteFilterKeywords = noteFilterKeywords.filter(k => k !== kw); renderNoteKw(); renderNoteTable(); }
@@ -1347,25 +1585,265 @@
         }
 
         // ================= 一般表格紀錄模組 (擴充 2,3,4,6) =================
-        async function submitGenericData() { const payload = { sheetName: currentPageName, id: editingGenericId || Date.now(), action: editingGenericId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`genCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = Object.values(payload).join(' ').toLowerCase(); if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = { ...payload, fullText }; } else { genericDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelGenericEdit(); fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); }
-        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } editingGenericId = null; const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料'; safeText('genericFormTitle', `新增 ${configName} 資料 (複製現有)`); safeText('submitGenericBtn', '新增資料'); safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        async function submitGenericData() { const payload = { sheetName: currentPageName, id: editingGenericId || newId(), action: editingGenericId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`genCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = buildFullText(payload, { cols: 10 }); if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = { ...payload, fullText }; } else { genericDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelGenericEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改擴充資料' : '新增擴充資料' }); }
+        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } const __cfg = PAGE_CONFIG[currentPageId] || {}; if (__cfg.viewMode === 'card') { safeSet(`genCol${__cfg.countCol || 7}`, ''); safeSet(`genCol${__cfg.lastOpenCol || 8}`, ''); } editingGenericId = null; const configName = __cfg.name || '資料'; safeText('genericFormTitle', `新增 ${configName} 資料 (複製現有)`); safeText('submitGenericBtn', '新增資料'); safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } editingGenericId = id; const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料'; safeText('genericFormTitle', `編輯 ${configName} 資料`); safeText('submitGenericBtn', '儲存修改'); safeClass('submitGenericBtn', 'btn-edit'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function deleteGenericData(id) { if (!confirm('確定刪除此筆資料？')) return; genericDataList = genericDataList.filter(d => String(d.id) !== String(id)); renderGenericTable(); fetch(API_URL, { method: 'POST', body: JSON.stringify({ id: id, action: 'delete', sheetName: currentPageName }) }); }
+        function deleteGenericData(id) { if (!confirm('確定刪除此筆資料？')) return; genericDataList = genericDataList.filter(d => String(d.id) !== String(id)); renderGenericTable(); queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除擴充資料' }); }
         
         function addGenericFilterKeyword() { handleFilterInput('genericFilterInput', genericFilterKeywords, renderGenericTable, renderGenericKw); }
         function removeGenericKeyword(kw) { genericFilterKeywords = genericFilterKeywords.filter(k => k !== kw); renderGenericKw(); renderGenericTable(); }
         function renderGenericKw() { const c = document.getElementById('genericKeywordContainer'); if(c){ c.innerHTML = ''; genericFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${escapeHtml(kw)} <span onclick="removeGenericKeyword('${escapeJsAttr(kw)}')">✖</span></div>`; }); } }
         
         function renderGenericTable() {
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            // v1.05：連結(3) 之類的 viewMode:'card' 頁面改走卡片渲染
+            if (cfg.viewMode === 'card') { renderGenericCards(cfg); return; }
+
+            safeDisplay('genericCardContainer', 'none');
+            safeDisplay('genericTableWrap', '');
+            safeDisplay('genericColToggle', '');
+
             const tbody = document.getElementById('genericTableBody'); if(!tbody) return; tbody.innerHTML = '';
             genericDataList.forEach(data => {
                 if (genericFilterKeywords.length > 0 && !genericFilterKeywords.every(kw => data.fullText.includes(kw))) return;
                 const tr = document.createElement('tr'); let colsHtml = '';
-                for(let i=1; i<=10; i++) { 
-                    let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); 
-                    if (currentPageName === '擴充預留網頁4' && i === 8 && val.trim() !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val.trim())}`; colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 ${escapeHtml(val)}</a></div></td>`; } else { colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell">${escapeHtml(val)}</div></td>`; }
+                for(let i=1; i<=10; i++) {
+                    let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val);
+                    const __mapCol = cfg.mapCol || null;
+                    if (__mapCol === i && val.trim() !== '') { const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val.trim())}`; colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell"><a href="${mapUrl}" target="_blank" class="map-link">📍 ${escapeHtml(val)}</a></div></td>`; } else { colsHtml += `<td data-label="欄位 ${i}"><div class="resizable-cell">${escapeHtml(val)}</div></td>`; }
                 }
                 tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyGenericData('${escapeJsAttr(data.id)}')">複製</button><button class="btn-edit" onclick="editGenericData('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteGenericData('${escapeJsAttr(data.id)}')">刪除</button></td>`; tbody.appendChild(tr);
+            });
+        }
+
+        // ================= 🔗 v1.05：連結卡片模組 =================
+        // 卡片大小 / 顏色由「開啟次數」決定：
+        //   - 每累積 256 次開啟 → 進一個色階（對應需求的「255 / 511 / 767 …」分段）
+        //   - 顏色由最淺到最深（HSL 明度 92% → 26%），色相由 id 決定一個穩定值（「任意搭配」）
+        //   - 次數越多，卡片寬度 / 字級越大（上限約 1.8 倍）
+        function linkCardStyle(count, id) {
+            count = Math.max(0, parseInt(count, 10) || 0);
+            const bracket = Math.floor(count / 256);            // 0,1,2,... 每 256 次一階
+            const within  = (count % 256) / 256;                // 該階內進度 0..1
+            const STEPS   = 7;                                  // 最深約 7 階
+            const depth   = Math.min(1, (Math.min(bracket, STEPS - 1) + within) / STEPS); // 單調遞增 0..1
+            const light   = 92 - depth * 66;                    // 92% → 26%
+            let h = 0; const s = String(id || '');
+            for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            const hue = h % 360;
+            const bg = `hsl(${hue}, 55%, ${light.toFixed(1)}%)`;
+            const fg = light < 52 ? '#ffffff' : '#222222';
+            // 卡片大小同樣以 256 為級距成長（每一階 +0.16 倍，約上限 2 倍）
+            const scale = 1 + Math.min(bracket, 5) * 0.16 + within * 0.16;
+            return { bg, fg, scale, bracket, depth };
+        }
+
+        // 與 linkify 類似，但連結被點擊時會呼叫 linkCardOpen 計數
+        function linkifyCount(text, id) {
+            let escaped = escapeHtml(text);
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return escaped.replace(urlRegex, function(url) {
+                return `<a href="${url}" target="_blank" rel="noopener" onclick="linkCardOpen('${escapeJsAttr(id)}', event)">${url}</a>`;
+            });
+        }
+
+        // 把整筆連結資料（col1~col10）以 upsert edit 同步回後端（走既有佇列/重試/離線補送）
+        function persistLinkRecord(item, label) {
+            item.fullText = buildFullText(item, { cols: 10 });
+            const payload = { sheetName: currentPageName, id: item.id, action: 'edit' };
+            for (let i = 1; i <= 10; i++) payload['col' + i] = safeStr(item['col' + i]);
+            queuedPost(payload, { label: label || '更新連結資料' });
+        }
+        function reRenderCardsSoon() {
+            setTimeout(() => { if ((PAGE_CONFIG[currentPageId] || {}).viewMode === 'card') renderGenericTable(); }, 60);
+        }
+
+        // 連結真的被點開 → 次數 +1、記錄今天日期、卡片即時變大變深、同步後端
+        function linkCardOpen(id, event) {
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const countCol = 'col' + (cfg.countCol || 7);
+            const lastCol  = 'col' + (cfg.lastOpenCol || 8);
+            const item = genericDataList.find(d => String(d.id) === String(id));
+            if (!item) return;   // 找不到就讓連結照常開新分頁，不做事
+            item[countCol] = String((parseInt(safeStr(item[countCol]), 10) || 0) + 1);
+            item[lastCol]  = new Date().toISOString().split('T')[0];
+            reRenderCardsSoon();
+            persistLinkRecord(item, '連結開啟計數');
+        }
+
+        // ---- v1.08：卡片子項目（帳號內容） ----
+        function subColKey(cfg) { return 'col' + ((cfg && cfg.subCol) || 10); }
+        function subParse(item, cfg) {
+            try { const a = JSON.parse(safeStr(item[subColKey(cfg)]) || '[]'); return Array.isArray(a) ? a : []; }
+            catch (e) { return []; }
+        }
+        function linkSubToggle(id) {
+            id = String(id);
+            if (expandedLinkCards.has(id)) expandedLinkCards.delete(id); else expandedLinkCards.add(id);
+            renderGenericTable();
+        }
+        function linkSubAdd(id) {
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            const gv = pid => { const el = document.getElementById(pid + id); return el ? el.value.trim() : ''; };
+            const cat = gv('subCat_'), url = gv('subUrl_'), topic = gv('subTopic_');
+            if (!cat && !url && !topic) return alert('請至少填一個欄位（分類 / 連結 / 主題）');
+            const now = new Date(); const pad = n => String(n).padStart(2, '0');
+            const arr = subParse(item, cfg);
+            arr.push({
+                sid: newId(), cat: cat, url: url, topic: topic, cnt: 0, last: '',
+                time: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`
+            });
+            item[subColKey(cfg)] = JSON.stringify(arr);
+            expandedLinkCards.add(String(id));
+            renderGenericTable();
+            persistLinkRecord(item, '新增帳號內容');
+        }
+        function linkSubDelete(id, sid) {
+            if (!confirm('刪除這一筆帳號內容？')) return;
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            item[subColKey(cfg)] = JSON.stringify(subParse(item, cfg).filter(s => String(s.sid) !== String(sid)));
+            renderGenericTable();
+            persistLinkRecord(item, '刪除帳號內容');
+        }
+        function linkSubOpen(id, sid, event) {
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            const arr = subParse(item, cfg);
+            const s = arr.find(x => String(x.sid) === String(sid)); if (!s) return;
+            s.cnt = (parseInt(s.cnt, 10) || 0) + 1;
+            s.last = new Date().toISOString().split('T')[0];
+            item[subColKey(cfg)] = JSON.stringify(arr);
+            reRenderCardsSoon();
+            persistLinkRecord(item, '帳號內容連結計數');
+        }
+        function buildSubPanel(data, cfg) {
+            const id = data.id;
+            const subs = subParse(data, cfg);
+            let itemsHtml = subs.map(function (s) {
+                const url = safeStr(s.url).trim();
+                const href = /^https?:\/\//i.test(url) ? url : ('http://' + url);
+                const linkHtml = url
+                    ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener" onclick="linkSubOpen('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}', event)">${escapeHtml(url)}</a>`
+                    : '<span style="opacity:.5;">（無連結）</span>';
+                return `<div class="lc-sub-item">
+                    <div class="lc-sub-line"><b>${escapeHtml(s.cat || '未分類')}</b>${s.topic ? ' — ' + escapeHtml(s.topic) : ''}</div>
+                    <div class="lc-sub-line">${linkHtml}</div>
+                    <div class="lc-sub-foot">🔗 ${parseInt(s.cnt, 10) || 0} 次 · 上次 ${s.last ? escapeHtml(s.last) : '—'} · 建立 ${escapeHtml(s.time || '')}
+                        <button class="btn-delete" style="padding:2px 7px; font-size:11px; margin-left:6px;" onclick="linkSubDelete('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}')">刪</button>
+                    </div>
+                </div>`;
+            }).join('');
+            if (!itemsHtml) itemsHtml = `<div style="opacity:.6; padding:6px 0;">還沒有帳號內容，用下面的欄位新增。</div>`;
+            return `<div class="lc-subpanel" onclick="event.stopPropagation()">
+                <div class="lc-sub-list">${itemsHtml}</div>
+                <div class="lc-sub-add">
+                    <input id="subCat_${escapeHtml(id)}" placeholder="分類" onkeypress="if(event.key==='Enter') linkSubAdd('${escapeJsAttr(id)}')">
+                    <input id="subUrl_${escapeHtml(id)}" placeholder="連結" onkeypress="if(event.key==='Enter') linkSubAdd('${escapeJsAttr(id)}')">
+                    <input id="subTopic_${escapeHtml(id)}" placeholder="主題" onkeypress="if(event.key==='Enter') linkSubAdd('${escapeJsAttr(id)}')">
+                    <button class="btn-add" style="padding:4px 10px; font-size:12px;" onclick="linkSubAdd('${escapeJsAttr(id)}')">新增</button>
+                </div>
+            </div>`;
+        }
+
+        function renderGenericCards(cfg) {
+            const box = document.getElementById('genericCardContainer'); if (!box) return;
+            safeDisplay('genericTableWrap', 'none');
+            safeDisplay('genericColToggle', 'none');
+            box.style.display = 'flex';
+            box.innerHTML = '';
+
+            const fields    = cfg.cardFields || [2, 3, 4, 5, 6];
+            const dateField = cfg.dateField || null;
+            const groupField = cfg.groupField || null;   // v1.06：分組欄位（連結3 = 欄位3）
+            const countCol  = 'col' + (cfg.countCol || 7);
+            const lastCol   = 'col' + (cfg.lastOpenCol || 8);
+            const cnt = d => Math.max(0, parseInt(safeStr(d[countCol]), 10) || 0);
+
+            // 1) 套用關鍵字過濾
+            const rows = genericDataList.filter(d =>
+                genericFilterKeywords.length === 0 || genericFilterKeywords.every(kw => d.fullText.includes(kw)));
+            if (rows.length === 0) { box.innerHTML = `<div style="color:#888; padding:20px;">沒有符合條件的連結。</div>`; return; }
+
+            // 2) 依 groupField 分組（沒設 groupField 就當成單一群組）
+            const groups = new Map();
+            rows.forEach(d => {
+                const k = groupField ? (safeStr(d['col' + groupField]).trim() || '(未分類)') : '__all__';
+                if (!groups.has(k)) groups.set(k, []);
+                groups.get(k).push(d);
+            });
+            // 3) 群組內：開啟次數降冪
+            groups.forEach(arr => arr.sort((a, b) => cnt(b) - cnt(a)));
+            // 4) 群組間：以該組最高開啟次數降冪（同分照組名 a→z）
+            const ordered = [...groups.entries()].sort((A, B) => {
+                const mb = Math.max.apply(null, B[1].map(cnt));
+                const ma = Math.max.apply(null, A[1].map(cnt));
+                if (mb !== ma) return mb - ma;
+                return A[0] < B[0] ? -1 : (A[0] > B[0] ? 1 : 0);
+            });
+
+            // 5) 渲染
+            ordered.forEach(function (entry) {
+                const groupKey = entry[0], arr = entry[1];
+                if (groupField) {
+                    const head = document.createElement('div');
+                    head.className = 'lc-group-head';
+                    head.innerHTML = `📁 ${escapeHtml(groupKey)} <span>(${arr.length})</span>`;
+                    box.appendChild(head);
+                }
+                arr.forEach(function (data) {
+                    const count    = cnt(data);
+                    const lastOpen = formatDate(safeStr(data[lastCol])).trim();
+                    const dateVal  = dateField ? formatDate(safeStr(data['col' + dateField])).trim() : '';
+                    const st       = linkCardStyle(count, data.id);
+
+                    let titleHtml = '', rowsHtml = '', first = true;
+                    fields.forEach(function (n) {
+                        if (n === dateField || n === groupField) return; // 日期→footer；分組欄→群組標題
+                        let v = safeStr(data['col' + n]); if (n === 2) v = formatDate(v);
+                        if (!v.trim()) return;
+                        const html = linkifyCount(v, data.id);
+                        if (first) { titleHtml = `<div class="lc-title">${html}</div>`; first = false; }
+                        else {
+                            const lb = (cfg.fieldLabels && cfg.fieldLabels[n]) ? `<span style="opacity:.6; font-size:.85em;">${escapeHtml(cfg.fieldLabels[n])}：</span>` : '';
+                            rowsHtml += `<div class="lc-row">${lb}${html}</div>`;
+                        }
+                    });
+                    if (!titleHtml) titleHtml = `<div class="lc-title" style="opacity:.5;">(無內容)</div>`;
+
+                    // v1.08：子項目（帳號內容）展開列 + 面板
+                    const subs = cfg.subCol ? subParse(data, cfg) : null;
+                    const isExpanded = !!(cfg.subCol && expandedLinkCards.has(String(data.id)));
+                    const subToggleHtml = cfg.subCol
+                        ? `<div class="lc-subtoggle" onclick="linkSubToggle('${escapeJsAttr(data.id)}')">${isExpanded ? '▾' : '▸'} 帳號內容 (${subs.length})</div>`
+                        : '';
+                    const subPanelHtml = isExpanded ? buildSubPanel(data, cfg) : '';
+
+                    const metaBorder = (st.fg === '#ffffff') ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.2)';
+                    const card = document.createElement('div');
+                    card.className = 'link-card';
+                    card.style.background = st.bg;
+                    card.style.color = st.fg;
+                    card.style.width = (isExpanded ? Math.max(360, Math.round(300 * st.scale)) : Math.round(300 * st.scale)) + 'px';
+                    card.style.fontSize = st.scale.toFixed(2) + 'em';
+                    card.innerHTML = `
+                        ${titleHtml}
+                        ${rowsHtml}
+                        ${subToggleHtml}
+                        ${subPanelHtml}
+                        <div class="lc-meta" style="border-color:${metaBorder};">
+                            ${dateVal ? `<span>📅 ${escapeHtml(dateVal)}</span>` : ''}
+                            <span class="lc-count">🔗 開啟 ${count} 次</span>
+                            <span>上次開啟：${lastOpen ? escapeHtml(lastOpen) : '—'}</span>
+                            <span class="lc-actions" style="margin-left:auto;">
+                                <button class="btn-copy" style="padding:3px 8px; font-size:12px;" onclick="copyGenericData('${escapeJsAttr(data.id)}')">複製</button>
+                                <button class="btn-edit" style="padding:3px 8px; font-size:12px;" onclick="editGenericData('${escapeJsAttr(data.id)}')">編輯</button>
+                                <button class="btn-delete" style="padding:3px 8px; font-size:12px;" onclick="deleteGenericData('${escapeJsAttr(data.id)}')">刪除</button>
+                            </span>
+                        </div>`;
+                    box.appendChild(card);
+                });
             });
         }
     </script>
