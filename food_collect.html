@@ -206,6 +206,18 @@
         .link-card .lc-sub-foot { margin-top: 4px; font-size: 11px; color: #666; }
         .link-card .lc-sub-add { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
         .link-card .lc-sub-add input { flex: 1 1 90px; min-width: 0; padding: 5px 7px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-family: inherit; background: #fff; color: #222; }
+        /* v1.09：減重紀錄卡片 */
+        .note-card { background: #fff; color: #222; border-left: 5px solid var(--theme-primary); width: 320px; }
+        .note-card .lc-title { font-size: 16px; color: var(--theme-dark); }
+        .note-card .nc-field { margin: 4px 0; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+        .note-card .nc-label { font-weight: bold; opacity: .55; margin-right: 6px; font-size: .82em; }
+        .note-card .nc-collapse-btn { background: none; border: none; color: var(--theme-primary); cursor: pointer; font-size: 12px; padding: 0; margin-left: 6px; font-weight: bold; }
+        .note-card .nc-collapse-btn:hover { text-decoration: underline; }
+        /* v1.10：運動明細（多筆：項目 / 時間或重量 / 組數） */
+        .note-card .nc-ex-item { display: block; margin: 2px 0; }
+        .note-card .nc-ex-del { background: none; border: 1px solid #d11; color: #d11; border-radius: 4px; font-size: 10px; padding: 0 5px; margin-left: 6px; cursor: pointer; }
+        .note-card .nc-ex-add { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+        .note-card .nc-ex-add input { flex: 1 1 80px; min-width: 0; padding: 5px 7px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-family: inherit; background: #fff; color: #222; }
         @media screen and (max-width: 768px) { .link-card { width: 100% !important; } }
     </style>
 </head>
@@ -443,25 +455,36 @@
 
     <div id="notePage" class="app-page" style="display: none;">
         <div class="section">
-            <h2 id="noteFormTitle">新增筆記 / 事件</h2>
-            <div class="form-group"><label>流水號 (col1)</label><input type="text" id="noteCol1" placeholder="例如：001"></div><div class="form-group"><label>日期 (col2)</label><input type="date" id="noteCol2"></div><div class="form-group"><label>分類 (col3)</label><input type="text" id="noteCol3"></div><div class="form-group"><label>內容 (col4)</label><textarea id="noteCol4" rows="3" style="width: 250px;"></textarea></div>
-            <script>for(let i=5; i<=10; i++) document.write(`<div class="form-group"><label>保留欄位 ${i}</label><textarea id="noteCol${i}" rows="2"></textarea></div>`);</script>
-            <div style="margin-top: 10px;"><button id="submitNoteBtn" class="btn-add" onclick="submitNoteData()">儲存筆記</button><button id="cancelNoteBtn" class="btn-cancel" onclick="cancelNoteEdit()">取消編輯</button></div>
+            <h2 id="noteFormTitle">新增減重紀錄</h2>
+            <!-- v1.09：筆記(1) 改作減重紀錄；欄位語意見下方 label -->
+            <div class="form-group"><label>天數 / 第幾天 (col1)</label><input type="text" id="noteCol1" placeholder="例如：1"></div>
+            <div class="form-group"><label>日期 (col2)</label><input type="date" id="noteCol2"></div>
+            <div class="form-group"><label>早餐 (col3)</label><textarea id="noteCol3" rows="2"></textarea></div>
+            <div class="form-group"><label>中餐 (col4)</label><textarea id="noteCol4" rows="2"></textarea></div>
+            <div class="form-group"><label>晚餐 (col5)</label><textarea id="noteCol5" rows="2"></textarea></div>
+            <div class="form-group"><label>下午茶 (col6)</label><textarea id="noteCol6" rows="2"></textarea></div>
+            <div class="form-group"><label>宵夜 (col7)</label><textarea id="noteCol7" rows="2"></textarea></div>
+            <div class="form-group" style="display:none;"><label>運動項目 (col8, 已改為卡片上的「運動明細」)</label><textarea id="noteCol8" rows="2"></textarea></div>
+            <div class="form-group"><label>心得 (col9)</label><textarea id="noteCol9" rows="3" style="width: 260px;"></textarea></div>
+            <div class="form-group" style="display:none;"><label>欄位10 (col10)</label><textarea id="noteCol10" rows="2"></textarea></div>
+            <div style="margin-top: 10px;"><button id="submitNoteBtn" class="btn-add" onclick="submitNoteData()">儲存紀錄</button><button id="cancelNoteBtn" class="btn-cancel" onclick="cancelNoteEdit()">取消編輯</button></div>
         </div>
         <div class="section">
-            <h2>筆記總覽</h2>
+            <h2>減重紀錄總覽</h2>
             <div style="margin-bottom: 15px;"><input type="text" id="noteFilterInput" placeholder="可用空白分隔多關鍵字" onkeypress="if(event.key === 'Enter') addNoteFilterKeyword()"><button class="btn-filter" onclick="addNoteFilterKeyword()">新增過濾條件</button><div class="keyword-tags" id="noteKeywordContainer"></div></div>
-            <div class="col-toggle-box">
+            <div class="col-toggle-box" id="noteColToggle">
                 <span class="theme-text" style="font-weight:bold;">👁️ 顯示欄位：</span>
                 <label><input type="checkbox" checked onchange="toggleCol('noteTable', 1, this)">流水號</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 2, this)">日期</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 3, this)">分類</label><label><input type="checkbox" checked onchange="toggleCol('noteTable', 4, this)">內容</label>
                 <script>for(let i=5; i<=10; i++){ document.write(`<label><input type="checkbox" checked onchange="toggleCol('noteTable', ${i}, this)">欄位 ${i}</label>`); }</script>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive" id="noteTableWrap">
                 <table id="noteTable">
                     <thead><tr><th onclick="handleHeaderSort('col1')">流水號 ↕</th><th onclick="handleHeaderSort('col2')">日期 ↕</th><th onclick="handleHeaderSort('col3')">分類 ↕</th><th onclick="handleHeaderSort('col4')">內容 ↕</th><th onclick="handleHeaderSort('col5')">欄位5 ↕</th><th onclick="handleHeaderSort('col6')">欄位6 ↕</th><th onclick="handleHeaderSort('col7')">欄位7 ↕</th><th onclick="handleHeaderSort('col8')">欄位8 ↕</th><th onclick="handleHeaderSort('col9')">欄位9 ↕</th><th onclick="handleHeaderSort('col10')">欄位10 ↕</th><th>操作</th></tr></thead>
                     <tbody id="noteTableBody"></tbody>
                 </table>
             </div>
+            <!-- v1.09：減重紀錄卡片容器 -->
+            <div id="noteCardContainer" class="link-card-grid" style="display:none;"></div>
         </div>
     </div>
 
@@ -731,7 +754,7 @@
             'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', label: '🏃‍♂️ 運動紀錄', type: 'sports',   color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
             'travelPage': { sheet: '擴充預留網頁7', name: '旅遊行程筆記', label: '✈️ 旅遊(7)', type: 'travel',   color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
             'newsPage':   { sheet: '擴充預留網頁5', name: '時事焦點紀錄', label: '📰 時事(5)', type: 'timeline', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
-            'notePage':   { sheet: '擴充預留網頁1', name: '隨身綜合筆記', label: '📝 筆記(1)', type: 'note',     color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
+            'notePage':   { sheet: '擴充預留網頁1', name: '減重紀錄', label: '⚖️ 減重(1)', type: 'note', exCol: 10, color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' },
             'extPage2':   { sheet: '擴充預留網頁2', name: '飲食日常紀錄', label: '🍽️ 飲食(2)', type: 'generic',  color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
             'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', label: '🔗 連結(3)', type: 'generic',
                             viewMode: 'card',        // v1.05：改用卡片式呈現
@@ -785,7 +808,9 @@
         let filterKeywords = []; 
         let foodDataList = []; let editingFoodId = null; 
         let sportsDataList = []; let editingSportsId = null;
-        let noteDataList = []; let editingNoteId = null; let noteFilterKeywords = []; 
+        let noteDataList = []; let editingNoteId = null; let noteFilterKeywords = [];
+        let expandedNoteCards = new Set(); // v1.09：心得已展開的減重紀錄卡片 id
+        let expandedNoteEx = new Set();    // v1.10：運動明細編輯區已展開的卡片 id
         let genericDataList = []; let editingGenericId = null; let genericFilterKeywords = [];
         let expandedLinkCards = new Set(); // v1.08：目前展開的連結卡片 id
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
@@ -972,7 +997,7 @@
             const t = pageType();
             if (t === 'food') { options.push({val: 'city', text: '縣市'}, {val: 'district', text: '區域'}, {val: 'address', text: '地址'}, {val: 'storeName', text: '店名'}, {val: 'category', text: '分類'}, {val: 'other', text: '其他'});
             } else if (t === 'sports') { options.push({val: 'date', text: '日期'}, {val: 'type', text: '運動類型'}, {val: 'distance', text: '距離(km)'}, {val: 'notes', text: '備註'});
-            } else if (t === 'note') { options.push({val: 'col1', text: '流水號'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '分類'}, {val: 'col4', text: '內容'}); for(let i=5; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i});
+            } else if (t === 'note') { options.push({val: 'col1', text: '天數'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '早餐'}, {val: 'col4', text: '中餐'}, {val: 'col5', text: '晚餐'}, {val: 'col6', text: '下午茶'}, {val: 'col7', text: '宵夜'}, {val: 'col9', text: '心得'});
             } else if (t === 'travel') { options.push({val: 'col1', text: '主類別'}, {val: 'col2', text: '名稱'}, {val: 'col3', text: '地點'}, {val: 'col4', text: '地理區域'}, {val: 'col5', text: '彈性標籤'}, {val: 'col6', text: '必訪亮點/筆記'}, {val: 'col7', text: '實用資訊包'});
             } else if (t === 'timeline') { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
             } else { for(let i=1; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i}); }
@@ -999,6 +1024,8 @@
             }
             const t = pageType();
             if (t === 'timeline' && sortConfigs.length === 0) { sortConfigs.push({col: 'col2', dir: 'desc'}); }
+            // v1.09：減重紀錄預設依日期由新到舊
+            if (t === 'note' && sortConfigs.length === 0) { sortConfigs.push({col: 'col2', dir: 'desc'}); }
             // v1.06：連結卡片頁預設「每次載入依開啟次數降冪」
             const __cfg = PAGE_CONFIG[currentPageId] || {};
             if (t === 'generic' && __cfg.viewMode === 'card' && sortConfigs.length === 0) {
@@ -1046,7 +1073,7 @@
         }
         function cancelNoteEdit() {
             editingNoteId = null; for(let i=1; i<=10; i++) safeSet(`noteCol${i}`, ''); safeSet('noteCol2', new Date().toISOString().split('T')[0]);
-            safeText('noteFormTitle', '新增筆記 / 事件'); safeText('submitNoteBtn', '儲存筆記'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'none');
+            safeText('noteFormTitle', '新增減重紀錄'); safeText('submitNoteBtn', '儲存紀錄'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'none');
         }
         function cancelTravelEdit() {
             editingTravelId = null; for(let i=1; i<=7; i++) safeSet(`travelCol${i}`, '');
@@ -1087,7 +1114,15 @@
             // v1.03 (item 5)：依 config.type 分流，不再比對 selectedPageId / 分頁名
             if (config.type === 'food') { safeDisplay('foodPage', 'block'); }
             else if (config.type === 'sports') { safeDisplay('sportsPage', 'block'); }
-            else if (config.type === 'note') { safeDisplay('notePage', 'block'); }
+            else if (config.type === 'note') {
+                safeDisplay('notePage', 'block');
+                // v1.09：改用卡片顯示 → 隱藏表格與欄位開關
+                safeDisplay('noteColToggle', 'none');
+                safeDisplay('noteTableWrap', 'none');
+                safeDisplay('noteCardContainer', 'flex');
+                expandedNoteCards.clear();
+                expandedNoteEx.clear();
+            }
             else if (config.type === 'travel') { safeDisplay('travelPage', 'block'); }
             else if (config.type === 'timeline') {
                 safeDisplay('newsPage', 'block');
@@ -1564,24 +1599,143 @@
         }
 
         // ================= 綜合筆記 (擴充1) =================
-        async function submitNoteData() { const payload = { sheetName: PAGE_CONFIG.notePage.sheet, id: editingNoteId || newId(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`noteCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = buildFullText(payload, { cols: 10 }); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改綜合筆記' : '新增綜合筆記' }); }
-        function copyNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = null; safeText('noteFormTitle', '新增筆記 / 事件 (複製現有)'); safeText('submitNoteBtn', '儲存筆記'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = id; safeText('noteFormTitle', '編輯筆記 / 事件'); safeText('submitNoteBtn', '儲存修改'); safeClass('submitNoteBtn', 'btn-edit'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function deleteNoteData(id) { if (!confirm('確定刪除此筆記？')) return; noteDataList = noteDataList.filter(d => String(d.id) !== String(id)); renderNoteTable(); queuedPost({ id: id, action: 'delete', sheetName: PAGE_CONFIG.notePage.sheet }, { label: '刪除綜合筆記' }); }
+        async function submitNoteData() { const payload = { sheetName: PAGE_CONFIG.notePage.sheet, id: editingNoteId || newId(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`noteCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = buildFullText(payload, { cols: 10 }); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改減重紀錄' : '新增減重紀錄' }); }
+        function copyNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = null; safeText('noteFormTitle', '新增減重紀錄 (複製現有)'); safeText('submitNoteBtn', '儲存紀錄'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = id; safeText('noteFormTitle', '編輯減重紀錄'); safeText('submitNoteBtn', '儲存修改'); safeClass('submitNoteBtn', 'btn-edit'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function deleteNoteData(id) { if (!confirm('確定刪除此筆紀錄？')) return; noteDataList = noteDataList.filter(d => String(d.id) !== String(id)); renderNoteTable(); queuedPost({ id: id, action: 'delete', sheetName: PAGE_CONFIG.notePage.sheet }, { label: '刪除減重紀錄' }); }
         
         function addNoteFilterKeyword() { handleFilterInput('noteFilterInput', noteFilterKeywords, renderNoteTable, renderNoteKw); }
         function removeNoteKeyword(kw) { noteFilterKeywords = noteFilterKeywords.filter(k => k !== kw); renderNoteKw(); renderNoteTable(); }
         function renderNoteKw() { const c = document.getElementById('noteKeywordContainer'); if(c){ c.innerHTML = ''; noteFilterKeywords.forEach(kw => { c.innerHTML += `<div class="tag">${escapeHtml(kw)} <span onclick="removeNoteKeyword('${escapeJsAttr(kw)}')">✖</span></div>`; }); } }
         
+        // v1.09：減重紀錄卡片渲染
+        //   顯示順序與顏色： 天數 日期 早餐 中餐 晚餐(黑) → 宵夜(紅) → 下午茶(黑) → 運動明細(綠,多筆) → 心得(黑,可折疊)
+        const NOTE_CARD_FIELDS = [
+            { col: 3, label: '早餐',   color: '#222' },
+            { col: 4, label: '中餐',   color: '#222' },
+            { col: 5, label: '晚餐',   color: '#222' },
+            { col: 7, label: '宵夜',   color: '#d11' },
+            { col: 6, label: '下午茶', color: '#222' }
+        ];
+        function noteCardToggle(id) {
+            id = String(id);
+            if (expandedNoteCards.has(id)) expandedNoteCards.delete(id); else expandedNoteCards.add(id);
+            renderNoteTable();
+        }
+
+        // ---- v1.10：運動明細（一天多筆，每筆 = 項目 / 時間或重量 / 組數；存 col10 JSON） ----
+        function noteExColKey(cfg) { return 'col' + ((cfg && cfg.exCol) || 10); }
+        function noteExParse(item, cfg) {
+            try { const a = JSON.parse(safeStr(item[noteExColKey(cfg)]) || '[]'); return Array.isArray(a) ? a : []; }
+            catch (e) { return []; }
+        }
+        function noteExToggle(id) {
+            id = String(id);
+            if (expandedNoteEx.has(id)) expandedNoteEx.delete(id); else expandedNoteEx.add(id);
+            renderNoteTable();
+        }
+        function noteExAdd(id) {
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            const gv = pfx => { const el = document.getElementById(pfx + id); return el ? el.value.trim() : ''; };
+            const name = gv('exName_'), load = gv('exLoad_'), sets = gv('exSets_');
+            if (!name && !load && !sets) return alert('請至少填一個欄位（項目 / 時間或重量 / 組數）');
+            const arr = noteExParse(item, cfg);
+            arr.push({ eid: newId(), name: name, load: load, sets: sets });
+            item[noteExColKey(cfg)] = JSON.stringify(arr);
+            expandedNoteEx.add(String(id));
+            renderNoteTable();
+            persistLinkRecord(item, '新增運動明細');
+        }
+        function noteExDelete(id, eid) {
+            if (!confirm('刪除這一筆運動明細？')) return;
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            item[noteExColKey(cfg)] = JSON.stringify(noteExParse(item, cfg).filter(e => String(e.eid) !== String(eid)));
+            renderNoteTable();
+            persistLinkRecord(item, '刪除運動明細');
+        }
+        function noteExSection(data, cfg) {
+            const id = data.id;
+            const arr = noteExParse(data, cfg);
+            const isOpen = expandedNoteEx.has(String(id));
+            let lines = arr.map(function (e) {
+                const head = safeStr(e.name).trim() ? `<b>${escapeHtml(e.name)}</b>` : '';
+                const tail = [];
+                if (safeStr(e.load).trim()) tail.push(escapeHtml(safeStr(e.load).trim()));
+                if (safeStr(e.sets).trim()) tail.push(escapeHtml(safeStr(e.sets).trim()) + ' 組');
+                const body = head + (tail.length ? (head ? '　' : '') + tail.join(' · ') : '');
+                const del = isOpen ? ` <button class="nc-ex-del" onclick="noteExDelete('${escapeJsAttr(id)}','${escapeJsAttr(e.eid)}')">刪</button>` : '';
+                return `<span class="nc-ex-item">• ${body || '（空）'}${del}</span>`;
+            }).join('');
+            if (!lines) lines = `<span style="opacity:.5;">（無）</span>`;
+            const toggleBtn = `<button class="nc-collapse-btn" onclick="noteExToggle('${escapeJsAttr(id)}')">${isOpen ? '收合 ▲' : '＋ 明細 (' + arr.length + ')'}</button>`;
+            let html = `<div class="nc-field"><span class="nc-label">運動</span><span style="color:#1a8f2a">${lines} ${toggleBtn}</span></div>`;
+            if (isOpen) {
+                html += `<div class="nc-ex-add">
+                    <input id="exName_${escapeHtml(id)}" placeholder="項目" onkeypress="if(event.key==='Enter') noteExAdd('${escapeJsAttr(id)}')">
+                    <input id="exLoad_${escapeHtml(id)}" placeholder="時間或重量" onkeypress="if(event.key==='Enter') noteExAdd('${escapeJsAttr(id)}')">
+                    <input id="exSets_${escapeHtml(id)}" placeholder="組數" onkeypress="if(event.key==='Enter') noteExAdd('${escapeJsAttr(id)}')">
+                    <button class="btn-add" style="padding:4px 10px; font-size:12px;" onclick="noteExAdd('${escapeJsAttr(id)}')">新增</button>
+                </div>`;
+            }
+            return html;
+        }
+
         function renderNoteTable() {
-            const tbody = document.getElementById('noteTableBody'); if(!tbody) return; tbody.innerHTML = '';
-            const labels = ['流水號','日期','分類','內容','欄位 5','欄位 6','欄位 7','欄位 8','欄位 9','欄位 10'];
+            const box = document.getElementById('noteCardContainer'); if (!box) return;
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            safeDisplay('noteTableWrap', 'none');
+            safeDisplay('noteColToggle', 'none');
+            box.style.display = 'flex';
+            box.innerHTML = '';
+            let shown = 0;
             noteDataList.forEach(data => {
                 if (noteFilterKeywords.length > 0 && !noteFilterKeywords.every(kw => data.fullText.includes(kw))) return;
-                const tr = document.createElement('tr'); let colsHtml = '';
-                for(let i=1; i<=10; i++) { let val = safeStr(data[`col${i}`]); if(i === 2) val = formatDate(val); colsHtml += `<td data-label="${labels[i-1]}"><div class="resizable-cell">${escapeHtml(val)}</div></td>`; }
-                tr.innerHTML = `${colsHtml}<td class="action-cell"><button class="btn-copy" onclick="copyNoteData('${escapeJsAttr(data.id)}')">複製</button><button class="btn-edit" onclick="editNoteData('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteNoteData('${escapeJsAttr(data.id)}')">刪除</button></td>`; tbody.appendChild(tr);
+                shown++;
+                const day  = safeStr(data.col1).trim();
+                const date = formatDate(safeStr(data.col2)).trim();
+
+                let bodyHtml = '';
+                NOTE_CARD_FIELDS.forEach(f => {
+                    const v = safeStr(data['col' + f.col]).trim();
+                    if (!v) return;
+                    bodyHtml += `<div class="nc-field"><span class="nc-label">${f.label}</span><span style="color:${f.color}">${escapeHtml(v)}</span></div>`;
+                });
+
+                // v1.10：運動明細（多筆）
+                if (cfg.exCol) bodyHtml += noteExSection(data, cfg);
+
+                // 心得 (col9) 可折疊：預設只顯示前 10 字
+                const note = safeStr(data.col9).trim();
+                if (note) {
+                    const isOpen = expandedNoteCards.has(String(data.id));
+                    const long = [...note].length > 10;
+                    const shownText = isOpen || !long ? note : ([...note].slice(0, 10).join('') + '…');
+                    const btn = long
+                        ? `<button class="nc-collapse-btn" onclick="noteCardToggle('${escapeJsAttr(data.id)}')">${isOpen ? '收合 ▲' : '展開 ▼'}</button>`
+                        : '';
+                    bodyHtml += `<div class="nc-field"><span class="nc-label">心得</span><span style="color:#222">${escapeHtml(shownText)}</span>${btn}</div>`;
+                }
+
+                const titleBits = [];
+                if (day)  titleBits.push(`第 ${escapeHtml(day)} 天`);
+                if (date) titleBits.push(escapeHtml(date));
+                const card = document.createElement('div');
+                card.className = 'link-card note-card';
+                card.innerHTML = `
+                    <div class="lc-title">📅 ${titleBits.join('　') || '(未填天數/日期)'}</div>
+                    ${bodyHtml}
+                    <div class="lc-meta" style="border-color:rgba(0,0,0,0.15);">
+                        <span class="lc-actions" style="margin-left:auto;">
+                            <button class="btn-copy" style="padding:3px 8px; font-size:12px;" onclick="copyNoteData('${escapeJsAttr(data.id)}')">複製</button>
+                            <button class="btn-edit" style="padding:3px 8px; font-size:12px;" onclick="editNoteData('${escapeJsAttr(data.id)}')">編輯</button>
+                            <button class="btn-delete" style="padding:3px 8px; font-size:12px;" onclick="deleteNoteData('${escapeJsAttr(data.id)}')">刪除</button>
+                        </span>
+                    </div>`;
+                box.appendChild(card);
             });
+            if (shown === 0) box.innerHTML = `<div style="color:#888; padding:20px;">沒有符合條件的紀錄。</div>`;
         }
 
         // ================= 一般表格紀錄模組 (擴充 2,3,4,6) =================
