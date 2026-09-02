@@ -97,7 +97,9 @@
 
 <script>
 /* ============================================================
-   減重單日卡片  v1.00
+   減重單日卡片  v1.01
+   v1.01：修正 col2 日期比對的時區問題（帶時間的 ISO 要用本地時間取日期），
+          否則每天都比不到資料、顯示空白。
    - 與 food_collect 主程式共用同一個 Google Apps Script / 試算表
    - 分頁：擴充預留網頁1；欄位語意見主程式 readme_v1.13.md
    - 天數：以 2026/09/01 為第 1 天，系統自動帶入（可手改）
@@ -118,7 +120,20 @@ let lastFailedWrite = null;  // { payload, label }
 /* ---------- 小工具 ---------- */
 const $ = id => document.getElementById(id);
 const safeStr = v => (v != null ? String(v) : "");
-const fmtDate = v => { const s = safeStr(v); return s.includes("T") ? s.split("T")[0] : s; };
+// 把 col2 正規化成 YYYY-MM-DD。
+// 試算表若把日期存成「日期型別」，GET 會回像 "2026-08-30T16:00:00.000Z" 這種帶時區的 ISO
+// （台北 UTC+8 的午夜 = 前一天 16:00 UTC）→ 必須用「本地時間」取日期，否則會差一天。
+// 假設：檢視這頁的瀏覽器時區 = 當初輸入資料的時區（個人自用通常成立）。
+function fmtDate(v){
+    const s = safeStr(v).trim();
+    if (!s) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;              // 已是純日期字串
+    const d = new Date(s);
+    if (!isNaN(d.getTime())){
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    }
+    return s.includes("T") ? s.split("T")[0] : s;             // 其它格式的保底
+}
 function esc(v){ return safeStr(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 function escAttr(v){ return safeStr(v).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r?\n/g,"\\n").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function todayStr(){ const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
