@@ -469,9 +469,11 @@
             <div class="form-group"><label>晚餐 (col5)</label><textarea id="noteCol5" rows="2"></textarea></div>
             <div class="form-group"><label>下午茶 (col6)</label><textarea id="noteCol6" rows="2"></textarea></div>
             <div class="form-group"><label>宵夜 (col7)</label><textarea id="noteCol7" rows="2"></textarea></div>
-            <div class="form-group" style="display:none;"><label>運動項目 (col8, 已改為卡片明細)</label><textarea id="noteCol8" rows="2"></textarea></div>
+            <div class="form-group" style="display:none;"><label>col8 (保留)</label><textarea id="noteCol8" rows="2"></textarea></div>
             <div class="form-group"><label>心得 (col9)</label><textarea id="noteCol9" rows="3" style="width: 260px;"></textarea></div>
-            <div class="form-group" style="display:none;"><label>體重紀錄 (col10, 已改為卡片明細)</label><textarea id="noteCol10" rows="2"></textarea></div>
+            <div class="form-group" style="display:none;"><label>運動明細 (col10, 卡片上編輯)</label><textarea id="noteCol10" rows="2"></textarea></div>
+            <!-- v1.12：新增 col11~col20 保留欄位（隱藏，僅供卡片明細/未來擴充；由表單提交時一併帶回，不會被洗掉） -->
+            <script>for(let i=11; i<=20; i++){ const nm = i===11?'體重明細 (col11, 卡片上編輯)':i===12?'飲水明細 (col12, 卡片上編輯)':`col${i} (保留)`; document.write(`<div class="form-group" style="display:none;"><label>${nm}</label><textarea id="noteCol${i}" rows="2"></textarea></div>`); }</script>
             <div style="margin-top: 10px;"><button id="submitNoteBtn" class="btn-add" onclick="submitNoteData()">儲存紀錄</button><button id="cancelNoteBtn" class="btn-cancel" onclick="cancelNoteEdit()">取消編輯</button></div>
         </div>
         <div class="section">
@@ -500,7 +502,7 @@
             <div id="genericInputsContainer">
                 <script>
                     document.write(`<div class="form-group"><label id="genLabel1">流水號 (col1)</label><input type="text" id="genCol1"></div><div class="form-group"><label id="genLabel2">日期 (col2)</label><input type="date" id="genCol2"></div>`);
-                    for(let i=3; i<=10; i++){ document.write(`<div class="form-group"><label id="genLabel${i}">欄位 ${i}</label><textarea id="genCol${i}" rows="2"></textarea></div>`); }
+                    for(let i=3; i<=20; i++){ document.write(`<div class="form-group"${i>=11?' style="display:none;"':''}><label id="genLabel${i}">欄位 ${i}</label><textarea id="genCol${i}" rows="2"></textarea></div>`); }
                 </script>
             </div>
             <div style="margin-top: 10px;"><button id="submitGenericBtn" class="btn-add" onclick="submitGenericData()">新增資料</button><button id="cancelGenericBtn" class="btn-cancel" onclick="cancelGenericEdit()">取消編輯</button></div>
@@ -528,7 +530,8 @@
 
     <script>
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
-        const API_URL = "https://script.google.com/macros/s/AKfycbwB2zSqKlHfk0RBBONpgIGgJx6VUVaRg-_D0qrq0sXCxjGwkDOnyo5qtbtCrw72sy0P/exec"; // V1.04
+        // const API_URL = "https://script.google.com/macros/s/AKfycbwB2zSqKlHfk0RBBONpgIGgJx6VUVaRg-_D0qrq0sXCxjGwkDOnyo5qtbtCrw72sy0P/exec"; // V1.04
+        const API_URL = "https://script.google.com/macros/s/AKfycbwB2zSqKlHfk0RBBONpgIGgJx6VUVaRg-_D0qrq0sXCxjGwkDOnyo5qtbtCrw72sy0P/exec"; // V1.05
 
         let ACCESS_TOKEN = '';
         const TOKEN_STORAGE_KEY = 'food_collect_access_token';
@@ -722,7 +725,7 @@
             'sportsPage': { sheet: '運動紀錄', name: '運動訓練紀錄', label: '🏃‍♂️ 運動紀錄', type: 'sports',   color: '#4CAF50', light: '#e8f5e9', dark: '#2e7d32' },
             'travelPage': { sheet: '擴充預留網頁7', name: '旅遊行程筆記', label: '✈️ 旅遊(7)', type: 'travel',   color: '#9c27b0', light: '#f3e5f5', dark: '#6a1b9a' },
             'newsPage':   { sheet: '擴充預留網頁5', name: '時事焦點紀錄', label: '📰 時事(5)', type: 'timeline', color: '#607d8b', light: '#eceff1', dark: '#37474f' },
-            'notePage':   { sheet: '擴充預留網頁1', name: '減重紀錄', label: '⚖️ 減重(1)', type: 'note', exCol: 8, color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' }, // 原本exCol:10，現改為8 (給運動明細)
+            'notePage':   { sheet: '擴充預留網頁1', name: '減重紀錄', label: '⚖️ 減重(1)', type: 'note', exCol: 10, weightCol: 11, waterCol: 12, color: '#00bcd4', light: '#e0f7fa', dark: '#00838f' }, // v1.12：運動明細=col10、體重=col11、飲水=col12
             'extPage2':   { sheet: '擴充預留網頁2', name: '飲食日常紀錄', label: '🍽️ 飲食(2)', type: 'generic',  color: '#ff9800', light: '#fff8e1', dark: '#f57c00' },
             'extPage3':   { sheet: '擴充預留網頁3', name: '網路連結紀錄', label: '🔗 連結(3)', type: 'generic',
                             viewMode: 'card', 
@@ -768,6 +771,7 @@
         let expandedNoteCards = new Set();
         let expandedNoteEx = new Set();
         let expandedNoteWeight = new Set(); // 🌟 體重卡片展開狀態
+        let expandedNoteWater = new Set();  // v1.13：飲水明細展開狀態
         let genericDataList = []; let editingGenericId = null; let genericFilterKeywords = [];
         let expandedLinkCards = new Set();
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
@@ -1017,7 +1021,7 @@
             safeText('sportsFormTitle', '新增運動紀錄'); safeText('submitSportsBtn', '新增紀錄'); safeClass('submitSportsBtn', 'btn-add'); safeDisplay('cancelSportsBtn', 'none');
         }
         function cancelNoteEdit() {
-            editingNoteId = null; for(let i=1; i<=10; i++) safeSet(`noteCol${i}`, ''); safeSet('noteCol2', new Date().toISOString().split('T')[0]);
+            editingNoteId = null; for(let i=1; i<=20; i++) safeSet(`noteCol${i}`, ''); safeSet('noteCol2', new Date().toISOString().split('T')[0]);
             safeText('noteFormTitle', '新增減重紀錄'); safeText('submitNoteBtn', '儲存紀錄'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'none');
         }
         function cancelTravelEdit() {
@@ -1030,7 +1034,7 @@
             safeText('newsFormTitle', `新增 ${configName}`); safeText('submitNewsBtn', '儲存紀錄'); safeClass('submitNewsBtn', 'btn-add'); safeDisplay('cancelNewsBtn', 'none');
         }
         function cancelGenericEdit() {
-            editingGenericId = null; for(let i=1; i<=10; i++) safeSet(`genCol${i}`, ''); safeSet('genCol2', new Date().toISOString().split('T')[0]);
+            editingGenericId = null; for(let i=1; i<=20; i++) safeSet(`genCol${i}`, ''); safeSet('genCol2', new Date().toISOString().split('T')[0]);
             const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料';
             safeText('genericFormTitle', `新增 ${configName} 資料`); safeText('submitGenericBtn', '新增資料'); safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'none');
         }
@@ -1066,6 +1070,7 @@
                 expandedNoteCards.clear();
                 expandedNoteEx.clear();
                 expandedNoteWeight.clear(); // 🌟 重設體重卡片狀態
+                expandedNoteWater.clear();  // v1.13：重設飲水卡片狀態
                 renderBreakfastQuickSelect(); // 🌟 重新渲染快選早餐
             }
             else if (config.type === 'travel') { safeDisplay('travelPage', 'block'); }
@@ -1087,13 +1092,14 @@
                 safeDisplay('genericColToggle', isCard ? 'none' : '');
                 safeDisplay('genericTableWrap', isCard ? 'none' : '');
                 safeDisplay('genericCardContainer', isCard ? 'flex' : 'none');
-                for (let i = 1; i <= 10; i++) {
+                for (let i = 1; i <= 20; i++) {
                     const dl = (i === 1) ? '流水號 (col1)' : (i === 2) ? '日期 (col2)' : `欄位 ${i}`;
                     const lbl = (config.fieldLabels && config.fieldLabels[i]) ? config.fieldLabels[i] : dl;
                     safeText(`genLabel${i}`, lbl);
                     const inp = document.getElementById(`genCol${i}`);
                     const fg = inp && inp.closest ? inp.closest('.form-group') : null;
-                    if (fg) fg.style.display = (isCard && i >= 7) ? 'none' : '';
+                    // v1.12：col11~20 一律隱藏（保留欄位）；卡片模式另隱藏 col7 以後
+                    if (fg) fg.style.display = (i >= 11 || (isCard && i >= 7)) ? 'none' : '';
                 }
             }
             loadData(currentPageName, targetIdToOpen);
@@ -1116,8 +1122,8 @@
                 const pt = pageTypeBySheet(sheetName);
                 if (pt === 'food') { foodDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.city)} ${safeStr(item.district)} ${safeStr(item.address)} ${safeStr(item.storeName)} ${safeStr(item.category)} ${safeStr(item.other)}`.toLowerCase() })); }
                 else if (pt === 'sports') { sportsDataList = data; }
-                else if (pt === 'note') { 
-                    noteDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); 
+                else if (pt === 'note') {
+                    noteDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 20 }) }));
                     // 🌟 載入完畢後，刷新快選早餐清單
                     renderBreakfastQuickSelect();
                 }
@@ -1135,7 +1141,7 @@
                     }); 
                     updateNewsCategoryCheckboxes();
                 } 
-                else { genericDataList = data.map(item => ({ ...item, fullText: `${safeStr(item.col1)} ${safeStr(item.col2)} ${safeStr(item.col3)} ${safeStr(item.col4)} ${safeStr(item.col5)} ${safeStr(item.col6)} ${safeStr(item.col7)} ${safeStr(item.col8)} ${safeStr(item.col9)} ${safeStr(item.col10)}`.toLowerCase() })); }
+                else { genericDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 20 }) })); }
                 
                 applyGlobalMultiSort();
             } catch (error) { if (!(error instanceof ApiAuthError)) alert("資料讀取失敗！請確認 API 是否已更新。"); }
@@ -1538,9 +1544,9 @@
         }
 
         // ================= 綜合筆記 (擴充1/減重) =================
-        async function submitNoteData() { const payload = { sheetName: PAGE_CONFIG.notePage.sheet, id: editingNoteId || newId(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`noteCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = buildFullText(payload, { cols: 10 }); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改減重紀錄' : '新增減重紀錄' }); }
-        function copyNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = null; safeText('noteFormTitle', '新增減重紀錄 (複製現有)'); safeText('submitNoteBtn', '儲存紀錄'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = id; safeText('noteFormTitle', '編輯減重紀錄'); safeText('submitNoteBtn', '儲存修改'); safeClass('submitNoteBtn', 'btn-edit'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        async function submitNoteData() { const payload = { sheetName: PAGE_CONFIG.notePage.sheet, id: editingNoteId || newId(), action: editingNoteId ? 'edit' : 'add' }; for(let i=1; i<=20; i++) { let el = document.getElementById(`noteCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = buildFullText(payload, { cols: 20 }); if (editingNoteId) { const idx = noteDataList.findIndex(d => String(d.id) === String(editingNoteId)); if (idx > -1) noteDataList[idx] = { ...payload, fullText }; } else { noteDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelNoteEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改減重紀錄' : '新增減重紀錄' }); }
+        function copyNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=20; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = null; safeText('noteFormTitle', '新增減重紀錄 (複製現有)'); safeText('submitNoteBtn', '儲存紀錄'); safeClass('submitNoteBtn', 'btn-add'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editNoteData(id) { const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=20; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`noteCol${i}`, val); } editingNoteId = id; safeText('noteFormTitle', '編輯減重紀錄'); safeText('submitNoteBtn', '儲存修改'); safeClass('submitNoteBtn', 'btn-edit'); safeDisplay('cancelNoteBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function deleteNoteData(id) { if (!confirm('確定刪除此筆紀錄？')) return; noteDataList = noteDataList.filter(d => String(d.id) !== String(id)); renderNoteTable(); queuedPost({ id: id, action: 'delete', sheetName: PAGE_CONFIG.notePage.sheet }, { label: '刪除減重紀錄' }); }
         
         function addNoteFilterKeyword() { handleFilterInput('noteFilterInput', noteFilterKeywords, renderNoteTable, renderNoteKw); }
@@ -1583,7 +1589,7 @@
         }
 
         // ---- v1.10：運動明細 (使用 col8) ----
-        function noteExColKey(cfg) { return 'col' + ((cfg && cfg.exCol) || 8); }
+        function noteExColKey(cfg) { return 'col' + ((cfg && cfg.exCol) || 10); }
         function noteExParse(item, cfg) {
             try { const a = JSON.parse(safeStr(item[noteExColKey(cfg)]) || '[]'); return Array.isArray(a) ? a : []; }
             catch (e) { return []; }
@@ -1641,9 +1647,10 @@
             return html;
         }
 
-        // 🌟 新增：體重明細 (使用 col10) 🌟
+        // 體重明細（v1.12：改用 col11；col10 讓回給運動明細）
+        const NOTE_WEIGHT_COL = 'col' + ((PAGE_CONFIG.notePage && PAGE_CONFIG.notePage.weightCol) || 11);
         function noteWeightParse(item) {
-            try { const a = JSON.parse(safeStr(item.col10) || '[]'); return Array.isArray(a) ? a : []; }
+            try { const a = JSON.parse(safeStr(item[NOTE_WEIGHT_COL]) || '[]'); return Array.isArray(a) ? a : []; }
             catch (e) { return []; }
         }
         function noteWeightToggle(id) {
@@ -1658,7 +1665,7 @@
             if (!weight) return alert('請填寫體重');
             const arr = noteWeightParse(item);
             arr.push({ wid: newId(), weight: weight, time: time });
-            item.col10 = JSON.stringify(arr);
+            item[NOTE_WEIGHT_COL] = JSON.stringify(arr);
             expandedNoteWeight.add(String(id));
             renderNoteTable();
             persistLinkRecord(item, '新增體重紀錄');
@@ -1666,7 +1673,7 @@
         function noteWeightDelete(id, wid) {
             if (!confirm('刪除這一筆體重紀錄？')) return;
             const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return;
-            item.col10 = JSON.stringify(noteWeightParse(item).filter(e => String(e.wid) !== String(wid)));
+            item[NOTE_WEIGHT_COL] = JSON.stringify(noteWeightParse(item).filter(e => String(e.wid) !== String(wid)));
             renderNoteTable();
             persistLinkRecord(item, '刪除體重紀錄');
         }
@@ -1691,6 +1698,72 @@
                     <input id="wVal_${escapeHtml(id)}" placeholder="體重(kg)" style="flex:1 1 60px;" onkeypress="if(event.key==='Enter') noteWeightAdd('${escapeJsAttr(id)}')">
                     <input id="wTime_${escapeHtml(id)}" placeholder="量測時間" value="${defTime}" style="flex:1 1 60px;" onkeypress="if(event.key==='Enter') noteWeightAdd('${escapeJsAttr(id)}')">
                     <button class="btn-add" style="padding:4px 10px; font-size:12px;" onclick="noteWeightAdd('${escapeJsAttr(id)}')">新增</button>
+                </div>`;
+            }
+            return html;
+        }
+
+        // 飲水明細（v1.13：col12）— 逐筆新增，並顯示當日累積量
+        const NOTE_WATER_COL = 'col' + ((PAGE_CONFIG.notePage && PAGE_CONFIG.notePage.waterCol) || 12);
+        function noteWaterParse(item) {
+            try { const a = JSON.parse(safeStr(item[NOTE_WATER_COL]) || '[]'); return Array.isArray(a) ? a : []; }
+            catch (e) { return []; }
+        }
+        function noteWaterTotal(arr) {
+            const s = arr.reduce(function (sum, e) {
+                return sum + (parseFloat(String(e.amount).replace(/[^\d.\-]/g, '')) || 0);
+            }, 0);
+            return Math.round(s * 100) / 100;
+        }
+        function noteWaterToggle(id) {
+            id = String(id);
+            if (expandedNoteWater.has(id)) expandedNoteWater.delete(id); else expandedNoteWater.add(id);
+            renderNoteTable();
+        }
+        function noteWaterAdd(id) {
+            const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            const gv = pfx => { const el = document.getElementById(pfx + id); return el ? el.value.trim() : ''; };
+            const amount = gv('waAmt_'), time = gv('waTime_');
+            if (!amount) return alert('請填寫飲水量');
+            const arr = noteWaterParse(item);
+            arr.push({ waid: newId(), amount: amount, time: time });
+            item[NOTE_WATER_COL] = JSON.stringify(arr);
+            expandedNoteWater.add(String(id));
+            renderNoteTable();
+            persistLinkRecord(item, '新增飲水紀錄');
+        }
+        function noteWaterDelete(id, waid) {
+            if (!confirm('刪除這一筆飲水紀錄？')) return;
+            const item = noteDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            item[NOTE_WATER_COL] = JSON.stringify(noteWaterParse(item).filter(e => String(e.waid) !== String(waid)));
+            renderNoteTable();
+            persistLinkRecord(item, '刪除飲水紀錄');
+        }
+        function noteWaterSection(data) {
+            const id = data.id;
+            const arr = noteWaterParse(data);
+            const isOpen = expandedNoteWater.has(String(id));
+            const total = noteWaterTotal(arr);
+            let lines = arr.map(function (e) {
+                const amt = safeStr(e.amount).trim();
+                const n = parseFloat(amt.replace(/[^\d.\-]/g, ''));
+                const head = amt ? `<b>${isNaN(n) ? escapeHtml(amt) : (n + ' ml')}</b>` : '';
+                const tail = safeStr(e.time).trim() ? escapeHtml(e.time) : '';
+                const body = head + (tail ? ' (' + tail + ')' : '');
+                const del = isOpen ? ` <button class="nc-ex-del" onclick="noteWaterDelete('${escapeJsAttr(id)}','${escapeJsAttr(e.waid)}')">刪</button>` : '';
+                return `<span class="nc-ex-item">• ${body || '（空）'}${del}</span>`;
+            }).join('');
+            if (!lines) lines = `<span style="opacity:.5;">（無）</span>`;
+            const totalHtml = arr.length ? `<span class="nc-ex-item" style="font-weight:bold;">＝ 今日累積 ${total} ml</span>` : '';
+            const toggleBtn = `<button class="nc-collapse-btn" onclick="noteWaterToggle('${escapeJsAttr(id)}')">${isOpen ? '收合 ▲' : '＋ 飲水 (' + arr.length + ')'}</button>`;
+            let html = `<div class="nc-field"><span class="nc-label">飲水</span><span style="color:#00acc1">${lines}${totalHtml} ${toggleBtn}</span></div>`;
+            if (isOpen) {
+                const now = new Date();
+                const defTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                html += `<div class="nc-ex-add">
+                    <input id="waAmt_${escapeHtml(id)}" placeholder="飲水量(ml)" style="flex:1 1 60px;" onkeypress="if(event.key==='Enter') noteWaterAdd('${escapeJsAttr(id)}')">
+                    <input id="waTime_${escapeHtml(id)}" placeholder="時間" value="${defTime}" style="flex:1 1 60px;" onkeypress="if(event.key==='Enter') noteWaterAdd('${escapeJsAttr(id)}')">
+                    <button class="btn-add" style="padding:4px 10px; font-size:12px;" onclick="noteWaterAdd('${escapeJsAttr(id)}')">新增</button>
                 </div>`;
             }
             return html;
@@ -1722,6 +1795,9 @@
 
                 // 🌟 新增：體重明細（多筆）
                 bodyHtml += noteWeightSection(data);
+
+                // v1.13：飲水明細（多筆，顯示當日累積）
+                bodyHtml += noteWaterSection(data);
 
                 // 心得 (col9) 可折疊
                 const note = safeStr(data.col9).trim();
@@ -1756,9 +1832,9 @@
         }
 
         // ================= 一般表格紀錄模組 =================
-        async function submitGenericData() { const payload = { sheetName: currentPageName, id: editingGenericId || newId(), action: editingGenericId ? 'edit' : 'add' }; for(let i=1; i<=10; i++) { let el = document.getElementById(`genCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = buildFullText(payload, { cols: 10 }); if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = { ...payload, fullText }; } else { genericDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelGenericEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改擴充資料' : '新增擴充資料' }); }
-        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } const __cfg = PAGE_CONFIG[currentPageId] || {}; if (__cfg.viewMode === 'card') { safeSet(`genCol${__cfg.countCol || 7}`, ''); safeSet(`genCol${__cfg.lastOpenCol || 8}`, ''); } editingGenericId = null; const configName = __cfg.name || '資料'; safeText('genericFormTitle', `新增 ${configName} 資料 (複製現有)`); safeText('submitGenericBtn', '新增資料'); safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=10; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } editingGenericId = id; const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料'; safeText('genericFormTitle', `編輯 ${configName} 資料`); safeText('submitGenericBtn', '儲存修改'); safeClass('submitGenericBtn', 'btn-edit'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        async function submitGenericData() { const payload = { sheetName: currentPageName, id: editingGenericId || newId(), action: editingGenericId ? 'edit' : 'add' }; for(let i=1; i<=20; i++) { let el = document.getElementById(`genCol${i}`); payload[`col${i}`] = el ? el.value : ''; } const fullText = buildFullText(payload, { cols: 20 }); if (editingGenericId) { const idx = genericDataList.findIndex(d => String(d.id) === String(editingGenericId)); if (idx > -1) genericDataList[idx] = { ...payload, fullText }; } else { genericDataList.push({ ...payload, fullText }); } applyGlobalMultiSort(); cancelGenericEdit(); queuedPost(payload, { label: payload.action === 'edit' ? '修改擴充資料' : '新增擴充資料' }); }
+        function copyGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=20; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } const __cfg = PAGE_CONFIG[currentPageId] || {}; if (__cfg.viewMode === 'card') { safeSet(`genCol${__cfg.countCol || 7}`, ''); safeSet(`genCol${__cfg.lastOpenCol || 8}`, ''); } editingGenericId = null; const configName = __cfg.name || '資料'; safeText('genericFormTitle', `新增 ${configName} 資料 (複製現有)`); safeText('submitGenericBtn', '新增資料'); safeClass('submitGenericBtn', 'btn-add'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function editGenericData(id) { const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return; for(let i=1; i<=20; i++) { let val = safeStr(item[`col${i}`]); if (i === 2) val = formatDate(val); safeSet(`genCol${i}`, val); } editingGenericId = id; const configName = PAGE_CONFIG[currentPageId] ? PAGE_CONFIG[currentPageId].name : '資料'; safeText('genericFormTitle', `編輯 ${configName} 資料`); safeText('submitGenericBtn', '儲存修改'); safeClass('submitGenericBtn', 'btn-edit'); safeDisplay('cancelGenericBtn', 'inline-block'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
         function deleteGenericData(id) { if (!confirm('確定刪除此筆資料？')) return; genericDataList = genericDataList.filter(d => String(d.id) !== String(id)); renderGenericTable(); queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除擴充資料' }); }
         
         function addGenericFilterKeyword() { handleFilterInput('genericFilterInput', genericFilterKeywords, renderGenericTable, renderGenericKw); }
@@ -1811,9 +1887,9 @@
         }
 
         function persistLinkRecord(item, label) {
-            item.fullText = buildFullText(item, { cols: 10 });
+            item.fullText = buildFullText(item, { cols: 20 });
             const payload = { sheetName: currentPageName, id: item.id, action: 'edit' };
-            for (let i = 1; i <= 10; i++) payload['col' + i] = safeStr(item['col' + i]);
+            for (let i = 1; i <= 20; i++) payload['col' + i] = safeStr(item['col' + i]);
             queuedPost(payload, { label: label || '更新連結資料' });
         }
         function reRenderCardsSoon() {
