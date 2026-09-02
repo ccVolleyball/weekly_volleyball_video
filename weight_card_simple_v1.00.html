@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>減重單日卡片</title>
+<style>
+    :root{
+        --c-primary:#00838f; --c-light:#e0f7fa; --c-dark:#006064;
+        --c-red:#d11; --c-green:#1a8f2a; --c-blue:#007bff; --c-cyan:#00acc1;
+    }
+    *{ box-sizing:border-box; }
+    body{ font-family:"Segoe UI",Tahoma,Verdana,sans-serif; margin:0; background:#f4f6f7; color:#222; }
+    .wrap{ max-width:640px; margin:0 auto; padding:14px; }
+
+    /* 頂部列 */
+    .topbar{ position:sticky; top:0; z-index:20; background:var(--c-light); border:1px solid var(--c-primary); border-radius:10px; padding:10px; margin-bottom:12px; }
+    .tb-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+    .tb-row input[type="date"]{ padding:6px 8px; border:1px solid #bbb; border-radius:6px; font-size:15px; }
+    #busy{ margin-top:6px; font-size:13px; color:var(--c-dark); font-weight:bold; }
+
+    /* 按鈕 */
+    .btn{ padding:7px 12px; border:1px solid #ccc; border-radius:8px; background:#fff; color:#333; cursor:pointer; font-size:14px; font-weight:bold; }
+    .btn:hover{ background:#f0f0f0; }
+    .btn.primary{ background:var(--c-primary); border-color:var(--c-dark); color:#fff; }
+    .btn.danger{ background:#dc3545; border-color:#b52a37; color:#fff; }
+    .btn.ghost{ background:transparent; }
+    .btn.sm{ padding:5px 10px; font-size:13px; }
+    .btn.big{ padding:11px 18px; font-size:16px; }
+    body.busy-on .btn{ opacity:.45; pointer-events:none; }
+
+    /* 重試列 */
+    .retrybar{ background:#fff3cd; border:1px solid #ffca2c; border-radius:8px; padding:8px 12px; margin-bottom:12px; font-size:14px; display:flex; align-items:center; gap:10px; }
+
+    /* 空狀態 */
+    .empty{ background:#fff; border:1px dashed #bbb; border-radius:12px; padding:36px 20px; text-align:center; color:#666; font-size:16px; line-height:2; }
+
+    /* 卡片 */
+    .card{ background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.08); border-left:6px solid var(--c-primary); padding:16px; }
+    .card-head{ font-size:18px; font-weight:bold; color:var(--c-dark); margin-bottom:12px; border-bottom:2px solid var(--c-light); padding-bottom:8px; }
+    .multi-warn{ background:#fff3cd; border:1px solid #ffca2c; border-radius:6px; padding:6px 10px; font-size:13px; margin-bottom:10px; }
+
+    .fld{ margin-bottom:12px; }
+    .fld > label{ display:block; font-weight:bold; font-size:13px; color:#555; margin-bottom:4px; }
+    .fld > label.red{ color:var(--c-red); }
+    .fld input[type="text"], .fld input[type="date"], .fld textarea{
+        width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; font-family:inherit; font-size:15px;
+    }
+    .fld textarea{ resize:vertical; }
+    .fld .hint{ display:block; font-size:11px; color:#999; margin-top:3px; }
+
+    /* 明細區塊（運動 / 體重 / 飲水） */
+    .detail{ border-radius:8px; padding:10px; margin-bottom:12px; background:#fafafa; border:1px solid #eee; }
+    .detail .d-head{ font-weight:bold; font-size:14px; margin-bottom:6px; }
+    .detail.green .d-head{ color:var(--c-green); }
+    .detail.blue  .d-head{ color:var(--c-blue); }
+    .detail.cyan  .d-head{ color:var(--c-cyan); }
+    .detail .d-head .total{ font-weight:bold; }
+    .ent-list{ font-size:14px; }
+    .ent-item{ padding:3px 0; line-height:1.6; word-break:break-word; }
+    .detail.green .ent-item{ color:var(--c-green); }
+    .detail.blue  .ent-item{ color:var(--c-blue); }
+    .detail.cyan  .ent-item{ color:var(--c-cyan); }
+    .ent-empty{ color:#aaa; font-size:13px; padding:2px 0; }
+    .ent-del{ background:none; border:1px solid var(--c-red); color:var(--c-red); border-radius:4px; font-size:10px; padding:0 5px; margin-left:6px; cursor:pointer; }
+    .ent-add{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .ent-add input{ flex:1 1 70px; min-width:0; padding:6px 7px; border:1px solid #ccc; border-radius:5px; font-size:13px; font-family:inherit; }
+
+    .card-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; border-top:1px dashed #ddd; padding-top:14px; }
+
+    /* Toast */
+    #toastBox{ position:fixed; right:16px; bottom:16px; z-index:3000; display:flex; flex-direction:column; gap:8px; max-width:320px; }
+    #toastBox > div{ color:#fff; padding:11px 15px; border-radius:8px; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,.25); opacity:0; transition:opacity .2s; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="topbar">
+        <div class="tb-row">
+            <button class="btn" onclick="shiftDay(-1)">◀ 前一天</button>
+            <input type="date" id="datePicker" onchange="loadDay(this.value)">
+            <button class="btn" onclick="shiftDay(1)">後一天 ▶</button>
+            <button class="btn ghost" onclick="loadDay(todayStr())">今天</button>
+            <button class="btn ghost" onclick="ensureToken(true)">🔑 設定權杖</button>
+        </div>
+        <div id="busy" style="display:none;">⏳ 處理中…</div>
+    </div>
+
+    <div id="retrybar" class="retrybar" style="display:none;">
+        ⚠️ <span id="retrymsg">上次儲存失敗</span>
+        <button class="btn danger sm" onclick="retryLastWrite()">重試</button>
+    </div>
+
+    <div id="dayContainer"></div>
+</div>
+<div id="toastBox"></div>
+
+<script>
+/* ============================================================
+   減重單日卡片  v1.00
+   - 與 food_collect 主程式共用同一個 Google Apps Script / 試算表
+   - 分頁：擴充預留網頁1；欄位語意見主程式 readme_v1.13.md
+   - 天數：以 2026/09/01 為第 1 天，系統自動帶入（可手改）
+   - 簡化版：直接送出 + 成功/失敗提示 + 失敗可重試（無離線佇列）
+   - ⚠️ 未來若新用到某欄位，主程式與本頁的 code 都要同步改
+   ============================================================ */
+
+const API_URL    = "https://script.google.com/macros/s/AKfycbwB2zSqKlHfk0RBBONpgIGgJx6VUVaRg-_D0qrq0sXCxjGwkDOnyo5qtbtCrw72sy0P/exec";
+const SHEET_NAME = "擴充預留網頁1";
+const FIRST_DAY  = "2026-09-01";
+const TOKEN_KEY  = "weight_card_simple_token";
+const MAX_COL    = 20;
+
+let ACCESS_TOKEN   = "";
+let dayRecord      = null;   // 目前這一天的資料列 {id, col1..col20}；null = 尚未建立
+let lastFailedWrite = null;  // { payload, label }
+
+/* ---------- 小工具 ---------- */
+const $ = id => document.getElementById(id);
+const safeStr = v => (v != null ? String(v) : "");
+const fmtDate = v => { const s = safeStr(v); return s.includes("T") ? s.split("T")[0] : s; };
+function esc(v){ return safeStr(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+function escAttr(v){ return safeStr(v).replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r?\n/g,"\\n").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function todayStr(){ const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+function nowHM(){ const d = new Date(); return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; }
+function newId(){ try{ if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); }catch(e){} return "id-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10); }
+function parseJson(v){ try{ const a = JSON.parse(safeStr(v) || "[]"); return Array.isArray(a) ? a : []; }catch(e){ return []; } }
+function dayNumberFor(dateStr){
+    const a = Date.parse(dateStr + "T00:00:00"), b = Date.parse(FIRST_DAY + "T00:00:00");
+    if (isNaN(a) || isNaN(b)) return "";
+    return Math.round((a - b) / 86400000) + 1;
+}
+function shiftDateStr(dateStr, delta){
+    const d = new Date((dateStr || todayStr()) + "T00:00:00");
+    d.setDate(d.getDate() + delta);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function waterTotal(arr){
+    const s = arr.reduce((sum,e) => sum + (parseFloat(String(e.amount).replace(/[^\d.\-]/g,"")) || 0), 0);
+    return Math.round(s * 100) / 100;
+}
+
+/* ---------- Toast / 忙碌 / 重試列 ---------- */
+function toast(msg, type){
+    const box = $("toastBox");
+    const t = document.createElement("div");
+    t.style.background = type === "err" ? "#dc3545" : (type === "ok" ? "#28a745" : "#37474f");
+    t.textContent = msg;
+    box.appendChild(t);
+    requestAnimationFrame(() => { t.style.opacity = "1"; });
+    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 250); }, 3600);
+}
+function setBusy(on){ document.body.classList.toggle("busy-on", on); $("busy").style.display = on ? "block" : "none"; }
+function showRetryBar(show, msg){ $("retrybar").style.display = show ? "flex" : "none"; if (msg) $("retrymsg").textContent = msg; }
+function retryLastWrite(){ if (lastFailedWrite) sendWrite(lastFailedWrite.payload, lastFailedWrite.label); }
+
+/* ---------- 存取權杖 ---------- */
+function loadToken(){ try{ ACCESS_TOKEN = localStorage.getItem(TOKEN_KEY) || ""; }catch(e){ ACCESS_TOKEN = ""; } }
+function saveToken(t){ ACCESS_TOKEN = (t || "").trim(); try{ localStorage.setItem(TOKEN_KEY, ACCESS_TOKEN); }catch(e){} }
+function ensureToken(force){
+    if (!ACCESS_TOKEN) loadToken();
+    if (force || !ACCESS_TOKEN){
+        try{
+            const v = window.prompt("請輸入資料庫存取權杖\n（與 food_collect 主程式同一組；只會存在這個網頁的瀏覽器）：", ACCESS_TOKEN || "");
+            if (v !== null) saveToken(v);
+        }catch(e){}
+    }
+    return ACCESS_TOKEN;
+}
+
+/* ---------- API ---------- */
+class AuthErr extends Error { constructor(){ super("unauthorized"); this.name = "AuthErr"; } }
+async function apiGet(){
+    ensureToken();
+    const url = `${API_URL}?sheetName=${encodeURIComponent(SHEET_NAME)}&token=${encodeURIComponent(ACCESS_TOKEN)}`;
+    const res = await fetch(url);
+    let j; try{ j = await res.json(); }catch(e){ throw new Error("伺服器回應解析失敗"); }
+    if (j && j.error === "unauthorized") throw new AuthErr();
+    return Array.isArray(j.data) ? j.data : (Array.isArray(j) ? j : []);
+}
+async function apiPost(payload){
+    ensureToken();
+    const res = await fetch(API_URL, { method:"POST", body: JSON.stringify({ ...payload, token: ACCESS_TOKEN }) });
+    let j = {}; try{ j = await res.json(); }catch(e){}
+    if (j && j.error === "unauthorized") throw new AuthErr();
+    return j;
+}
+
+/* ---------- 寫入（簡化版：送出 + 提示 + 失敗可重試） ---------- */
+async function sendWrite(payload, label){
+    setBusy(true);
+    try{
+        await apiPost(payload);
+        lastFailedWrite = null; showRetryBar(false);
+        toast("✅ " + (label || "已儲存"), "ok");
+        return true;
+    }catch(err){
+        lastFailedWrite = { payload, label };
+        if (err instanceof AuthErr){
+            toast("❌ 存取權杖無效，請按「🔑 設定權杖」重新輸入後再重試", "err");
+            showRetryBar(true, "權杖無效");
+            ensureToken(true);
+        }else{
+            toast("⚠️ " + (label || "儲存") + "失敗：" + err.message, "err");
+            showRetryBar(true, (label || "儲存") + "失敗");
+        }
+        return false;
+    }finally{ setBusy(false); }
+}
+function recordPayload(action){
+    const p = { sheetName: SHEET_NAME, id: dayRecord.id, action: action };
+    for (let i = 1; i <= MAX_COL; i++) p["col" + i] = safeStr(dayRecord["col" + i]);
+    return p;
+}
+// 把卡片上目前輸入框的值收回 dayRecord（重繪前呼叫，避免未存的餐點內容被洗掉）
+function syncFormToRecord(){
+    if (!dayRecord) return;
+    const m = { f_day:"col1", f_b:"col3", f_l:"col4", f_d:"col5", f_a:"col6", f_n:"col7", f_note:"col9" };
+    for (const id in m){ const el = $(id); if (el) dayRecord[m[id]] = el.value; }
+    const fd = $("f_date"); if (fd && fd.value) dayRecord.col2 = fd.value;
+}
+
+/* ---------- 載入 / 建立 / 儲存 / 刪除 某一天 ---------- */
+async function loadDay(dateStr){
+    dateStr = dateStr || todayStr();
+    $("datePicker").value = dateStr;
+    setBusy(true);
+    try{
+        const rows = await apiGet();
+        const matches = rows.filter(r => fmtDate(r.col2) === dateStr);
+        dayRecord = matches[0] || null;
+        render(dateStr, matches.length);
+    }catch(err){
+        dayRecord = null;
+        render(dateStr, 0);
+        if (err instanceof AuthErr){ toast("❌ 存取權杖無效，請按「🔑 設定權杖」重新輸入", "err"); ensureToken(true); }
+        else { toast("⚠️ 讀取失敗：" + err.message, "err"); }
+    }finally{ setBusy(false); }
+}
+async function createDay(){
+    const dateStr = $("datePicker").value || todayStr();
+    dayRecord = { id: newId(), col1: String(dayNumberFor(dateStr)), col2: dateStr };
+    for (let i = 3; i <= MAX_COL; i++) dayRecord["col" + i] = "";
+    render(dateStr, 1);
+    await sendWrite(recordPayload("add"), "建立這一天");
+}
+function saveDay(){
+    if (!dayRecord) return;
+    syncFormToRecord();
+    const newDate = ($("f_date") && $("f_date").value) || dayRecord.col2;
+    dayRecord.col2 = newDate;
+    sendWrite(recordPayload("edit"), "儲存這一天").then(ok => {
+        if (ok && newDate !== $("datePicker").value) loadDay(newDate);
+    });
+}
+function deleteDay(){
+    if (!dayRecord) return;
+    if (!confirm(`確定刪除 ${$("datePicker").value} 這一整天的紀錄？`)) return;
+    const p = { sheetName: SHEET_NAME, id: dayRecord.id, action: "delete" };
+    sendWrite(p, "刪除這一天").then(ok => {
+        if (ok){ dayRecord = null; render($("datePicker").value, 0); }
+    });
+}
+function shiftDay(delta){ loadDay(shiftDateStr($("datePicker").value, delta)); }
+
+/* ---------- 明細：運動(col10) / 體重(col11) / 飲水(col12) ---------- */
+function detailAfterChange(label){
+    render($("datePicker").value, 1);
+    sendWrite(recordPayload("edit"), label);
+}
+function exAdd(){
+    syncFormToRecord();
+    const g = id => { const el = $(id); return el ? el.value.trim() : ""; };
+    const name = g("ex_name"), load = g("ex_load"), sets = g("ex_sets");
+    if (!name && !load && !sets) return alert("請至少填一個欄位（項目 / 時間或重量 / 組數）");
+    const arr = parseJson(dayRecord.col10);
+    arr.push({ eid: newId(), name, load, sets });
+    dayRecord.col10 = JSON.stringify(arr);
+    detailAfterChange("新增運動明細");
+}
+function exDel(eid){
+    if (!confirm("刪除這一筆運動明細？")) return;
+    syncFormToRecord();
+    dayRecord.col10 = JSON.stringify(parseJson(dayRecord.col10).filter(e => String(e.eid) !== String(eid)));
+    detailAfterChange("刪除運動明細");
+}
+function wAdd(){
+    syncFormToRecord();
+    const g = id => { const el = $(id); return el ? el.value.trim() : ""; };
+    const weight = g("w_val"), time = g("w_time");
+    if (!weight) return alert("請填寫體重");
+    const arr = parseJson(dayRecord.col11);
+    arr.push({ wid: newId(), weight, time });
+    dayRecord.col11 = JSON.stringify(arr);
+    detailAfterChange("新增體重紀錄");
+}
+function wDel(wid){
+    if (!confirm("刪除這一筆體重紀錄？")) return;
+    syncFormToRecord();
+    dayRecord.col11 = JSON.stringify(parseJson(dayRecord.col11).filter(e => String(e.wid) !== String(wid)));
+    detailAfterChange("刪除體重紀錄");
+}
+function waAdd(){
+    syncFormToRecord();
+    const g = id => { const el = $(id); return el ? el.value.trim() : ""; };
+    const amount = g("wa_amt"), time = g("wa_time");
+    if (!amount) return alert("請填寫飲水量");
+    const arr = parseJson(dayRecord.col12);
+    arr.push({ waid: newId(), amount, time });
+    dayRecord.col12 = JSON.stringify(arr);
+    detailAfterChange("新增飲水紀錄");
+}
+function waDel(waid){
+    if (!confirm("刪除這一筆飲水紀錄？")) return;
+    syncFormToRecord();
+    dayRecord.col12 = JSON.stringify(parseJson(dayRecord.col12).filter(e => String(e.waid) !== String(waid)));
+    detailAfterChange("刪除飲水紀錄");
+}
+
+/* ---------- 畫面 ---------- */
+function render(dateStr, matchCount){
+    const box = $("dayContainer");
+
+    if (!dayRecord){
+        const dn = dayNumberFor(dateStr);
+        box.innerHTML = `<div class="empty">
+            📭 <b>${esc(dateStr)}</b> 這一天尚未建立
+            <br><button class="btn primary big" onclick="createDay()">＋ 建立這一天${dn !== "" ? `（第 ${dn} 天）` : ""}</button>
+        </div>`;
+        return;
+    }
+
+    const autoDn = dayNumberFor(dateStr);
+    const dayVal = safeStr(dayRecord.col1) || (autoDn === "" ? "" : String(autoDn));
+
+    const exArr = parseJson(dayRecord.col10);
+    const wArr  = parseJson(dayRecord.col11);
+    const waArr = parseJson(dayRecord.col12);
+
+    const exItems = exArr.length ? exArr.map(e => {
+        const tail = [];
+        if (safeStr(e.load).trim()) tail.push(esc(safeStr(e.load).trim()));
+        if (safeStr(e.sets).trim()) tail.push(esc(safeStr(e.sets).trim()) + " 組");
+        const head = safeStr(e.name).trim() ? `<b>${esc(e.name)}</b>` : "";
+        return `<div class="ent-item">• ${head}${tail.length ? (head ? "　" : "") + tail.join(" · ") : ""}
+            <button class="ent-del" onclick="exDel('${escAttr(e.eid)}')">刪</button></div>`;
+    }).join("") : `<div class="ent-empty">（無）</div>`;
+
+    const wItems = wArr.length ? wArr.map(e => {
+        const t = safeStr(e.time).trim();
+        return `<div class="ent-item">• <b>${esc(safeStr(e.weight).trim())} kg</b>${t ? " (" + esc(t) + ")" : ""}
+            <button class="ent-del" onclick="wDel('${escAttr(e.wid)}')">刪</button></div>`;
+    }).join("") : `<div class="ent-empty">（無）</div>`;
+
+    const waItems = waArr.length ? waArr.map(e => {
+        const t = safeStr(e.time).trim();
+        const amt = safeStr(e.amount).trim();
+        const n = parseFloat(amt.replace(/[^\d.\-]/g,""));
+        const disp = isNaN(n) ? esc(amt) : (n + " ml");
+        return `<div class="ent-item">• <b>${disp}</b>${t ? " (" + esc(t) + ")" : ""}
+            <button class="ent-del" onclick="waDel('${escAttr(e.waid)}')">刪</button></div>`;
+    }).join("") : `<div class="ent-empty">（無）</div>`;
+
+    box.innerHTML = `
+    <div class="card">
+        <div class="card-head">📅 第 ${esc(dayVal || "?")} 天　${esc(dateStr)}</div>
+        ${matchCount > 1 ? `<div class="multi-warn">⚠️ 這一天在試算表有 ${matchCount} 筆資料，目前只顯示第一筆。</div>` : ""}
+
+        <div class="fld"><label>天數（第幾天）</label>
+            <input type="text" id="f_day" value="${esc(dayVal)}">
+            <span class="hint">以 2026/09/01 為第 1 天，系統自動帶第 ${autoDn} 天（可手改）</span>
+        </div>
+        <div class="fld"><label>日期</label>
+            <input type="date" id="f_date" value="${esc(dateStr)}">
+            <span class="hint">改這裡再按「儲存這一天」＝把這筆搬到別的日期</span>
+        </div>
+
+        <div class="fld"><label>早餐</label><textarea id="f_b" rows="2">${esc(dayRecord.col3)}</textarea></div>
+        <div class="fld"><label>中餐</label><textarea id="f_l" rows="2">${esc(dayRecord.col4)}</textarea></div>
+        <div class="fld"><label>晚餐</label><textarea id="f_d" rows="2">${esc(dayRecord.col5)}</textarea></div>
+        <div class="fld"><label>下午茶</label><textarea id="f_a" rows="2">${esc(dayRecord.col6)}</textarea></div>
+        <div class="fld"><label class="red">宵夜</label><textarea id="f_n" rows="2">${esc(dayRecord.col7)}</textarea></div>
+
+        <div class="detail green">
+            <div class="d-head">🏃 運動明細</div>
+            <div class="ent-list">${exItems}</div>
+            <div class="ent-add">
+                <input id="ex_name" placeholder="項目">
+                <input id="ex_load" placeholder="時間或重量">
+                <input id="ex_sets" placeholder="組數">
+                <button class="btn sm primary" onclick="exAdd()">＋ 新增</button>
+            </div>
+        </div>
+
+        <div class="detail blue">
+            <div class="d-head">⚖️ 體重明細</div>
+            <div class="ent-list">${wItems}</div>
+            <div class="ent-add">
+                <input id="w_val" placeholder="體重(kg)">
+                <input id="w_time" placeholder="量測時間" value="${esc(nowHM())}">
+                <button class="btn sm primary" onclick="wAdd()">＋ 新增</button>
+            </div>
+        </div>
+
+        <div class="detail cyan">
+            <div class="d-head">💧 飲水明細　<span class="total">＝ 今日累積 ${waterTotal(waArr)} ml</span></div>
+            <div class="ent-list">${waItems}</div>
+            <div class="ent-add">
+                <input id="wa_amt" placeholder="飲水量(ml)">
+                <input id="wa_time" placeholder="時間" value="${esc(nowHM())}">
+                <button class="btn sm primary" onclick="waAdd()">＋ 新增</button>
+            </div>
+        </div>
+
+        <div class="fld"><label>心得</label><textarea id="f_note" rows="3">${esc(dayRecord.col9)}</textarea></div>
+
+        <div class="card-actions">
+            <button class="btn primary big" onclick="saveDay()">💾 儲存這一天</button>
+            <button class="btn danger" onclick="deleteDay()">🗑️ 刪除這一天</button>
+        </div>
+    </div>`;
+}
+
+/* ---------- 啟動 ---------- */
+window.addEventListener("DOMContentLoaded", () => {
+    loadToken();
+    $("datePicker").value = todayStr();
+    ensureToken();
+    loadDay(todayStr());
+});
+</script>
+</body>
+</html>
