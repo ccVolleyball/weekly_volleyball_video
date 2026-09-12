@@ -204,6 +204,20 @@
         .link-card .lc-sub-foot { margin-top: 4px; font-size: 11px; color: #666; }
         .link-card .lc-sub-add { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
         .link-card .lc-sub-add input { flex: 1 1 90px; min-width: 0; padding: 5px 7px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-family: inherit; background: #fff; color: #222; }
+        /* v1.14：帳號內容 編輯模式 */
+        .link-card .lc-sub-edit { display: flex; flex-wrap: wrap; gap: 6px; }
+        .link-card .lc-sub-edit input { flex: 1 1 90px; min-width: 0; padding: 5px 7px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-family: inherit; background: #fff; color: #222; }
+        .link-card .lc-sub-edit .lc-sub-edit-btns { flex: 1 1 100%; display: flex; gap: 6px; margin-top: 2px; }
+        /* v1.14：帳號內容 心得筆記 */
+        .link-card .lc-note-toggle { margin-top: 6px; font-size: 12px; font-weight: bold; cursor: pointer; user-select: none; opacity: .8; color: var(--theme-dark); }
+        .link-card .lc-note-toggle:hover { opacity: 1; text-decoration: underline; }
+        .link-card .lc-note-panel { margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(0,0,0,0.15); }
+        .link-card .lc-note-item { background: rgba(0,0,0,0.04); border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; font-size: 12px; }
+        .link-card .lc-note-time { font-size: 11px; color: #777; margin-bottom: 2px; }
+        .link-card .lc-note-text { white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
+        .link-card .lc-note-del { background: none; border: 1px solid #d11; color: #d11; border-radius: 4px; font-size: 10px; padding: 0 5px; margin-top: 4px; cursor: pointer; }
+        .link-card .lc-note-add { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .link-card .lc-note-add textarea { flex: 1 1 100%; min-width: 0; min-height: 44px; padding: 5px 7px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-family: inherit; background: #fff; color: #222; resize: vertical; }
         /* v1.09：減重紀錄卡片 */
         .note-card { background: #fff; color: #222; border-left: 5px solid var(--theme-primary); width: 320px; }
         .note-card .lc-title { font-size: 16px; color: var(--theme-dark); }
@@ -774,6 +788,8 @@
         let expandedNoteWater = new Set();  // v1.13：飲水明細展開狀態
         let genericDataList = []; let editingGenericId = null; let genericFilterKeywords = [];
         let expandedLinkCards = new Set();
+        let editingSubKey = null;           // v1.14：正在編輯的「帳號內容」= `${id}:${sid}`
+        let expandedSubNotes = new Set();   // v1.14：已展開「筆記」的帳號內容 = `${id}:${sid}`
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
         let newsDataList = []; let editingNewsId = null; 
 
@@ -1089,6 +1105,8 @@
 
                 const isCard = config.viewMode === 'card';
                 expandedLinkCards.clear();
+                editingSubKey = null;          // v1.14：換頁清掉帳號內容編輯狀態
+                expandedSubNotes.clear();      // v1.14：換頁收合筆記
                 safeDisplay('genericColToggle', isCard ? 'none' : '');
                 safeDisplay('genericTableWrap', isCard ? 'none' : '');
                 safeDisplay('genericCardContainer', isCard ? 'flex' : 'none');
@@ -1936,12 +1954,74 @@
             persistLinkRecord(item, '新增帳號內容');
         }
         function linkSubDelete(id, sid) {
-            if (!confirm('刪除這一筆帳號內容？')) return;
+            if (!confirm('刪除這一筆帳號內容？（底下的筆記也會一併刪除）')) return;
             const cfg = PAGE_CONFIG[currentPageId] || {};
             const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return;
             item[subColKey(cfg)] = JSON.stringify(subParse(item, cfg).filter(s => String(s.sid) !== String(sid)));
             renderGenericTable();
             persistLinkRecord(item, '刪除帳號內容');
+        }
+        // v1.14：帳號內容（分類/連結/主題）編輯
+        function subKey(id, sid) { return String(id) + ':' + String(sid); }
+        function linkSubEditStart(id, sid) {
+            editingSubKey = subKey(id, sid);
+            renderGenericTable();
+        }
+        function linkSubEditCancel() {
+            editingSubKey = null;
+            renderGenericTable();
+        }
+        function linkSubEditSave(id, sid) {
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            const domId = escapeHtml(String(id)) + '__' + escapeHtml(String(sid));
+            const gv = elId => { const el = document.getElementById(elId); return el ? el.value.trim() : ''; };
+            const cat = gv('editSubCat_' + domId), url = gv('editSubUrl_' + domId), topic = gv('editSubTopic_' + domId);
+            if (!cat && !url && !topic) return alert('請至少填一個欄位（分類 / 連結 / 主題）');
+            const arr = subParse(item, cfg);
+            const s = arr.find(x => String(x.sid) === String(sid)); if (!s) return;
+            s.cat = cat; s.url = url; s.topic = topic;
+            item[subColKey(cfg)] = JSON.stringify(arr);
+            editingSubKey = null;
+            renderGenericTable();
+            persistLinkRecord(item, '編輯帳號內容');
+        }
+        // v1.14：帳號內容 心得筆記（定期更新、可回顧歷史）
+        function subNoteToggle(id, sid) {
+            const key = subKey(id, sid);
+            if (expandedSubNotes.has(key)) expandedSubNotes.delete(key); else expandedSubNotes.add(key);
+            renderGenericTable();
+        }
+        function subNoteAdd(id, sid) {
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            const domId = escapeHtml(String(id)) + '__' + escapeHtml(String(sid));
+            const el = document.getElementById('noteText_' + domId);
+            const text = el ? el.value.trim() : '';
+            if (!text) return alert('請輸入筆記內容');
+            const now = new Date(); const pad = n => String(n).padStart(2, '0');
+            const arr = subParse(item, cfg);
+            const s = arr.find(x => String(x.sid) === String(sid)); if (!s) return;
+            if (!Array.isArray(s.notes)) s.notes = [];
+            s.notes.push({
+                nid: newId(), text: text,
+                time: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`
+            });
+            item[subColKey(cfg)] = JSON.stringify(arr);
+            expandedSubNotes.add(subKey(id, sid));
+            renderGenericTable();
+            persistLinkRecord(item, '新增筆記');
+        }
+        function subNoteDelete(id, sid, nid) {
+            if (!confirm('刪除這則筆記？')) return;
+            const cfg = PAGE_CONFIG[currentPageId] || {};
+            const item = genericDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            const arr = subParse(item, cfg);
+            const s = arr.find(x => String(x.sid) === String(sid)); if (!s) return;
+            s.notes = (Array.isArray(s.notes) ? s.notes : []).filter(n => String(n.nid) !== String(nid));
+            item[subColKey(cfg)] = JSON.stringify(arr);
+            renderGenericTable();
+            persistLinkRecord(item, '刪除筆記');
         }
         function linkSubOpen(id, sid, event) {
             const cfg = PAGE_CONFIG[currentPageId] || {};
@@ -1958,17 +2038,58 @@
             const id = data.id;
             const subs = subParse(data, cfg);
             let itemsHtml = subs.map(function (s) {
+                const key = subKey(id, s.sid);
+                const domId = escapeHtml(String(id)) + '__' + escapeHtml(String(s.sid));
+                const isEditing = editingSubKey === key;
                 const url = safeStr(s.url).trim();
                 const href = /^https?:\/\//i.test(url) ? url : ('http://' + url);
                 const linkHtml = url
                     ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener" onclick="linkSubOpen('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}', event)">${escapeHtml(url)}</a>`
                     : '<span style="opacity:.5;">（無連結）</span>';
-                return `<div class="lc-sub-item">
+
+                const mainHtml = isEditing ? `
+                    <div class="lc-sub-edit">
+                        <input id="editSubCat_${domId}" placeholder="分類" value="${escapeHtml(s.cat || '')}">
+                        <input id="editSubUrl_${domId}" placeholder="連結" value="${escapeHtml(s.url || '')}">
+                        <input id="editSubTopic_${domId}" placeholder="主題" value="${escapeHtml(s.topic || '')}">
+                        <div class="lc-sub-edit-btns">
+                            <button class="btn-add" style="padding:3px 9px; font-size:11px;" onclick="linkSubEditSave('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}')">儲存</button>
+                            <button class="btn-copy" style="padding:3px 9px; font-size:11px;" onclick="linkSubEditCancel()">取消</button>
+                        </div>
+                    </div>` : `
                     <div class="lc-sub-line"><b>${escapeHtml(s.cat || '未分類')}</b>${s.topic ? ' — ' + escapeHtml(s.topic) : ''}</div>
                     <div class="lc-sub-line">${linkHtml}</div>
                     <div class="lc-sub-foot">🔗 ${parseInt(s.cnt, 10) || 0} 次 · 上次 ${s.last ? escapeHtml(s.last) : '—'} · 建立 ${escapeHtml(s.time || '')}
-                        <button class="btn-delete" style="padding:2px 7px; font-size:11px; margin-left:6px;" onclick="linkSubDelete('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}')">刪</button>
-                    </div>
+                        <button class="btn-edit" style="padding:2px 7px; font-size:11px; margin-left:6px;" onclick="linkSubEditStart('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}')">編輯</button>
+                        <button class="btn-delete" style="padding:2px 7px; font-size:11px; margin-left:4px;" onclick="linkSubDelete('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}')">刪</button>
+                    </div>`;
+
+                const notes = (Array.isArray(s.notes) ? s.notes.slice() : []).sort((a, b) => String(b.time).localeCompare(String(a.time)));
+                const notesOpen = expandedSubNotes.has(key);
+                const notesToggleHtml = `<div class="lc-note-toggle" onclick="subNoteToggle('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}')">${notesOpen ? '▾' : '▸'} 📝 筆記 (${notes.length})</div>`;
+                let notesPanelHtml = '';
+                if (notesOpen) {
+                    let notesListHtml = notes.map(function (n) {
+                        return `<div class="lc-note-item">
+                            <div class="lc-note-time">🕒 ${escapeHtml(n.time || '')}</div>
+                            <div class="lc-note-text">${linkify(n.text || '')}</div>
+                            <button class="lc-note-del" onclick="subNoteDelete('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}','${escapeJsAttr(n.nid)}')">刪除這則</button>
+                        </div>`;
+                    }).join('');
+                    if (!notesListHtml) notesListHtml = `<div style="opacity:.6; font-size:12px; padding:2px 0 6px;">還沒有筆記，定期更新的心得可以記在這裡，會依時間列出歷史紀錄。</div>`;
+                    notesPanelHtml = `<div class="lc-note-panel" onclick="event.stopPropagation()">
+                        ${notesListHtml}
+                        <div class="lc-note-add">
+                            <textarea id="noteText_${domId}" placeholder="輸入這次的心得…"></textarea>
+                            <button class="btn-add" style="padding:4px 10px; font-size:12px;" onclick="subNoteAdd('${escapeJsAttr(id)}','${escapeJsAttr(s.sid)}')">新增筆記</button>
+                        </div>
+                    </div>`;
+                }
+
+                return `<div class="lc-sub-item">
+                    ${mainHtml}
+                    ${notesToggleHtml}
+                    ${notesPanelHtml}
                 </div>`;
             }).join('');
             if (!itemsHtml) itemsHtml = `<div style="opacity:.6; padding:6px 0;">還沒有帳號內容，用下面的欄位新增。</div>`;
