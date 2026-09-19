@@ -230,6 +230,34 @@
         .note-card .nc-ex-del { background: none; border: 1px solid #d11; color: #d11; border-radius: 4px; font-size: 10px; padding: 0 5px; margin-left: 6px; cursor: pointer; }
         .note-card .nc-ex-add { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
         .note-card .nc-ex-add input { flex: 1 1 80px; min-width: 0; padding: 5px 7px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; font-family: inherit; background: #fff; color: #222; }
+        /* v1.15：東京馬拉松2027 頁 */
+        .marathon-countdown-box { background: linear-gradient(135deg, var(--theme-dark), var(--theme-primary)); color: #fff; text-align: center; }
+        .marathon-countdown-title { font-size: 15px; opacity: .9; margin-bottom: 6px; }
+        .marathon-countdown-main { font-size: 30px; font-weight: bold; }
+        .marathon-countdown-num { font-size: 1.3em; }
+        .marathon-countdown-num-sm { font-size: .9em; }
+        .marathon-countdown-phase { margin-top: 8px; font-size: 13px; opacity: .95; }
+        .marathon-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid var(--theme-light); padding-bottom: 12px; }
+        .marathon-tab-btn { background: #eee; color: #555; padding: 8px 16px; border-radius: 20px; }
+        .marathon-tab-btn.active { background: var(--theme-primary); color: #fff; }
+        .marathon-tab-panel h2 { font-size: 17px; }
+        .marathon-week-summary { margin: 12px 0; padding: 10px 14px; background: var(--theme-light); color: var(--theme-dark); border-radius: 6px; font-weight: bold; font-size: 14px; }
+        .marathon-note-list { margin-top: 10px; }
+        .marathon-note-item { background: #f5f5f5; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+        .marathon-note-time { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .marathon-note-text { white-space: pre-wrap; word-break: break-word; line-height: 1.6; margin-bottom: 6px; }
+        /* v1.16：分段配速 */
+        .marathon-seg-row { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
+        .marathon-seg-row input { flex: 1 1 140px; min-width: 0; }
+        .marathon-seg-del { background: none; border: 1px solid #d11; color: #d11; border-radius: 4px; font-size: 12px; padding: 4px 8px; cursor: pointer; margin: 0; }
+        /* v1.16：依日期 Overview */
+        .marathon-ov-day { background: #fff; border: 1px solid #eee; border-left: 4px solid var(--theme-primary); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+        .marathon-ov-day-title { font-weight: bold; font-size: 15px; color: var(--theme-dark); margin-bottom: 8px; }
+        .marathon-ov-section { margin-bottom: 8px; }
+        .marathon-ov-section-title { font-weight: bold; font-size: 12px; opacity: .6; margin-bottom: 4px; }
+        .marathon-ov-item { background: #f7f7f7; border-radius: 6px; padding: 6px 10px; margin-bottom: 4px; font-size: 13px; }
+        .marathon-ov-sub { font-size: 12px; opacity: .7; margin-top: 2px; white-space: pre-wrap; word-break: break-word; }
+        .marathon-ov-empty { font-size: 12px; opacity: .5; padding: 2px 4px; }
         @media screen and (max-width: 768px) { .link-card { width: 100% !important; } }
     </style>
 </head>
@@ -542,6 +570,98 @@
     </div>
 
 
+    <!-- v1.15：東京馬拉松2027 準備/紀錄頁（擴充預留網頁6） -->
+    <div id="marathonPage" class="app-page" style="display: none;">
+        <div class="section marathon-countdown-box" id="marathonCountdownBox"></div>
+
+        <div class="section">
+            <div class="marathon-tabs">
+                <button type="button" class="marathon-tab-btn active" id="marathonTabBtn_log" onclick="switchMarathonTab('log')">🏃 訓練記錄</button>
+                <button type="button" class="marathon-tab-btn" id="marathonTabBtn_note" onclick="switchMarathonTab('note')">📝 筆記</button>
+                <button type="button" class="marathon-tab-btn" id="marathonTabBtn_resource" onclick="switchMarathonTab('resource')">🔗 訓練資源</button>
+                <button type="button" class="marathon-tab-btn" id="marathonTabBtn_overview" onclick="switchMarathonTab('overview')">📅 Overview</button>
+            </div>
+
+            <!-- 訓練記錄 -->
+            <div id="marathonTab_log" class="marathon-tab-panel">
+                <h2 id="marathonLogFormTitle">新增訓練記錄</h2>
+                <div class="form-group"><label>日期</label><input type="date" id="marathonLogDate"></div>
+                <div class="form-group"><label>訓練類型</label>
+                    <select id="marathonLogType">
+                        <option value="輕鬆跑">輕鬆跑</option>
+                        <option value="節奏跑">節奏跑</option>
+                        <option value="間歇">間歇</option>
+                        <option value="長距離LSD">長距離LSD</option>
+                        <option value="恢復跑">恢復跑</option>
+                        <option value="肌力訓練">肌力訓練</option>
+                        <option value="伸展">伸展</option>
+                        <option value="交叉訓練">交叉訓練</option>
+                        <option value="休息">休息</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:block; width:100%; max-width:520px;">
+                    <label>分段配速（例如：前2km/中5km/後2km 各自的距離+配速；肌力訓練/伸展可以只填一段或留空，細節寫在心得備註）</label>
+                    <div id="marathonSegmentContainer"></div>
+                    <button type="button" class="btn-copy" style="padding:5px 10px; font-size:12px;" onclick="addMarathonSegment()">➕ 新增分段</button>
+                </div>
+                <div class="form-group"><label>心得備註</label><textarea id="marathonLogNotes" rows="2" style="width:250px;"></textarea></div>
+                <div style="margin-top: 10px;">
+                    <button id="submitMarathonLogBtn" class="btn-add" onclick="submitMarathonLog()">新增紀錄</button>
+                    <button id="cancelMarathonLogBtn" class="btn-cancel" onclick="cancelMarathonLogEdit()">取消編輯</button>
+                </div>
+                <div class="marathon-week-summary" id="marathonWeekSummary"></div>
+                <div class="table-responsive">
+                    <table id="marathonLogTable">
+                        <thead><tr><th>日期</th><th>訓練類型</th><th>距離(km)</th><th>時間/配速</th><th>心得備註</th><th>操作</th></tr></thead>
+                        <tbody id="marathonLogTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 筆記 -->
+            <div id="marathonTab_note" class="marathon-tab-panel" style="display:none;">
+                <h2>新增筆記</h2>
+                <div class="form-group" style="display:block; width:100%; max-width:520px;">
+                    <textarea id="marathonNoteText" rows="3" style="width:100%;" placeholder="賽前準備、裝備心得、報名資訊…定期更新都可以記在這裡"></textarea>
+                </div>
+                <div style="margin-top: 10px;"><button class="btn-add" onclick="submitMarathonNote()">新增筆記</button></div>
+                <div id="marathonNoteList" class="marathon-note-list"></div>
+            </div>
+
+            <!-- 訓練資源 -->
+            <div id="marathonTab_resource" class="marathon-tab-panel" style="display:none;">
+                <h2 id="marathonResourceFormTitle">新增訓練資源</h2>
+                <div class="form-group"><label>分類</label><input type="text" id="marathonResCat" placeholder="例如：訓練計畫/官方資訊/裝備"></div>
+                <div class="form-group"><label>名稱</label><input type="text" id="marathonResName"></div>
+                <div class="form-group"><label>連結</label><input type="text" id="marathonResUrl"></div>
+                <div class="form-group"><label>說明</label><textarea id="marathonResDesc" rows="2" style="width:250px;"></textarea></div>
+                <div style="margin-top: 10px;">
+                    <button id="submitMarathonResBtn" class="btn-add" onclick="submitMarathonResource()">新增資源</button>
+                    <button id="cancelMarathonResBtn" class="btn-cancel" onclick="cancelMarathonResEdit()">取消編輯</button>
+                    <button class="btn-copy" onclick="seedMarathonResources()">📥 匯入建議訓練資源</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="marathonResTable">
+                        <thead><tr><th>分類</th><th>名稱</th><th>連結</th><th>說明</th><th>建立日期</th><th>操作</th></tr></thead>
+                        <tbody id="marathonResTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Overview（依日期整合三種紀錄） -->
+            <div id="marathonTab_overview" class="marathon-tab-panel" style="display:none;">
+                <h2>依日期查看 Overview</h2>
+                <div style="margin-bottom: 15px;">
+                    <input type="date" id="marathonOverviewDateInput">
+                    <button class="btn-filter" onclick="addMarathonOverviewDate()">加入日期</button>
+                    <div class="keyword-tags" id="marathonOverviewDateTags"></div>
+                </div>
+                <div id="marathonOverviewResult"></div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // 🚨 這裡請填上您自己最新的 Google Apps Script 網址 🚨
         // const API_URL = "https://script.google.com/macros/s/AKfycbwB2zSqKlHfk0RBBONpgIGgJx6VUVaRg-_D0qrq0sXCxjGwkDOnyo5qtbtCrw72sy0P/exec"; // V1.04
@@ -747,7 +867,8 @@
                             cardFields: [5, 4, 6], dateField: 2, groupField: 3, countCol: 7, lastOpenCol: 8, subCol: 10,
                             color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
             'extPage4':   { sheet: '擴充預留網頁4', name: '東京旅遊紀錄', label: '🗼 東京旅遊(4)', type: 'generic', mapCol: 8, color: '#e91e63', light: '#fce4ec', dark: '#ad1457' },
-            'extPage6':   { sheet: '擴充預留網頁6', name: '擴充預留網頁6', label: '📄 網頁6', type: 'generic',  color: '#007bff', light: '#f0f7ff', dark: '#0056b3' },
+            'extPage6':   { sheet: '擴充預留網頁6', name: '東京馬拉松2027', label: '🏃 東京馬(6)', type: 'marathon', raceDate: '2027-03-07',
+                            color: '#1565c0', light: '#e3f2fd', dark: '#0d47a1' }, // v1.15：東京馬拉松2027 準備/紀錄
             'extPage8':   { sheet: '擴充預留網頁8', name: '擴充預留網頁8', label: '📰 網頁8', type: 'timeline', color: '#009688', light: '#e0f2f1', dark: '#00695c' },
             'extPage9':   { sheet: '擴充預留網頁9', name: '擴充預留網頁9', label: '📰 網頁9', type: 'timeline', color: '#ff5722', light: '#fbe9e7', dark: '#d84315' },
             'extPage10':  { sheet: '擴充預留網頁10', name: '擴充預留網頁10', label: '📰 網頁10', type: 'timeline', color: '#3f51b5', light: '#e8eaf6', dark: '#283593' },
@@ -790,6 +911,13 @@
         let expandedLinkCards = new Set();
         let editingSubKey = null;           // v1.14：正在編輯的「帳號內容」= `${id}:${sid}`
         let expandedSubNotes = new Set();   // v1.14：已展開「筆記」的帳號內容 = `${id}:${sid}`
+        let marathonDataList = [];          // v1.15：東京馬拉松2027（col1='訓練記錄'/'筆記'/'資源' 混存同一分頁）
+        let editingMarathonLogId = null;
+        let editingMarathonResId = null;
+        let marathonSubTab = 'log';
+        let marathonCountdownTimer = null;
+        let marathonLogSegments = [{ distance: '', pace: '' }]; // v1.16：訓練記錄表單目前編輯中的分段（距離+配速）
+        let marathonOverviewDates = [];                          // v1.16：Overview 已選擇的日期標籤
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
         let newsDataList = []; let editingNewsId = null; 
 
@@ -969,6 +1097,7 @@
             } else if (t === 'note') { options.push({val: 'col1', text: '天數'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '早餐'}, {val: 'col4', text: '中餐'}, {val: 'col5', text: '晚餐'}, {val: 'col6', text: '下午茶'}, {val: 'col7', text: '宵夜'}, {val: 'col9', text: '心得'});
             } else if (t === 'travel') { options.push({val: 'col1', text: '主類別'}, {val: 'col2', text: '名稱'}, {val: 'col3', text: '地點'}, {val: 'col4', text: '地理區域'}, {val: 'col5', text: '彈性標籤'}, {val: 'col6', text: '必訪亮點/筆記'}, {val: 'col7', text: '實用資訊包'});
             } else if (t === 'timeline') { options.push({val: 'col1', text: '分類'}, {val: 'col2', text: '日期'}, {val: 'col3', text: '標題'}, {val: 'col4', text: '詳細內容'});
+            } else if (t === 'marathon') { options.push({val: 'col1', text: '記錄類型'}, {val: 'col2', text: '日期/時間/分類'}, {val: 'col3', text: '訓練類型/內容/名稱'}, {val: 'col4', text: '距離/連結'});
             } else { for(let i=1; i<=10; i++) options.push({val: 'col'+i, text: '欄位 '+i}); }
 
             for(let i=1; i<=5; i++) {
@@ -1005,6 +1134,7 @@
             else if(t === 'note') { targetList = noteDataList; renderFn = renderNoteTable; }
             else if(t === 'travel') { targetList = travelDataList; renderFn = renderTravelTable; }
             else if(t === 'timeline') { targetList = newsDataList; renderFn = renderNewsTimeline; }
+            else if(t === 'marathon') { targetList = marathonDataList; renderFn = renderMarathonAll; }
             else { targetList = genericDataList; renderFn = renderGenericTable; }
 
             targetList.sort((a, b) => {
@@ -1068,8 +1198,9 @@
 
             document.querySelectorAll('.app-page').forEach(page => { page.style.display = 'none'; });
             
-            cancelFoodEdit(); cancelSportsEdit(); cancelNoteEdit(); cancelTravelEdit(); cancelNewsEdit(); cancelGenericEdit();
-            
+            cancelFoodEdit(); cancelSportsEdit(); cancelNoteEdit(); cancelTravelEdit(); cancelNewsEdit(); cancelGenericEdit(); cancelMarathonLogEdit(); cancelMarathonResEdit();
+            if (marathonCountdownTimer) { clearInterval(marathonCountdownTimer); marathonCountdownTimer = null; } // v1.15：離開東京馬頁先停掉倒數計時器
+
             applyTheme(config);
             currentPageName = config.sheet;
 
@@ -1090,6 +1221,14 @@
                 renderBreakfastQuickSelect(); // 🌟 重新渲染快選早餐
             }
             else if (config.type === 'travel') { safeDisplay('travelPage', 'block'); }
+            else if (config.type === 'marathon') {
+                safeDisplay('marathonPage', 'block');
+                marathonSubTab = 'log';
+                switchMarathonTab('log');
+                marathonOverviewDates = []; renderMarathonOverviewTags(); // v1.16：換頁清空 Overview 已選日期
+                renderMarathonCountdown();
+                marathonCountdownTimer = setInterval(renderMarathonCountdown, 60000); // 每分鐘更新一次倒數
+            }
             else if (config.type === 'timeline') {
                 safeDisplay('newsPage', 'block');
                 safeText('newsFormTitle', `新增 ${config.name}`);
@@ -1158,7 +1297,11 @@
                         };
                     }); 
                     updateNewsCategoryCheckboxes();
-                } 
+                }
+                else if (pt === 'marathon') {
+                    marathonDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 7 }) }));
+                    renderMarathonAll();
+                }
                 else { genericDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 20 }) })); }
                 
                 applyGlobalMultiSort();
@@ -2196,6 +2339,396 @@
                     box.appendChild(card);
                 });
             });
+        }
+
+        // ================= 🏃 東京馬拉松2027（v1.15） =================
+        // 同一分頁（擴充預留網頁6）混存三種紀錄，用 col1 區分：
+        //   col1='訓練記錄' → col2=日期 col3=訓練類型 col4=距離(km) col5=時間/配速 col6=心得備註
+        //   col1='筆記'     → col2=時間(YYYY-MM-DD HH:mm) col3=內容
+        //   col1='資源'     → col2=分類 col3=名稱 col4=連結 col5=說明
+
+        function upsertMarathonLocal(payload) {
+            const item = { ...payload, fullText: buildFullText(payload, { cols: 7 }) };
+            delete item.action;
+            const idx = marathonDataList.findIndex(d => String(d.id) === String(payload.id));
+            if (idx > -1) marathonDataList[idx] = item; else marathonDataList.push(item);
+            renderMarathonAll();
+        }
+
+        function switchMarathonTab(tab) {
+            marathonSubTab = tab;
+            ['log', 'note', 'resource', 'overview'].forEach(t => {
+                safeDisplay(`marathonTab_${t}`, t === tab ? 'block' : 'none');
+                safeClass(`marathonTabBtn_${t}`, 'marathon-tab-btn' + (t === tab ? ' active' : ''));
+            });
+        }
+
+        function renderMarathonAll() {
+            renderMarathonCountdown();
+            renderMarathonWeekSummary();
+            renderMarathonLogTable();
+            renderMarathonNoteList();
+            renderMarathonResTable();
+            renderMarathonOverview();
+        }
+
+        // ---- 倒數計時 + 訓練階段提示 ----
+        function renderMarathonCountdown() {
+            const box = document.getElementById('marathonCountdownBox'); if (!box) return;
+            const cfg = PAGE_CONFIG[currentPageId] || PAGE_CONFIG['extPage6'] || {};
+            const raceDateStr = cfg.raceDate || '2027-03-07';
+            const now = new Date();
+            const race = new Date(raceDateStr + 'T00:00:00');
+            const diffMs = race - now;
+
+            if (diffMs < 0) {
+                box.innerHTML = `<div class="marathon-countdown-title">🏁 ${escapeHtml(raceDateStr)} 東京馬拉松</div><div class="marathon-countdown-main" style="font-size:20px;">比賽已經結束了，辛苦了！🎉</div>`;
+                return;
+            }
+            const diffDays = Math.floor(diffMs / 86400000);
+            const diffHours = Math.floor((diffMs % 86400000) / 3600000);
+            const weeksLeft = diffDays / 7;
+
+            let phaseHtml;
+            if (weeksLeft > 16) {
+                phaseHtml = '目前處於：<b>基礎期</b>（可先累積跑量、加強核心/肌力，之後再排正式訓練計畫）';
+            } else if (weeksLeft > 3) {
+                const wk = Math.max(1, 17 - Math.ceil(weeksLeft));
+                phaseHtml = `目前處於：<b>訓練期</b>（約在 16 週計畫的第 ${wk} 週附近）`;
+            } else {
+                phaseHtml = '目前處於：<b>減量期</b>（賽前 taper，記得多休息、少量維持手感）';
+            }
+
+            box.innerHTML = `
+                <div class="marathon-countdown-title">🏁 距離東京馬拉松（${escapeHtml(raceDateStr)}）</div>
+                <div class="marathon-countdown-main">還有 <span class="marathon-countdown-num">${diffDays}</span> 天 <span class="marathon-countdown-num-sm">${diffHours}</span> 小時</div>
+                <div class="marathon-countdown-phase">${phaseHtml}</div>
+            `;
+        }
+
+        // ---- 訓練記錄 ----
+        function isoWeekRange(d) {
+            const date = new Date(d); if (isNaN(date)) return null;
+            const day = (date.getDay() + 6) % 7; // 週一 = 0
+            const monday = new Date(date); monday.setDate(date.getDate() - day); monday.setHours(0, 0, 0, 0);
+            const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6); sunday.setHours(23, 59, 59, 999);
+            return [monday, sunday];
+        }
+        function renderMarathonWeekSummary() {
+            const el = document.getElementById('marathonWeekSummary'); if (!el) return;
+            const range = isoWeekRange(new Date()); if (!range) return;
+            const [monday, sunday] = range;
+            let total = 0;
+            marathonDataList.filter(d => d.col1 === '訓練記錄').forEach(d => {
+                const dt = new Date(formatDate(d.col2)); if (isNaN(dt)) return;
+                if (dt >= monday && dt <= sunday) {
+                    const n = parseFloat(String(d.col4).replace(/[^\d.]/g, ''));
+                    if (!isNaN(n)) total += n;
+                }
+            });
+            el.textContent = `📊 本週（${formatDate(monday.toISOString())} ～ ${formatDate(sunday.toISOString())}）已累積跑量：${total.toFixed(1)} km`;
+        }
+        // ---- 分段配速（col7 = JSON 陣列 [{distance,pace}, ...]） ----
+        function marathonSegParse(item) {
+            try { const a = JSON.parse(safeStr(item.col7) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+        }
+        function marathonSegTotalDistance(segs) {
+            return segs.reduce((sum, s) => {
+                const n = parseFloat(String(s.distance).replace(/[^\d.]/g, ''));
+                return sum + (isNaN(n) ? 0 : n);
+            }, 0);
+        }
+        function marathonSegSummaryText(segs) {
+            return segs.filter(s => s.distance || s.pace).map(s => `${s.distance || '?'}km@${s.pace || '?'}`).join('、');
+        }
+        function renderMarathonSegmentInputs() {
+            const box = document.getElementById('marathonSegmentContainer'); if (!box) return;
+            box.innerHTML = marathonLogSegments.map(function (seg, i) {
+                return `<div class="marathon-seg-row">
+                    <input type="text" placeholder="距離(km)" value="${escapeHtml(seg.distance)}" oninput="marathonLogSegments[${i}].distance = this.value">
+                    <input type="text" placeholder="配速（例如 5:30/km 或 25:00）" value="${escapeHtml(seg.pace)}" oninput="marathonLogSegments[${i}].pace = this.value">
+                    <button type="button" class="marathon-seg-del" onclick="removeMarathonSegment(${i})" ${marathonLogSegments.length <= 1 ? 'style="visibility:hidden;"' : ''}>✖</button>
+                </div>`;
+            }).join('');
+        }
+        function addMarathonSegment() {
+            marathonLogSegments.push({ distance: '', pace: '' });
+            renderMarathonSegmentInputs();
+        }
+        function removeMarathonSegment(idx) {
+            if (marathonLogSegments.length <= 1) return;
+            marathonLogSegments.splice(idx, 1);
+            renderMarathonSegmentInputs();
+        }
+
+        // ---- 訓練記錄 ----
+        function isoWeekRange(d) {
+            const date = new Date(d); if (isNaN(date)) return null;
+            const day = (date.getDay() + 6) % 7; // 週一 = 0
+            const monday = new Date(date); monday.setDate(date.getDate() - day); monday.setHours(0, 0, 0, 0);
+            const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6); sunday.setHours(23, 59, 59, 999);
+            return [monday, sunday];
+        }
+        function renderMarathonWeekSummary() {
+            const el = document.getElementById('marathonWeekSummary'); if (!el) return;
+            const range = isoWeekRange(new Date()); if (!range) return;
+            const [monday, sunday] = range;
+            let total = 0;
+            marathonDataList.filter(d => d.col1 === '訓練記錄').forEach(d => {
+                const dt = new Date(formatDate(d.col2)); if (isNaN(dt)) return;
+                if (dt >= monday && dt <= sunday) {
+                    const n = parseFloat(String(d.col4).replace(/[^\d.]/g, ''));
+                    if (!isNaN(n)) total += n;
+                }
+            });
+            el.textContent = `📊 本週（${formatDate(monday.toISOString())} ～ ${formatDate(sunday.toISOString())}）已累積跑量：${total.toFixed(1)} km`;
+        }
+        function cancelMarathonLogEdit() {
+            editingMarathonLogId = null;
+            safeSet('marathonLogDate', new Date().toISOString().split('T')[0]);
+            safeSet('marathonLogType', '輕鬆跑'); safeSet('marathonLogNotes', '');
+            marathonLogSegments = [{ distance: '', pace: '' }];
+            renderMarathonSegmentInputs();
+            safeText('marathonLogFormTitle', '新增訓練記錄');
+            safeText('submitMarathonLogBtn', '新增紀錄'); safeClass('submitMarathonLogBtn', 'btn-add');
+            safeDisplay('cancelMarathonLogBtn', 'none');
+        }
+        async function submitMarathonLog() {
+            const date = document.getElementById('marathonLogDate').value;
+            if (!date) return alert('請選擇日期！');
+            const type = document.getElementById('marathonLogType').value;
+            const notes = document.getElementById('marathonLogNotes').value.trim();
+            const segs = marathonLogSegments
+                .map(s => ({ distance: safeStr(s.distance).trim(), pace: safeStr(s.pace).trim() }))
+                .filter(s => s.distance || s.pace);
+            const totalDistance = marathonSegTotalDistance(segs);
+            const payload = {
+                sheetName: currentPageName, id: editingMarathonLogId || newId(), action: editingMarathonLogId ? 'edit' : 'add',
+                col1: '訓練記錄', col2: date, col3: type,
+                col4: segs.length ? String(totalDistance) : '-',
+                col5: '-', // v1.16 起改用 col7 存分段；col5 保留只為相容更舊的資料
+                col6: notes || '-',
+                col7: JSON.stringify(segs)
+            };
+            upsertMarathonLocal(payload);
+            cancelMarathonLogEdit();
+            queuedPost(payload, { label: payload.action === 'edit' ? '修改訓練記錄' : '新增訓練記錄' });
+        }
+        function editMarathonLog(id) {
+            const item = marathonDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            safeSet('marathonLogDate', formatDate(item.col2));
+            safeSet('marathonLogType', item.col3 || '輕鬆跑');
+            safeSet('marathonLogNotes', item.col6 === '-' ? '' : item.col6);
+            let segs = marathonSegParse(item);
+            if (segs.length === 0 && item.col4 && item.col4 !== '-') {
+                // 相容 v1.15 以前只有單一距離/配速的舊資料
+                segs = [{ distance: item.col4, pace: (item.col5 && item.col5 !== '-') ? item.col5 : '' }];
+            }
+            marathonLogSegments = segs.length ? segs.map(s => ({ distance: s.distance || '', pace: s.pace || '' })) : [{ distance: '', pace: '' }];
+            renderMarathonSegmentInputs();
+            editingMarathonLogId = id;
+            safeText('marathonLogFormTitle', '編輯訓練記錄');
+            safeText('submitMarathonLogBtn', '儲存修改'); safeClass('submitMarathonLogBtn', 'btn-edit');
+            safeDisplay('cancelMarathonLogBtn', 'inline-block');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function deleteMarathonLog(id) {
+            if (!confirm('確定刪除此訓練記錄？')) return;
+            marathonDataList = marathonDataList.filter(d => String(d.id) !== String(id));
+            renderMarathonAll();
+            queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除訓練記錄' });
+        }
+        function renderMarathonLogTable() {
+            const tbody = document.getElementById('marathonLogTableBody'); if (!tbody) return; tbody.innerHTML = '';
+            const rows = marathonDataList.filter(d => d.col1 === '訓練記錄').slice().sort((a, b) => String(b.col2).localeCompare(String(a.col2)));
+            rows.forEach(data => {
+                const segs = marathonSegParse(data);
+                const paceDisplay = segs.length ? marathonSegSummaryText(segs) : ((data.col5 && data.col5 !== '-') ? data.col5 : '-');
+                tbody.innerHTML += `<tr>
+                    <td data-label="日期"><div class="resizable-cell">${escapeHtml(formatDate(data.col2))}</div></td>
+                    <td data-label="訓練類型"><div class="resizable-cell">${escapeHtml(data.col3)}</div></td>
+                    <td data-label="距離(km)"><div class="resizable-cell">${escapeHtml(data.col4)}</div></td>
+                    <td data-label="時間/配速"><div class="resizable-cell">${escapeHtml(paceDisplay)}</div></td>
+                    <td data-label="心得備註"><div class="resizable-cell">${escapeHtml(data.col6)}</div></td>
+                    <td class="action-cell"><button class="btn-edit" onclick="editMarathonLog('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteMarathonLog('${escapeJsAttr(data.id)}')">刪除</button></td>
+                </tr>`;
+            });
+        }
+
+        // ---- 筆記（定期新增、依時間瀏覽） ----
+        async function submitMarathonNote() {
+            const el = document.getElementById('marathonNoteText');
+            const text = el ? el.value.trim() : '';
+            if (!text) return alert('請輸入筆記內容');
+            const now = new Date(); const pad = n => String(n).padStart(2, '0');
+            const timeStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            const payload = { sheetName: currentPageName, id: newId(), action: 'add', col1: '筆記', col2: timeStr, col3: text };
+            upsertMarathonLocal(payload);
+            el.value = '';
+            queuedPost(payload, { label: '新增東京馬筆記' });
+        }
+        function deleteMarathonNote(id) {
+            if (!confirm('刪除這則筆記？')) return;
+            marathonDataList = marathonDataList.filter(d => String(d.id) !== String(id));
+            renderMarathonAll();
+            queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除東京馬筆記' });
+        }
+        function renderMarathonNoteList() {
+            const box = document.getElementById('marathonNoteList'); if (!box) return;
+            const rows = marathonDataList.filter(d => d.col1 === '筆記').slice().sort((a, b) => String(b.col2).localeCompare(String(a.col2)));
+            if (rows.length === 0) { box.innerHTML = `<div style="opacity:.6; padding:10px 0;">還沒有筆記，賽前準備、裝備心得、報名資訊都可以記在這裡，會依時間列出歷史紀錄。</div>`; return; }
+            box.innerHTML = rows.map(function (d) {
+                return `<div class="marathon-note-item">
+                    <div class="marathon-note-time">🕒 ${escapeHtml(d.col2 || '')}</div>
+                    <div class="marathon-note-text">${linkify(d.col3 || '')}</div>
+                    <button class="btn-delete" style="padding:3px 9px; font-size:11px;" onclick="deleteMarathonNote('${escapeJsAttr(d.id)}')">刪除</button>
+                </div>`;
+            }).join('');
+        }
+
+        // ---- 訓練資源 ----
+        // v1.15：查資料時找到的幾個常用資源，按「📥 匯入建議訓練資源」一次匯入（已存在的名稱不會重複匯入）
+        const MARATHON_SUGGESTED_RESOURCES = [
+            { cat: '訓練計畫', name: 'Marathon Handbook 訓練計畫總覽', url: 'https://marathonhandbook.com/trainingplans/marathon-training-plans/', desc: '各種程度（新手/Sub4/Sub3:30等）的免費訓練計畫總覽' },
+            { cat: '訓練計畫', name: 'CorrerJuntos Sub 3:30 16週計畫', url: 'https://www.correrjuntos.com/blog/en/marathon-sub-3-30-plan', desc: '16週 Sub 3:30 訓練計畫（適合有基礎的跑者）' },
+            { cat: '官方資訊', name: 'Tokyo Marathon 官方賽事總覽', url: 'https://www.marathon.tokyo/en', desc: '東京馬拉松官方網站（賽事資訊、路線圖等）' },
+            { cat: '官方資訊', name: 'Tokyo Marathon 報名/繳費時程', url: 'https://www.marathon.tokyo/en/participants/', desc: '官方公布的報名與繳費時程' }
+        ];
+        function seedMarathonResources() {
+            const existingNames = new Set(marathonDataList.filter(d => d.col1 === '資源').map(d => d.col3));
+            const today = new Date().toISOString().split('T')[0];
+            let added = 0;
+            MARATHON_SUGGESTED_RESOURCES.forEach(s => {
+                if (existingNames.has(s.name)) return;
+                const payload = { sheetName: currentPageName, id: newId(), action: 'add', col1: '資源', col2: s.cat, col3: s.name, col4: s.url, col5: s.desc, col6: today };
+                upsertMarathonLocal(payload);
+                queuedPost(payload, { label: '匯入建議訓練資源' });
+                added++;
+            });
+            alert(added > 0 ? `已匯入 ${added} 筆建議資源！` : '建議資源都已經在列表裡了。');
+        }
+        function cancelMarathonResEdit() {
+            editingMarathonResId = null;
+            safeSet('marathonResCat', ''); safeSet('marathonResName', ''); safeSet('marathonResUrl', ''); safeSet('marathonResDesc', '');
+            safeText('marathonResourceFormTitle', '新增訓練資源');
+            safeText('submitMarathonResBtn', '新增資源'); safeClass('submitMarathonResBtn', 'btn-add');
+            safeDisplay('cancelMarathonResBtn', 'none');
+        }
+        async function submitMarathonResource() {
+            const cat = document.getElementById('marathonResCat').value.trim();
+            const name = document.getElementById('marathonResName').value.trim();
+            const url = document.getElementById('marathonResUrl').value.trim();
+            const desc = document.getElementById('marathonResDesc').value.trim();
+            if (!cat && !name && !url) return alert('請至少填一個欄位（分類 / 名稱 / 連結）');
+            // v1.16：col6 記「建立日期」，只在新增時設定，編輯時延用原本的建立日期
+            let createdDate = new Date().toISOString().split('T')[0];
+            if (editingMarathonResId) {
+                const existing = marathonDataList.find(d => String(d.id) === String(editingMarathonResId));
+                if (existing && existing.col6) createdDate = existing.col6;
+            }
+            const payload = {
+                sheetName: currentPageName, id: editingMarathonResId || newId(), action: editingMarathonResId ? 'edit' : 'add',
+                col1: '資源', col2: cat || '-', col3: name || '-', col4: url || '-', col5: desc || '-', col6: createdDate
+            };
+            upsertMarathonLocal(payload);
+            cancelMarathonResEdit();
+            queuedPost(payload, { label: payload.action === 'edit' ? '修改訓練資源' : '新增訓練資源' });
+        }
+        function editMarathonResource(id) {
+            const item = marathonDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            safeSet('marathonResCat', item.col2 === '-' ? '' : item.col2);
+            safeSet('marathonResName', item.col3 === '-' ? '' : item.col3);
+            safeSet('marathonResUrl', item.col4 === '-' ? '' : item.col4);
+            safeSet('marathonResDesc', item.col5 === '-' ? '' : item.col5);
+            editingMarathonResId = id;
+            safeText('marathonResourceFormTitle', '編輯訓練資源');
+            safeText('submitMarathonResBtn', '儲存修改'); safeClass('submitMarathonResBtn', 'btn-edit');
+            safeDisplay('cancelMarathonResBtn', 'inline-block');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function deleteMarathonResource(id) {
+            if (!confirm('確定刪除此訓練資源？')) return;
+            marathonDataList = marathonDataList.filter(d => String(d.id) !== String(id));
+            renderMarathonAll();
+            queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除訓練資源' });
+        }
+        function renderMarathonResTable() {
+            const tbody = document.getElementById('marathonResTableBody'); if (!tbody) return; tbody.innerHTML = '';
+            const rows = marathonDataList.filter(d => d.col1 === '資源');
+            rows.forEach(data => {
+                const url = safeStr(data.col4).trim();
+                const href = /^https?:\/\//i.test(url) ? url : (url ? 'http://' + url : '');
+                const linkHtml = (url && url !== '-') ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(url)}</a>` : '<span style="opacity:.5;">（無連結）</span>';
+                tbody.innerHTML += `<tr>
+                    <td data-label="分類"><div class="resizable-cell">${escapeHtml(data.col2)}</div></td>
+                    <td data-label="名稱"><div class="resizable-cell">${escapeHtml(data.col3)}</div></td>
+                    <td data-label="連結"><div class="resizable-cell">${linkHtml}</div></td>
+                    <td data-label="說明"><div class="resizable-cell">${escapeHtml(data.col5)}</div></td>
+                    <td data-label="建立日期"><div class="resizable-cell">${escapeHtml(formatDate(data.col6))}</div></td>
+                    <td class="action-cell"><button class="btn-edit" onclick="editMarathonResource('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteMarathonResource('${escapeJsAttr(data.id)}')">刪除</button></td>
+                </tr>`;
+            });
+        }
+
+        // ---- Overview（依日期整合訓練記錄／筆記／訓練資源） ----
+        function addMarathonOverviewDate() {
+            const el = document.getElementById('marathonOverviewDateInput'); if (!el || !el.value) return;
+            if (!marathonOverviewDates.includes(el.value)) marathonOverviewDates.push(el.value);
+            el.value = '';
+            renderMarathonOverviewTags();
+            renderMarathonOverview();
+        }
+        function removeMarathonOverviewDate(d) {
+            marathonOverviewDates = marathonOverviewDates.filter(x => x !== d);
+            renderMarathonOverviewTags();
+            renderMarathonOverview();
+        }
+        function renderMarathonOverviewTags() {
+            const c = document.getElementById('marathonOverviewDateTags'); if (!c) return;
+            c.innerHTML = '';
+            marathonOverviewDates.slice().sort().forEach(d => {
+                c.innerHTML += `<div class="tag">${escapeHtml(d)} <span onclick="removeMarathonOverviewDate('${escapeJsAttr(d)}')">✖</span></div>`;
+            });
+        }
+        // 每種紀錄類型各自的「代表日期」：訓練記錄看col2、筆記看時間戳前10碼、資源看建立日期(col6)
+        function marathonRecordDate(d) {
+            if (d.col1 === '訓練記錄') return formatDate(d.col2);
+            if (d.col1 === '筆記') return safeStr(d.col2).slice(0, 10);
+            if (d.col1 === '資源') return formatDate(d.col6);
+            return '';
+        }
+        function renderMarathonOverview() {
+            const box = document.getElementById('marathonOverviewResult'); if (!box) return;
+            if (marathonOverviewDates.length === 0) { box.innerHTML = `<div style="opacity:.6; padding:10px 0;">請先在上面加入一個或多個日期。</div>`; return; }
+
+            box.innerHTML = marathonOverviewDates.slice().sort().map(function (dateStr) {
+                const logs = marathonDataList.filter(d => d.col1 === '訓練記錄' && marathonRecordDate(d) === dateStr);
+                const notes = marathonDataList.filter(d => d.col1 === '筆記' && marathonRecordDate(d) === dateStr);
+                const resources = marathonDataList.filter(d => d.col1 === '資源' && marathonRecordDate(d) === dateStr);
+
+                const logsHtml = logs.length ? logs.map(function (d) {
+                    const segs = marathonSegParse(d);
+                    const paceDisplay = segs.length ? marathonSegSummaryText(segs) : ((d.col5 && d.col5 !== '-') ? d.col5 : '');
+                    return `<div class="marathon-ov-item">🏃 <b>${escapeHtml(d.col3)}</b>　${escapeHtml(d.col4 && d.col4 !== '-' ? d.col4 : '0')} km${paceDisplay ? '　(' + escapeHtml(paceDisplay) + ')' : ''}${(d.col6 && d.col6 !== '-') ? `<div class="marathon-ov-sub">${escapeHtml(d.col6)}</div>` : ''}</div>`;
+                }).join('') : `<div class="marathon-ov-empty">這天沒有訓練記錄</div>`;
+
+                const notesHtml = notes.length ? notes.map(function (d) {
+                    return `<div class="marathon-ov-item">📝 ${linkify(d.col3 || '')}<div class="marathon-ov-sub">🕒 ${escapeHtml(d.col2 || '')}</div></div>`;
+                }).join('') : `<div class="marathon-ov-empty">這天沒有筆記</div>`;
+
+                const resHtml = resources.length ? resources.map(function (d) {
+                    const url = safeStr(d.col4).trim();
+                    const href = /^https?:\/\//i.test(url) ? url : (url ? 'http://' + url : '');
+                    return `<div class="marathon-ov-item">🔗 <b>${escapeHtml(d.col3)}</b>${(url && url !== '-') ? ` — <a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(url)}</a>` : ''}</div>`;
+                }).join('') : `<div class="marathon-ov-empty">這天沒有新增訓練資源</div>`;
+
+                return `<div class="marathon-ov-day">
+                    <div class="marathon-ov-day-title">📅 ${escapeHtml(dateStr)}</div>
+                    <div class="marathon-ov-section"><div class="marathon-ov-section-title">🏃 訓練記錄</div>${logsHtml}</div>
+                    <div class="marathon-ov-section"><div class="marathon-ov-section-title">📝 筆記</div>${notesHtml}</div>
+                    <div class="marathon-ov-section"><div class="marathon-ov-section-title">🔗 訓練資源</div>${resHtml}</div>
+                </div>`;
+            }).join('');
         }
     </script>
 </body>
