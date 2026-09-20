@@ -258,6 +258,10 @@
         .marathon-ov-item { background: #f7f7f7; border-radius: 6px; padding: 6px 10px; margin-bottom: 4px; font-size: 13px; }
         .marathon-ov-sub { font-size: 12px; opacity: .7; margin-top: 2px; white-space: pre-wrap; word-break: break-word; }
         .marathon-ov-empty { font-size: 12px; opacity: .5; padding: 2px 4px; }
+        /* v1.17：跑鞋累積距離提醒（一般建議 500~800km 該換鞋） */
+        .marathon-shoe-dist { font-weight: bold; }
+        .marathon-shoe-dist.warn { color: #e65100; }
+        .marathon-shoe-dist.danger { color: #dc3545; }
         @media screen and (max-width: 768px) { .link-card { width: 100% !important; } }
     </style>
 </head>
@@ -578,6 +582,7 @@
             <div class="marathon-tabs">
                 <button type="button" class="marathon-tab-btn active" id="marathonTabBtn_log" onclick="switchMarathonTab('log')">🏃 訓練記錄</button>
                 <button type="button" class="marathon-tab-btn" id="marathonTabBtn_note" onclick="switchMarathonTab('note')">📝 筆記</button>
+                <button type="button" class="marathon-tab-btn" id="marathonTabBtn_shoe" onclick="switchMarathonTab('shoe')">👟 跑鞋</button>
                 <button type="button" class="marathon-tab-btn" id="marathonTabBtn_resource" onclick="switchMarathonTab('resource')">🔗 訓練資源</button>
                 <button type="button" class="marathon-tab-btn" id="marathonTabBtn_overview" onclick="switchMarathonTab('overview')">📅 Overview</button>
             </div>
@@ -599,6 +604,7 @@
                         <option value="休息">休息</option>
                     </select>
                 </div>
+                <div class="form-group"><label>跑鞋</label><select id="marathonLogShoe"><option value="">（不記錄）</option></select></div>
                 <div class="form-group" style="display:block; width:100%; max-width:520px;">
                     <label>分段配速（例如：前2km/中5km/後2km 各自的距離+配速；肌力訓練/伸展可以只填一段或留空，細節寫在心得備註）</label>
                     <div id="marathonSegmentContainer"></div>
@@ -612,8 +618,26 @@
                 <div class="marathon-week-summary" id="marathonWeekSummary"></div>
                 <div class="table-responsive">
                     <table id="marathonLogTable">
-                        <thead><tr><th>日期</th><th>訓練類型</th><th>距離(km)</th><th>時間/配速</th><th>心得備註</th><th>操作</th></tr></thead>
+                        <thead><tr><th>日期</th><th>訓練類型</th><th>距離(km)</th><th>時間/配速</th><th>跑鞋</th><th>心得備註</th><th>操作</th></tr></thead>
                         <tbody id="marathonLogTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 跑鞋 -->
+            <div id="marathonTab_shoe" class="marathon-tab-panel" style="display:none;">
+                <h2 id="marathonShoeFormTitle">新增跑鞋</h2>
+                <div class="form-group"><label>名稱</label><input type="text" id="marathonShoeName" placeholder="例如：Nike Pegasus 41"></div>
+                <div class="form-group"><label>備註</label><input type="text" id="marathonShoeNote" placeholder="顏色/購入地點等"></div>
+                <div class="form-group"><label>購入日期</label><input type="date" id="marathonShoeDate"></div>
+                <div style="margin-top: 10px;">
+                    <button id="submitMarathonShoeBtn" class="btn-add" onclick="submitMarathonShoe()">新增跑鞋</button>
+                    <button id="cancelMarathonShoeBtn" class="btn-cancel" onclick="cancelMarathonShoeEdit()">取消編輯</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="marathonShoeTable">
+                        <thead><tr><th>名稱</th><th>備註</th><th>購入日期</th><th>累積距離(km)</th><th>使用次數</th><th>操作</th></tr></thead>
+                        <tbody id="marathonShoeTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -918,6 +942,7 @@
         let marathonCountdownTimer = null;
         let marathonLogSegments = [{ distance: '', pace: '' }]; // v1.16：訓練記錄表單目前編輯中的分段（距離+配速）
         let marathonOverviewDates = [];                          // v1.16：Overview 已選擇的日期標籤
+        let editingMarathonShoeId = null;                        // v1.17：正在編輯的跑鞋
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
         let newsDataList = []; let editingNewsId = null; 
 
@@ -1198,7 +1223,7 @@
 
             document.querySelectorAll('.app-page').forEach(page => { page.style.display = 'none'; });
             
-            cancelFoodEdit(); cancelSportsEdit(); cancelNoteEdit(); cancelTravelEdit(); cancelNewsEdit(); cancelGenericEdit(); cancelMarathonLogEdit(); cancelMarathonResEdit();
+            cancelFoodEdit(); cancelSportsEdit(); cancelNoteEdit(); cancelTravelEdit(); cancelNewsEdit(); cancelGenericEdit(); cancelMarathonLogEdit(); cancelMarathonResEdit(); cancelMarathonShoeEdit();
             if (marathonCountdownTimer) { clearInterval(marathonCountdownTimer); marathonCountdownTimer = null; } // v1.15：離開東京馬頁先停掉倒數計時器
 
             applyTheme(config);
@@ -1299,7 +1324,7 @@
                     updateNewsCategoryCheckboxes();
                 }
                 else if (pt === 'marathon') {
-                    marathonDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 7 }) }));
+                    marathonDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 8 }) }));
                     renderMarathonAll();
                 }
                 else { genericDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 20 }) })); }
@@ -2342,13 +2367,14 @@
         }
 
         // ================= 🏃 東京馬拉松2027（v1.15） =================
-        // 同一分頁（擴充預留網頁6）混存三種紀錄，用 col1 區分：
-        //   col1='訓練記錄' → col2=日期 col3=訓練類型 col4=距離(km) col5=時間/配速 col6=心得備註
+        // 同一分頁（擴充預留網頁6）混存四種紀錄，用 col1 區分：
+        //   col1='訓練記錄' → col2=日期 col3=訓練類型 col4=距離加總(km) col5=(舊資料相容用) col6=心得備註 col7=分段JSON col8=跑鞋id
         //   col1='筆記'     → col2=時間(YYYY-MM-DD HH:mm) col3=內容
-        //   col1='資源'     → col2=分類 col3=名稱 col4=連結 col5=說明
+        //   col1='資源'     → col2=分類 col3=名稱 col4=連結 col5=說明 col6=建立日期
+        //   col1='跑鞋'     → col2=名稱 col3=備註 col4=購入日期（v1.17）
 
         function upsertMarathonLocal(payload) {
-            const item = { ...payload, fullText: buildFullText(payload, { cols: 7 }) };
+            const item = { ...payload, fullText: buildFullText(payload, { cols: 8 }) };
             delete item.action;
             const idx = marathonDataList.findIndex(d => String(d.id) === String(payload.id));
             if (idx > -1) marathonDataList[idx] = item; else marathonDataList.push(item);
@@ -2357,7 +2383,7 @@
 
         function switchMarathonTab(tab) {
             marathonSubTab = tab;
-            ['log', 'note', 'resource', 'overview'].forEach(t => {
+            ['log', 'shoe', 'note', 'resource', 'overview'].forEach(t => {
                 safeDisplay(`marathonTab_${t}`, t === tab ? 'block' : 'none');
                 safeClass(`marathonTabBtn_${t}`, 'marathon-tab-btn' + (t === tab ? ' active' : ''));
             });
@@ -2365,8 +2391,10 @@
 
         function renderMarathonAll() {
             renderMarathonCountdown();
+            renderMarathonShoeOptions();
             renderMarathonWeekSummary();
             renderMarathonLogTable();
+            renderMarathonShoeTable();
             renderMarathonNoteList();
             renderMarathonResTable();
             renderMarathonOverview();
@@ -2486,7 +2514,7 @@
         function cancelMarathonLogEdit() {
             editingMarathonLogId = null;
             safeSet('marathonLogDate', new Date().toISOString().split('T')[0]);
-            safeSet('marathonLogType', '輕鬆跑'); safeSet('marathonLogNotes', '');
+            safeSet('marathonLogType', '輕鬆跑'); safeSet('marathonLogNotes', ''); safeSet('marathonLogShoe', '');
             marathonLogSegments = [{ distance: '', pace: '' }];
             renderMarathonSegmentInputs();
             safeText('marathonLogFormTitle', '新增訓練記錄');
@@ -2497,6 +2525,7 @@
             const date = document.getElementById('marathonLogDate').value;
             if (!date) return alert('請選擇日期！');
             const type = document.getElementById('marathonLogType').value;
+            const shoeId = document.getElementById('marathonLogShoe').value;
             const notes = document.getElementById('marathonLogNotes').value.trim();
             const segs = marathonLogSegments
                 .map(s => ({ distance: safeStr(s.distance).trim(), pace: safeStr(s.pace).trim() }))
@@ -2508,7 +2537,8 @@
                 col4: segs.length ? String(totalDistance) : '-',
                 col5: '-', // v1.16 起改用 col7 存分段；col5 保留只為相容更舊的資料
                 col6: notes || '-',
-                col7: JSON.stringify(segs)
+                col7: JSON.stringify(segs),
+                col8: shoeId || '' // v1.17：跑鞋 id（對應 col1='跑鞋' 那筆的 id）
             };
             upsertMarathonLocal(payload);
             cancelMarathonLogEdit();
@@ -2519,6 +2549,7 @@
             safeSet('marathonLogDate', formatDate(item.col2));
             safeSet('marathonLogType', item.col3 || '輕鬆跑');
             safeSet('marathonLogNotes', item.col6 === '-' ? '' : item.col6);
+            safeSet('marathonLogShoe', item.col8 || '');
             let segs = marathonSegParse(item);
             if (segs.length === 0 && item.col4 && item.col4 !== '-') {
                 // 相容 v1.15 以前只有單一距離/配速的舊資料
@@ -2544,13 +2575,98 @@
             rows.forEach(data => {
                 const segs = marathonSegParse(data);
                 const paceDisplay = segs.length ? marathonSegSummaryText(segs) : ((data.col5 && data.col5 !== '-') ? data.col5 : '-');
+                const shoeName = marathonShoeNameById(data.col8);
                 tbody.innerHTML += `<tr>
                     <td data-label="日期"><div class="resizable-cell">${escapeHtml(formatDate(data.col2))}</div></td>
                     <td data-label="訓練類型"><div class="resizable-cell">${escapeHtml(data.col3)}</div></td>
                     <td data-label="距離(km)"><div class="resizable-cell">${escapeHtml(data.col4)}</div></td>
                     <td data-label="時間/配速"><div class="resizable-cell">${escapeHtml(paceDisplay)}</div></td>
+                    <td data-label="跑鞋"><div class="resizable-cell">${escapeHtml(shoeName)}</div></td>
                     <td data-label="心得備註"><div class="resizable-cell">${escapeHtml(data.col6)}</div></td>
                     <td class="action-cell"><button class="btn-edit" onclick="editMarathonLog('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteMarathonLog('${escapeJsAttr(data.id)}')">刪除</button></td>
+                </tr>`;
+            });
+        }
+
+        // ---- 跑鞋（v1.17：記錄訓練穿的鞋子，累計每雙鞋的里程；一般建議跑鞋累積 500~800km 該考慮更換） ----
+        function marathonShoeDistance(shoeId) {
+            let total = 0;
+            marathonDataList.filter(d => d.col1 === '訓練記錄' && d.col8 && String(d.col8) === String(shoeId)).forEach(d => {
+                const n = parseFloat(String(d.col4).replace(/[^\d.]/g, ''));
+                if (!isNaN(n)) total += n;
+            });
+            return total;
+        }
+        function marathonShoeCount(shoeId) {
+            return marathonDataList.filter(d => d.col1 === '訓練記錄' && d.col8 && String(d.col8) === String(shoeId)).length;
+        }
+        function marathonShoeNameById(id) {
+            if (!id) return '-';
+            const shoe = marathonDataList.find(d => d.col1 === '跑鞋' && String(d.id) === String(id));
+            return shoe ? shoe.col2 : '（已刪除的鞋子）';
+        }
+        function cancelMarathonShoeEdit() {
+            editingMarathonShoeId = null;
+            safeSet('marathonShoeName', ''); safeSet('marathonShoeNote', ''); safeSet('marathonShoeDate', '');
+            safeText('marathonShoeFormTitle', '新增跑鞋');
+            safeText('submitMarathonShoeBtn', '新增跑鞋'); safeClass('submitMarathonShoeBtn', 'btn-add');
+            safeDisplay('cancelMarathonShoeBtn', 'none');
+        }
+        async function submitMarathonShoe() {
+            const name = document.getElementById('marathonShoeName').value.trim();
+            if (!name) return alert('請輸入跑鞋名稱！');
+            const note = document.getElementById('marathonShoeNote').value.trim();
+            const date = document.getElementById('marathonShoeDate').value;
+            const payload = {
+                sheetName: currentPageName, id: editingMarathonShoeId || newId(), action: editingMarathonShoeId ? 'edit' : 'add',
+                col1: '跑鞋', col2: name, col3: note || '-', col4: date || '-'
+            };
+            upsertMarathonLocal(payload);
+            cancelMarathonShoeEdit();
+            queuedPost(payload, { label: payload.action === 'edit' ? '修改跑鞋' : '新增跑鞋' });
+        }
+        function editMarathonShoe(id) {
+            const item = marathonDataList.find(d => String(d.id) === String(id)); if (!item) return;
+            safeSet('marathonShoeName', item.col2 || '');
+            safeSet('marathonShoeNote', item.col3 === '-' ? '' : item.col3);
+            safeSet('marathonShoeDate', item.col4 === '-' ? '' : formatDate(item.col4));
+            editingMarathonShoeId = id;
+            safeText('marathonShoeFormTitle', '編輯跑鞋');
+            safeText('submitMarathonShoeBtn', '儲存修改'); safeClass('submitMarathonShoeBtn', 'btn-edit');
+            safeDisplay('cancelMarathonShoeBtn', 'inline-block');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function deleteMarathonShoe(id) {
+            const usedCount = marathonShoeCount(id);
+            const msg = usedCount > 0 ? `這雙鞋已經連結 ${usedCount} 筆訓練記錄，刪除後訓練記錄仍會保留，只是鞋子欄位會顯示「已刪除的鞋子」。確定刪除？` : '確定刪除此跑鞋？';
+            if (!confirm(msg)) return;
+            marathonDataList = marathonDataList.filter(d => String(d.id) !== String(id));
+            renderMarathonAll();
+            queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除跑鞋' });
+        }
+        function renderMarathonShoeOptions() {
+            const sel = document.getElementById('marathonLogShoe'); if (!sel) return;
+            const current = sel.value;
+            const shoes = marathonDataList.filter(d => d.col1 === '跑鞋').slice().sort((a, b) => safeStr(a.col2).localeCompare(safeStr(b.col2)));
+            sel.innerHTML = '<option value="">（不記錄）</option>' + shoes.map(s => `<option value="${escapeHtml(s.id)}">${escapeHtml(s.col2)}</option>`).join('');
+            if (shoes.some(s => String(s.id) === String(current))) sel.value = current;
+        }
+        function renderMarathonShoeTable() {
+            const tbody = document.getElementById('marathonShoeTableBody'); if (!tbody) return; tbody.innerHTML = '';
+            const rows = marathonDataList.filter(d => d.col1 === '跑鞋').slice().sort((a, b) => safeStr(a.col2).localeCompare(safeStr(b.col2)));
+            if (rows.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; opacity:.6;">還沒有新增跑鞋</td></tr>`; return; }
+            rows.forEach(data => {
+                const dist = marathonShoeDistance(data.id);
+                const count = marathonShoeCount(data.id);
+                let distClass = 'marathon-shoe-dist';
+                if (dist > 800) distClass += ' danger'; else if (dist > 500) distClass += ' warn';
+                tbody.innerHTML += `<tr>
+                    <td data-label="名稱"><div class="resizable-cell">${escapeHtml(data.col2)}</div></td>
+                    <td data-label="備註"><div class="resizable-cell">${escapeHtml(data.col3)}</div></td>
+                    <td data-label="購入日期"><div class="resizable-cell">${escapeHtml(formatDate(data.col4))}</div></td>
+                    <td data-label="累積距離(km)"><div class="resizable-cell ${distClass}">${dist.toFixed(1)}</div></td>
+                    <td data-label="使用次數"><div class="resizable-cell">${count}</div></td>
+                    <td class="action-cell"><button class="btn-edit" onclick="editMarathonShoe('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteMarathonShoe('${escapeJsAttr(data.id)}')">刪除</button></td>
                 </tr>`;
             });
         }
@@ -2709,7 +2825,8 @@
                 const logsHtml = logs.length ? logs.map(function (d) {
                     const segs = marathonSegParse(d);
                     const paceDisplay = segs.length ? marathonSegSummaryText(segs) : ((d.col5 && d.col5 !== '-') ? d.col5 : '');
-                    return `<div class="marathon-ov-item">🏃 <b>${escapeHtml(d.col3)}</b>　${escapeHtml(d.col4 && d.col4 !== '-' ? d.col4 : '0')} km${paceDisplay ? '　(' + escapeHtml(paceDisplay) + ')' : ''}${(d.col6 && d.col6 !== '-') ? `<div class="marathon-ov-sub">${escapeHtml(d.col6)}</div>` : ''}</div>`;
+                    const shoeDisplay = d.col8 ? '　👟 ' + escapeHtml(marathonShoeNameById(d.col8)) : '';
+                    return `<div class="marathon-ov-item">🏃 <b>${escapeHtml(d.col3)}</b>　${escapeHtml(d.col4 && d.col4 !== '-' ? d.col4 : '0')} km${paceDisplay ? '　(' + escapeHtml(paceDisplay) + ')' : ''}${shoeDisplay}${(d.col6 && d.col6 !== '-') ? `<div class="marathon-ov-sub">${escapeHtml(d.col6)}</div>` : ''}</div>`;
                 }).join('') : `<div class="marathon-ov-empty">這天沒有訓練記錄</div>`;
 
                 const notesHtml = notes.length ? notes.map(function (d) {
