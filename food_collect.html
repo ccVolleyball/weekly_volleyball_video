@@ -262,6 +262,24 @@
         .marathon-shoe-dist { font-weight: bold; }
         .marathon-shoe-dist.warn { color: #e65100; }
         .marathon-shoe-dist.danger { color: #dc3545; }
+        /* v1.18：訓練類型可複選，用顏色標籤區分跑步／肌力／伸展／交叉／休息 */
+        .marathon-type-checks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+        .marathon-type-check { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 14px; font-size: 13px; cursor: pointer; background: #eceff1; color: #546e7a; }
+        .marathon-type-check input { margin: 0; }
+        .marathon-type-check.run { background: #e3f2fd; color: #1565c0; }
+        .marathon-type-check.strength { background: #fff3e0; color: #e65100; }
+        .marathon-type-check.stretch { background: #e8f5e9; color: #2e7d32; }
+        .marathon-type-check.cross { background: #f3e5f5; color: #6a1b9a; }
+        .marathon-type-check.rest { background: #eceff1; color: #546e7a; }
+        .marathon-type-tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin: 1px 3px 1px 0; white-space: nowrap; }
+        .marathon-type-tag.run { background: #e3f2fd; color: #1565c0; }
+        .marathon-type-tag.strength { background: #fff3e0; color: #e65100; }
+        .marathon-type-tag.stretch { background: #e8f5e9; color: #2e7d32; }
+        .marathon-type-tag.cross { background: #f3e5f5; color: #6a1b9a; }
+        .marathon-type-tag.rest { background: #eceff1; color: #546e7a; }
+        /* v1.18：訓練資源縮放（收合成一行摘要） */
+        .marathon-res-collapsed-row td { padding: 8px 10px; opacity: .8; cursor: pointer; font-size: 13px; }
+        .marathon-res-collapsed-row:hover td { opacity: 1; background: #f5f5f5; }
         @media screen and (max-width: 768px) { .link-card { width: 100% !important; } }
     </style>
 </head>
@@ -591,20 +609,22 @@
             <div id="marathonTab_log" class="marathon-tab-panel">
                 <h2 id="marathonLogFormTitle">新增訓練記錄</h2>
                 <div class="form-group"><label>日期</label><input type="date" id="marathonLogDate"></div>
-                <div class="form-group"><label>訓練類型</label>
-                    <select id="marathonLogType">
-                        <option value="輕鬆跑">輕鬆跑</option>
-                        <option value="節奏跑">節奏跑</option>
-                        <option value="間歇">間歇</option>
-                        <option value="長距離LSD">長距離LSD</option>
-                        <option value="恢復跑">恢復跑</option>
-                        <option value="肌力訓練">肌力訓練</option>
-                        <option value="伸展">伸展</option>
-                        <option value="交叉訓練">交叉訓練</option>
-                        <option value="休息">休息</option>
-                    </select>
+                <div class="form-group" style="display:block; width:100%; max-width:560px;">
+                    <label>訓練類型（可複選，例如同時做跑步＋肌力訓練）</label>
+                    <div class="marathon-type-checks">
+                        <label class="marathon-type-check run"><input type="checkbox" class="marathonLogTypeCheck" value="輕鬆跑" checked> 輕鬆跑</label>
+                        <label class="marathon-type-check run"><input type="checkbox" class="marathonLogTypeCheck" value="節奏跑"> 節奏跑</label>
+                        <label class="marathon-type-check run"><input type="checkbox" class="marathonLogTypeCheck" value="間歇"> 間歇</label>
+                        <label class="marathon-type-check run"><input type="checkbox" class="marathonLogTypeCheck" value="長距離LSD"> 長距離LSD</label>
+                        <label class="marathon-type-check run"><input type="checkbox" class="marathonLogTypeCheck" value="恢復跑"> 恢復跑</label>
+                        <label class="marathon-type-check strength"><input type="checkbox" class="marathonLogTypeCheck" value="肌力訓練"> 肌力訓練</label>
+                        <label class="marathon-type-check stretch"><input type="checkbox" class="marathonLogTypeCheck" value="伸展"> 伸展</label>
+                        <label class="marathon-type-check cross"><input type="checkbox" class="marathonLogTypeCheck" value="交叉訓練"> 交叉訓練</label>
+                        <label class="marathon-type-check rest"><input type="checkbox" class="marathonLogTypeCheck" value="休息"> 休息</label>
+                    </div>
                 </div>
                 <div class="form-group"><label>跑鞋</label><select id="marathonLogShoe"><option value="">（不記錄）</option></select></div>
+                <div class="form-group"><label>引用訓練資源</label><select id="marathonLogResource" onchange="applyMarathonResourceToLog()"><option value="">（不引用）</option></select></div>
                 <div class="form-group" style="display:block; width:100%; max-width:520px;">
                     <label>分段配速（例如：前2km/中5km/後2km 各自的距離+配速；肌力訓練/伸展可以只填一段或留空，細節寫在心得備註）</label>
                     <div id="marathonSegmentContainer"></div>
@@ -618,7 +638,7 @@
                 <div class="marathon-week-summary" id="marathonWeekSummary"></div>
                 <div class="table-responsive">
                     <table id="marathonLogTable">
-                        <thead><tr><th>日期</th><th>訓練類型</th><th>距離(km)</th><th>時間/配速</th><th>跑鞋</th><th>心得備註</th><th>操作</th></tr></thead>
+                        <thead><tr><th>日期</th><th>訓練類型</th><th>距離(km)</th><th>時間/配速</th><th>跑鞋</th><th>引用資源</th><th>心得備註</th><th>操作</th></tr></thead>
                         <tbody id="marathonLogTableBody"></tbody>
                     </table>
                 </div>
@@ -663,10 +683,11 @@
                     <button id="submitMarathonResBtn" class="btn-add" onclick="submitMarathonResource()">新增資源</button>
                     <button id="cancelMarathonResBtn" class="btn-cancel" onclick="cancelMarathonResEdit()">取消編輯</button>
                     <button class="btn-copy" onclick="seedMarathonResources()">📥 匯入建議訓練資源</button>
+                    <button class="btn-copy" id="marathonResToggleAllBtn" onclick="toggleMarathonResAllCollapse()">🔽 全部收合</button>
                 </div>
                 <div class="table-responsive">
                     <table id="marathonResTable">
-                        <thead><tr><th>分類</th><th>名稱</th><th>連結</th><th>說明</th><th>建立日期</th><th>操作</th></tr></thead>
+                        <thead><tr><th>編號</th><th>分類</th><th>名稱</th><th>連結</th><th>說明</th><th>建立日期</th><th>使用次數</th><th>操作</th></tr></thead>
                         <tbody id="marathonResTableBody"></tbody>
                     </table>
                 </div>
@@ -943,6 +964,7 @@
         let marathonLogSegments = [{ distance: '', pace: '' }]; // v1.16：訓練記錄表單目前編輯中的分段（距離+配速）
         let marathonOverviewDates = [];                          // v1.16：Overview 已選擇的日期標籤
         let editingMarathonShoeId = null;                        // v1.17：正在編輯的跑鞋
+        let marathonResCollapsedIds = new Set();                 // v1.18：訓練資源目前收合中的id（純畫面狀態，不存後端）
         let travelDataList = []; let editingTravelId = null; let travelFilterKeywords = []; 
         let newsDataList = []; let editingNewsId = null; 
 
@@ -1324,7 +1346,7 @@
                     updateNewsCategoryCheckboxes();
                 }
                 else if (pt === 'marathon') {
-                    marathonDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 8 }) }));
+                    marathonDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 9 }) }));
                     renderMarathonAll();
                 }
                 else { genericDataList = data.map(item => ({ ...item, fullText: buildFullText(item, { cols: 20 }) })); }
@@ -2368,13 +2390,13 @@
 
         // ================= 🏃 東京馬拉松2027（v1.15） =================
         // 同一分頁（擴充預留網頁6）混存四種紀錄，用 col1 區分：
-        //   col1='訓練記錄' → col2=日期 col3=訓練類型 col4=距離加總(km) col5=(舊資料相容用) col6=心得備註 col7=分段JSON col8=跑鞋id
+        //   col1='訓練記錄' → col2=日期 col3=訓練類型(JSON陣列，可複選) col4=距離加總(km) col5=(舊資料相容用) col6=心得備註 col7=分段JSON col8=跑鞋id col9=引用的訓練資源id（v1.18）
         //   col1='筆記'     → col2=時間(YYYY-MM-DD HH:mm) col3=內容
-        //   col1='資源'     → col2=分類 col3=名稱 col4=連結 col5=說明 col6=建立日期
+        //   col1='資源'     → col2=分類 col3=名稱 col4=連結 col5=說明 col6=建立日期 col7=編號（流水號，v1.18） col8=使用次數（v1.18）
         //   col1='跑鞋'     → col2=名稱 col3=備註 col4=購入日期（v1.17）
 
         function upsertMarathonLocal(payload) {
-            const item = { ...payload, fullText: buildFullText(payload, { cols: 8 }) };
+            const item = { ...payload, fullText: buildFullText(payload, { cols: 9 }) };
             delete item.action;
             const idx = marathonDataList.findIndex(d => String(d.id) === String(payload.id));
             if (idx > -1) marathonDataList[idx] = item; else marathonDataList.push(item);
@@ -2392,6 +2414,7 @@
         function renderMarathonAll() {
             renderMarathonCountdown();
             renderMarathonShoeOptions();
+            renderMarathonResourceOptions();
             renderMarathonWeekSummary();
             renderMarathonLogTable();
             renderMarathonShoeTable();
@@ -2511,10 +2534,29 @@
             });
             el.textContent = `📊 本週（${formatDate(monday.toISOString())} ～ ${formatDate(sunday.toISOString())}）已累積跑量：${total.toFixed(1)} km`;
         }
+        // ---- 訓練類型（v1.18：可複選，存成 JSON 陣列；舊資料是單一字串，用 marathonTypeParse 相容） ----
+        function marathonTypeParse(item) {
+            const raw = safeStr(item.col3).trim();
+            if (!raw) return [];
+            try { const a = JSON.parse(raw); if (Array.isArray(a)) return a.filter(t => t); } catch (e) {}
+            return [raw]; // 舊資料：col3 是單一字串
+        }
+        function marathonTypeColorClass(type) {
+            if (['輕鬆跑', '節奏跑', '間歇', '長距離LSD', '恢復跑'].indexOf(type) > -1) return 'run';
+            if (type === '肌力訓練') return 'strength';
+            if (type === '伸展') return 'stretch';
+            if (type === '交叉訓練') return 'cross';
+            if (type === '休息') return 'rest';
+            return 'run';
+        }
+        function marathonTypeTagsHtml(types) {
+            return types.map(t => `<span class="marathon-type-tag ${marathonTypeColorClass(t)}">${escapeHtml(t)}</span>`).join('');
+        }
         function cancelMarathonLogEdit() {
             editingMarathonLogId = null;
             safeSet('marathonLogDate', new Date().toISOString().split('T')[0]);
-            safeSet('marathonLogType', '輕鬆跑'); safeSet('marathonLogNotes', ''); safeSet('marathonLogShoe', '');
+            document.querySelectorAll('.marathonLogTypeCheck').forEach(el => { el.checked = (el.value === '輕鬆跑'); });
+            safeSet('marathonLogNotes', ''); safeSet('marathonLogShoe', ''); safeSet('marathonLogResource', '');
             marathonLogSegments = [{ distance: '', pace: '' }];
             renderMarathonSegmentInputs();
             safeText('marathonLogFormTitle', '新增訓練記錄');
@@ -2524,32 +2566,50 @@
         async function submitMarathonLog() {
             const date = document.getElementById('marathonLogDate').value;
             if (!date) return alert('請選擇日期！');
-            const type = document.getElementById('marathonLogType').value;
+            const types = Array.from(document.querySelectorAll('.marathonLogTypeCheck:checked')).map(el => el.value);
+            if (types.length === 0) return alert('請至少勾選一個訓練類型！');
             const shoeId = document.getElementById('marathonLogShoe').value;
+            const resourceId = document.getElementById('marathonLogResource').value;
             const notes = document.getElementById('marathonLogNotes').value.trim();
             const segs = marathonLogSegments
                 .map(s => ({ distance: safeStr(s.distance).trim(), pace: safeStr(s.pace).trim() }))
                 .filter(s => s.distance || s.pace);
             const totalDistance = marathonSegTotalDistance(segs);
+
+            // v1.18：記住舊的引用資源，等等要跟新的比對，調整訓練資源的「使用次數」
+            let oldResourceId = '';
+            if (editingMarathonLogId) {
+                const existing = marathonDataList.find(d => String(d.id) === String(editingMarathonLogId));
+                if (existing) oldResourceId = existing.col9 || '';
+            }
+
             const payload = {
                 sheetName: currentPageName, id: editingMarathonLogId || newId(), action: editingMarathonLogId ? 'edit' : 'add',
-                col1: '訓練記錄', col2: date, col3: type,
+                col1: '訓練記錄', col2: date, col3: JSON.stringify(types),
                 col4: segs.length ? String(totalDistance) : '-',
                 col5: '-', // v1.16 起改用 col7 存分段；col5 保留只為相容更舊的資料
                 col6: notes || '-',
                 col7: JSON.stringify(segs),
-                col8: shoeId || '' // v1.17：跑鞋 id（對應 col1='跑鞋' 那筆的 id）
+                col8: shoeId || '', // v1.17：跑鞋 id（對應 col1='跑鞋' 那筆的 id）
+                col9: resourceId || '' // v1.18：引用的訓練資源 id（對應 col1='資源' 那筆的 id）
             };
             upsertMarathonLocal(payload);
             cancelMarathonLogEdit();
             queuedPost(payload, { label: payload.action === 'edit' ? '修改訓練記錄' : '新增訓練記錄' });
+
+            if (oldResourceId !== (resourceId || '')) {
+                if (oldResourceId) adjustMarathonResourceUsage(oldResourceId, -1);
+                if (resourceId) adjustMarathonResourceUsage(resourceId, 1);
+            }
         }
         function editMarathonLog(id) {
             const item = marathonDataList.find(d => String(d.id) === String(id)); if (!item) return;
             safeSet('marathonLogDate', formatDate(item.col2));
-            safeSet('marathonLogType', item.col3 || '輕鬆跑');
+            const types = marathonTypeParse(item);
+            document.querySelectorAll('.marathonLogTypeCheck').forEach(el => { el.checked = types.indexOf(el.value) > -1; });
             safeSet('marathonLogNotes', item.col6 === '-' ? '' : item.col6);
             safeSet('marathonLogShoe', item.col8 || '');
+            safeSet('marathonLogResource', item.col9 || ''); // 程式設值不會觸發 onchange，不會重複帶入內容
             let segs = marathonSegParse(item);
             if (segs.length === 0 && item.col4 && item.col4 !== '-') {
                 // 相容 v1.15 以前只有單一距離/配速的舊資料
@@ -2565,9 +2625,12 @@
         }
         function deleteMarathonLog(id) {
             if (!confirm('確定刪除此訓練記錄？')) return;
+            const item = marathonDataList.find(d => String(d.id) === String(id));
+            const resourceId = item ? (item.col9 || '') : '';
             marathonDataList = marathonDataList.filter(d => String(d.id) !== String(id));
             renderMarathonAll();
             queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除訓練記錄' });
+            if (resourceId) adjustMarathonResourceUsage(resourceId, -1);
         }
         function renderMarathonLogTable() {
             const tbody = document.getElementById('marathonLogTableBody'); if (!tbody) return; tbody.innerHTML = '';
@@ -2576,12 +2639,16 @@
                 const segs = marathonSegParse(data);
                 const paceDisplay = segs.length ? marathonSegSummaryText(segs) : ((data.col5 && data.col5 !== '-') ? data.col5 : '-');
                 const shoeName = marathonShoeNameById(data.col8);
+                const types = marathonTypeParse(data);
+                const typeTags = types.length ? marathonTypeTagsHtml(types) : (escapeHtml(data.col3) || '-');
+                const resourceLabel = marathonResourceLabelById(data.col9);
                 tbody.innerHTML += `<tr>
                     <td data-label="日期"><div class="resizable-cell">${escapeHtml(formatDate(data.col2))}</div></td>
-                    <td data-label="訓練類型"><div class="resizable-cell">${escapeHtml(data.col3)}</div></td>
+                    <td data-label="訓練類型"><div class="resizable-cell">${typeTags}</div></td>
                     <td data-label="距離(km)"><div class="resizable-cell">${escapeHtml(data.col4)}</div></td>
                     <td data-label="時間/配速"><div class="resizable-cell">${escapeHtml(paceDisplay)}</div></td>
                     <td data-label="跑鞋"><div class="resizable-cell">${escapeHtml(shoeName)}</div></td>
+                    <td data-label="引用資源"><div class="resizable-cell">${escapeHtml(resourceLabel)}</div></td>
                     <td data-label="心得備註"><div class="resizable-cell">${escapeHtml(data.col6)}</div></td>
                     <td class="action-cell"><button class="btn-edit" onclick="editMarathonLog('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteMarathonLog('${escapeJsAttr(data.id)}')">刪除</button></td>
                 </tr>`;
@@ -2710,13 +2777,56 @@
             { cat: '官方資訊', name: 'Tokyo Marathon 官方賽事總覽', url: 'https://www.marathon.tokyo/en', desc: '東京馬拉松官方網站（賽事資訊、路線圖等）' },
             { cat: '官方資訊', name: 'Tokyo Marathon 報名/繳費時程', url: 'https://www.marathon.tokyo/en/participants/', desc: '官方公布的報名與繳費時程' }
         ];
+        // v1.18：訓練資源編號（流水號）／被訓練記錄引用的使用次數
+        function nextMarathonResNumber() {
+            let max = 0;
+            marathonDataList.filter(d => d.col1 === '資源').forEach(d => {
+                const n = parseInt(d.col7);
+                if (!isNaN(n) && n > max) max = n;
+            });
+            return max + 1;
+        }
+        function adjustMarathonResourceUsage(resourceId, delta) {
+            if (!resourceId) return;
+            const res = marathonDataList.find(d => d.col1 === '資源' && String(d.id) === String(resourceId));
+            if (!res) return;
+            const newCount = Math.max(0, (parseInt(res.col8) || 0) + delta);
+            const payload = {
+                sheetName: currentPageName, id: res.id, action: 'edit',
+                col1: '資源', col2: res.col2, col3: res.col3, col4: res.col4, col5: res.col5, col6: res.col6, col7: res.col7,
+                col8: String(newCount)
+            };
+            upsertMarathonLocal(payload);
+            queuedPost(payload, { label: '更新訓練資源使用次數' });
+        }
+        function marathonResourceLabelById(id) {
+            if (!id) return '-';
+            const res = marathonDataList.find(d => d.col1 === '資源' && String(d.id) === String(id));
+            return res ? `#${res.col7 || '-'} ${res.col3}` : '（已刪除的資源）';
+        }
+        function renderMarathonResourceOptions() {
+            const sel = document.getElementById('marathonLogResource'); if (!sel) return;
+            const current = sel.value;
+            const resources = marathonDataList.filter(d => d.col1 === '資源').slice().sort((a, b) => (parseInt(a.col7) || 0) - (parseInt(b.col7) || 0));
+            sel.innerHTML = '<option value="">（不引用）</option>' + resources.map(r => `<option value="${escapeHtml(r.id)}">#${escapeHtml(r.col7 || '-')} ${escapeHtml(r.col3)}</option>`).join('');
+            if (resources.some(r => String(r.id) === String(current))) sel.value = current;
+        }
+        // v1.18：選了訓練資源後，自動把資源內容帶入心得備註（還是可以自己再編輯／刪掉）
+        function applyMarathonResourceToLog() {
+            const sel = document.getElementById('marathonLogResource'); if (!sel || !sel.value) return;
+            const res = marathonDataList.find(d => d.col1 === '資源' && String(d.id) === String(sel.value));
+            if (!res) return;
+            const notesEl = document.getElementById('marathonLogNotes'); if (!notesEl) return;
+            const block = `📎 引用資源：${res.col3}${(res.col5 && res.col5 !== '-') ? '\n' + res.col5 : ''}${(res.col4 && res.col4 !== '-') ? '\n' + res.col4 : ''}`;
+            notesEl.value = notesEl.value.trim() ? notesEl.value.trim() + '\n\n' + block : block;
+        }
         function seedMarathonResources() {
             const existingNames = new Set(marathonDataList.filter(d => d.col1 === '資源').map(d => d.col3));
             const today = new Date().toISOString().split('T')[0];
             let added = 0;
             MARATHON_SUGGESTED_RESOURCES.forEach(s => {
                 if (existingNames.has(s.name)) return;
-                const payload = { sheetName: currentPageName, id: newId(), action: 'add', col1: '資源', col2: s.cat, col3: s.name, col4: s.url, col5: s.desc, col6: today };
+                const payload = { sheetName: currentPageName, id: newId(), action: 'add', col1: '資源', col2: s.cat, col3: s.name, col4: s.url, col5: s.desc, col6: today, col7: String(nextMarathonResNumber()), col8: '0' };
                 upsertMarathonLocal(payload);
                 queuedPost(payload, { label: '匯入建議訓練資源' });
                 added++;
@@ -2738,13 +2848,20 @@
             if (!cat && !name && !url) return alert('請至少填一個欄位（分類 / 名稱 / 連結）');
             // v1.16：col6 記「建立日期」，只在新增時設定，編輯時延用原本的建立日期
             let createdDate = new Date().toISOString().split('T')[0];
+            // v1.18：col7「編號」、col8「使用次數」也是編輯時延用原本的值，不會被重設
+            let resNumber = '';
+            let usageCount = '0';
             if (editingMarathonResId) {
                 const existing = marathonDataList.find(d => String(d.id) === String(editingMarathonResId));
                 if (existing && existing.col6) createdDate = existing.col6;
+                if (existing && existing.col7) resNumber = existing.col7;
+                if (existing && existing.col8) usageCount = existing.col8;
             }
+            if (!resNumber) resNumber = String(nextMarathonResNumber());
             const payload = {
                 sheetName: currentPageName, id: editingMarathonResId || newId(), action: editingMarathonResId ? 'edit' : 'add',
-                col1: '資源', col2: cat || '-', col3: name || '-', col4: url || '-', col5: desc || '-', col6: createdDate
+                col1: '資源', col2: cat || '-', col3: name || '-', col4: url || '-', col5: desc || '-', col6: createdDate,
+                col7: resNumber, col8: usageCount
             };
             upsertMarathonLocal(payload);
             cancelMarathonResEdit();
@@ -2763,27 +2880,60 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         function deleteMarathonResource(id) {
-            if (!confirm('確定刪除此訓練資源？')) return;
+            const res = marathonDataList.find(d => String(d.id) === String(id));
+            const usedCount = res ? (parseInt(res.col8) || 0) : 0;
+            const msg = usedCount > 0 ? `這個資源已經被 ${usedCount} 筆訓練記錄引用，刪除後訓練記錄仍會保留，但顯示會變成「（已刪除的資源）」。確定刪除？` : '確定刪除此訓練資源？';
+            if (!confirm(msg)) return;
             marathonDataList = marathonDataList.filter(d => String(d.id) !== String(id));
+            marathonResCollapsedIds.delete(id);
             renderMarathonAll();
             queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除訓練資源' });
         }
+        // v1.18：訓練資源縮放（收合／展開）
+        function toggleMarathonResCollapse(id) {
+            if (marathonResCollapsedIds.has(id)) marathonResCollapsedIds.delete(id); else marathonResCollapsedIds.add(id);
+            renderMarathonResTable();
+        }
+        function toggleMarathonResAllCollapse() {
+            const rows = marathonDataList.filter(d => d.col1 === '資源');
+            const allCollapsed = rows.length > 0 && rows.every(d => marathonResCollapsedIds.has(d.id));
+            if (allCollapsed) { marathonResCollapsedIds.clear(); } else { rows.forEach(d => marathonResCollapsedIds.add(d.id)); }
+            renderMarathonResTable();
+        }
         function renderMarathonResTable() {
             const tbody = document.getElementById('marathonResTableBody'); if (!tbody) return; tbody.innerHTML = '';
-            const rows = marathonDataList.filter(d => d.col1 === '資源');
+            const rows = marathonDataList.filter(d => d.col1 === '資源').slice().sort((a, b) => (parseInt(a.col7) || 0) - (parseInt(b.col7) || 0));
             rows.forEach(data => {
+                if (marathonResCollapsedIds.has(data.id)) {
+                    tbody.innerHTML += `<tr class="marathon-res-collapsed-row" onclick="toggleMarathonResCollapse('${escapeJsAttr(data.id)}')">
+                        <td colspan="8">🔽 #${escapeHtml(data.col7 || '-')}　${escapeHtml(data.col2)}　${escapeHtml(data.col3)}　（點擊展開）</td>
+                    </tr>`;
+                    return;
+                }
                 const url = safeStr(data.col4).trim();
                 const href = /^https?:\/\//i.test(url) ? url : (url ? 'http://' + url : '');
                 const linkHtml = (url && url !== '-') ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(url)}</a>` : '<span style="opacity:.5;">（無連結）</span>';
                 tbody.innerHTML += `<tr>
+                    <td data-label="編號"><div class="resizable-cell">${escapeHtml(data.col7 || '-')}</div></td>
                     <td data-label="分類"><div class="resizable-cell">${escapeHtml(data.col2)}</div></td>
                     <td data-label="名稱"><div class="resizable-cell">${escapeHtml(data.col3)}</div></td>
                     <td data-label="連結"><div class="resizable-cell">${linkHtml}</div></td>
                     <td data-label="說明"><div class="resizable-cell">${escapeHtml(data.col5)}</div></td>
                     <td data-label="建立日期"><div class="resizable-cell">${escapeHtml(formatDate(data.col6))}</div></td>
-                    <td class="action-cell"><button class="btn-edit" onclick="editMarathonResource('${escapeJsAttr(data.id)}')">編輯</button><button class="btn-delete" onclick="deleteMarathonResource('${escapeJsAttr(data.id)}')">刪除</button></td>
+                    <td data-label="使用次數"><div class="resizable-cell">${escapeHtml(data.col8 || '0')}</div></td>
+                    <td class="action-cell">
+                        <button class="btn-copy" style="padding:3px 8px; font-size:12px;" onclick="toggleMarathonResCollapse('${escapeJsAttr(data.id)}')">收合</button>
+                        <button class="btn-edit" onclick="editMarathonResource('${escapeJsAttr(data.id)}')">編輯</button>
+                        <button class="btn-delete" onclick="deleteMarathonResource('${escapeJsAttr(data.id)}')">刪除</button>
+                    </td>
                 </tr>`;
             });
+            if (rows.length === 0) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; opacity:.6;">還沒有新增訓練資源</td></tr>`; }
+            const toggleBtn = document.getElementById('marathonResToggleAllBtn');
+            if (toggleBtn) {
+                const allCollapsed = rows.length > 0 && rows.every(d => marathonResCollapsedIds.has(d.id));
+                toggleBtn.textContent = allCollapsed ? '🔼 全部展開' : '🔽 全部收合';
+            }
         }
 
         // ---- Overview（依日期整合訓練記錄／筆記／訓練資源） ----
@@ -2826,7 +2976,9 @@
                     const segs = marathonSegParse(d);
                     const paceDisplay = segs.length ? marathonSegSummaryText(segs) : ((d.col5 && d.col5 !== '-') ? d.col5 : '');
                     const shoeDisplay = d.col8 ? '　👟 ' + escapeHtml(marathonShoeNameById(d.col8)) : '';
-                    return `<div class="marathon-ov-item">🏃 <b>${escapeHtml(d.col3)}</b>　${escapeHtml(d.col4 && d.col4 !== '-' ? d.col4 : '0')} km${paceDisplay ? '　(' + escapeHtml(paceDisplay) + ')' : ''}${shoeDisplay}${(d.col6 && d.col6 !== '-') ? `<div class="marathon-ov-sub">${escapeHtml(d.col6)}</div>` : ''}</div>`;
+                    const types = marathonTypeParse(d);
+                    const typeTags = types.length ? marathonTypeTagsHtml(types) : escapeHtml(d.col3 || '');
+                    return `<div class="marathon-ov-item">🏃 ${typeTags}　${escapeHtml(d.col4 && d.col4 !== '-' ? d.col4 : '0')} km${paceDisplay ? '　(' + escapeHtml(paceDisplay) + ')' : ''}${shoeDisplay}${(d.col6 && d.col6 !== '-') ? `<div class="marathon-ov-sub">${escapeHtml(d.col6)}</div>` : ''}</div>`;
                 }).join('') : `<div class="marathon-ov-empty">這天沒有訓練記錄</div>`;
 
                 const notesHtml = notes.length ? notes.map(function (d) {
