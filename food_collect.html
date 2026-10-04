@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -294,26 +293,48 @@
         .marathon-type-manager-item .dot.rest { background: #757575; }
         .marathon-type-manager-item .name { flex: 1 1 auto; }
         .marathon-type-manager-item .btns { display: flex; gap: 4px; }
-        /* v1.19：訓練資源依分類分卡片顯示（仿連結(3)頁卡片風格） */
-        .marathon-res-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; align-items: flex-start; }
-        .marathon-res-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); flex: 1 1 320px; min-width: 280px; max-width: 480px; }
-        .marathon-res-card-title { font-weight: bold; color: var(--theme-dark); font-size: 15px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--theme-light); }
-        .marathon-res-card-title span { font-weight: normal; color: #999; font-size: 12px; }
-        .marathon-res-item { background: #f7f7f7; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 13px; }
-        .marathon-res-item:last-child { margin-bottom: 0; }
-        .marathon-res-item .mri-num { font-weight: bold; opacity: .6; margin-right: 4px; }
-        .marathon-res-item .mri-name { font-weight: bold; }
-        .marathon-res-item .mri-desc { margin-top: 4px; opacity: .85; white-space: pre-wrap; word-break: break-word; }
-        .marathon-res-item .mri-link a { color: #0056b3; word-break: break-all; }
-        .marathon-res-item .mri-meta { margin-top: 6px; font-size: 11px; opacity: .6; display: flex; gap: 10px; flex-wrap: wrap; }
-        .marathon-res-item .mri-actions { margin-top: 6px; display: flex; gap: 6px; }
-        .marathon-res-item.collapsed { cursor: pointer; opacity: .85; }
-        .marathon-res-item.collapsed:hover { opacity: 1; background: #eee; }
-        .marathon-res-item.collapsed .mri-cat { font-weight: normal; opacity: .6; font-size: 12px; margin-right: 6px; }
-        .marathon-res-item.collapsed .mri-collapsed-body { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-        .marathon-res-item.collapsed .mri-collapsed-body .mri-link { margin-top: 2px; }
-        .marathon-res-item.collapsed .mri-collapsed-body .mri-desc { margin-top: 2px; }
-        .marathon-res-item.collapsed .mri-collapsed-hint { margin-top: 4px; font-size: 11px; opacity: .55; text-align: right; }
+        /* v1.23：訓練資源改成「左邊樹狀（分類→編號+名稱）、右邊顯示內容」的版面；手機（窄螢幕）時改成上下排列 */
+        .marathon-res-split { display: flex; gap: 14px; margin-top: 10px; align-items: flex-start; }
+        .marathon-res-left { flex: 0 0 340px; max-width: 46%; box-sizing: border-box; background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .marathon-res-toolbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 2px solid var(--theme-light); }
+        .marathon-res-toolbar button { padding: 4px 10px; font-size: 12px; }
+        .marathon-res-toolbar button:disabled { opacity: .4; cursor: not-allowed; }
+        .marathon-res-selected-hint { flex-basis: 100%; font-size: 12px; color: #888; word-break: break-word; }
+        .marathon-res-tree { max-height: 70vh; overflow-y: auto; font-size: 13px; }
+        .mrt-row { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
+        .mrt-row:hover { background: #f3f3f3; }
+        .mrt-row.selected { background: var(--theme-light); }
+        .mrt-row.cat { font-weight: bold; color: var(--theme-dark); }
+        .mrt-row.res { margin-left: 22px; }
+        .mrt-row .mrt-caret { width: 16px; text-align: center; user-select: none; flex-shrink: 0; color: #888; }
+        .mrt-row .mrt-count { font-weight: normal; color: #999; font-size: 12px; }
+        .mrt-row .mrt-num { font-weight: bold; opacity: .6; flex-shrink: 0; }
+        .mrt-row .mrt-label { flex: 1 1 auto; word-break: break-word; }
+        .mrt-row input[type=checkbox] { flex-shrink: 0; margin: 0; cursor: pointer; }
+        .marathon-res-detail { flex: 1 1 auto; min-width: 0; box-sizing: border-box; background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .mrd-title { font-weight: bold; color: var(--theme-dark); font-size: 15px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--theme-light); }
+        .mrd-title span { font-weight: normal; color: #999; font-size: 12px; }
+        .mrd-empty { opacity: .6; font-size: 13px; }
+        .mrd-list-item { padding: 6px 10px; border-radius: 6px; cursor: pointer; background: #f7f7f7; margin-bottom: 6px; font-size: 13px; }
+        .mrd-list-item:hover { background: #eee; }
+        .mrd-list-item .mrd-num { font-weight: bold; opacity: .6; margin-right: 6px; }
+        .mrd-field { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px dashed rgba(0,0,0,0.1); font-size: 13px; }
+        .mrd-field .k { flex: 0 0 56px; color: #888; }
+        .mrd-field .v { flex: 1 1 auto; min-width: 0; word-break: break-word; white-space: pre-wrap; }
+        .mrd-field .v a { color: #0056b3; word-break: break-all; }
+        /* v1.24：YouTube 內嵌播放器（16:9，寬度跟著內容區） */
+        .mrd-video { margin-top: 12px; }
+        .mrd-video-frame { position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 8px; overflow: hidden; }
+        .mrd-video-frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .mrd-video-hint { margin-top: 4px; font-size: 12px; opacity: .65; }
+        .mrd-video-hint a { color: #0056b3; }
+        .mrd-meta { margin-top: 10px; font-size: 12px; opacity: .65; display: flex; gap: 14px; flex-wrap: wrap; }
+        @media screen and (max-width: 768px) {
+            .marathon-res-split { flex-direction: column; }
+            .marathon-res-left { flex: none; width: 100%; max-width: 100%; }
+            .marathon-res-detail { width: 100%; }
+            .marathon-res-tree { max-height: 50vh; }
+        }
         /* v1.22：訓練資源「批量編碼」清單，一次修改很多筆的編號（只改編號，其他欄位不變） */
         .marathon-res-batch-panel { margin-top: 10px; margin-bottom: 10px; padding: 12px; background: #f7f7f7; border-radius: 8px; border: 1px dashed rgba(0,0,0,0.15); }
         .marathon-res-batch-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; font-size: 12px; opacity: .8; }
@@ -739,7 +760,18 @@
                     </div>
                     <div id="marathonResBatchList" class="marathon-res-batch-list"></div>
                 </div>
-                <div id="marathonResCardContainer" class="marathon-res-grid"></div>
+                <div class="marathon-res-split">
+                    <div class="marathon-res-left">
+                        <div class="marathon-res-toolbar">
+                            <button type="button" class="btn-edit" id="marathonResActEdit" onclick="marathonResActionEdit()" disabled>編輯</button>
+                            <button type="button" class="btn-delete" id="marathonResActDelete" onclick="marathonResActionDelete()" disabled>刪除</button>
+                            <button type="button" class="btn-copy" id="marathonResActToggle" onclick="toggleMarathonResCollapse()" disabled>🔽 收合</button>
+                            <div class="marathon-res-selected-hint" id="marathonResSelectedHint"></div>
+                        </div>
+                        <div class="marathon-res-tree" id="marathonResTree"></div>
+                    </div>
+                    <div class="marathon-res-detail" id="marathonResDetail"></div>
+                </div>
             </div>
 
             <!-- Overview（依日期整合三種紀錄） -->
@@ -1013,7 +1045,9 @@
         let marathonLogSegments = [{ distance: '', pace: '' }]; // v1.16：訓練記錄表單目前編輯中的分段（距離+配速）
         let marathonOverviewDates = [];                          // v1.16：Overview 已選擇的日期標籤
         let editingMarathonShoeId = null;                        // v1.17：正在編輯的跑鞋
-        let marathonResCollapsedIds = new Set();                 // v1.18：訓練資源目前收合中的id（純畫面狀態，不存後端）
+        let marathonResCatCollapsed = new Set();                 // v1.23：樹狀裡目前收合中的「分類」（純畫面狀態，不存後端；取代 v1.18 的逐筆收合）
+        let marathonResSelected = null;                          // v1.23：樹狀目前勾選的項目 {type:'cat'|'res', key:分類名稱|資源id}，只能單選（純畫面狀態）
+        const MARATHON_CAT_PASSWORD = '1234';                    // v1.23：修改「分類」名稱前要輸入的密碼（只是防誤觸用的畫面層確認，不是真正的安全機制）
         let marathonResShowDesc = true;                          // v1.21：是否顯示說明文字，全部資源共用一個開關（純畫面狀態，不存後端）
         let marathonResNumberTouched = false;                    // v1.19：使用者是否自己動手改過「編號」欄（改過就不要再被自動建議蓋掉）
         let editingMarathonTypeDefId = null;                     // v1.20：管理訓練類型面板中，正在編輯的類型id
@@ -1310,6 +1344,7 @@
             // v1.20：換頁時，順便收起「管理訓練類型」面板、清掉面板內正在編輯的狀態，避免下次打開頁面時殘留
             editingMarathonTypeDefId = null;
             safeDisplay('marathonTypeManagerPanel', 'none');
+            marathonResSelected = null; // v1.23：換頁時清掉訓練資源樹狀的選取狀態
             safeDisplay('marathonResBatchPanel', 'none'); // v1.22：換頁時順便收起「批量編碼」面板，避免有還沒儲存的編號修改被誤以為已經存檔
 
             applyTheme(config);
@@ -3133,20 +3168,112 @@
             const msg = usedCount > 0 ? `這個資源已經被 ${usedCount} 筆訓練記錄引用，刪除後訓練記錄仍會保留，但顯示會變成「（已刪除的資源）」。確定刪除？` : '確定刪除此訓練資源？';
             if (!confirm(msg)) return;
             marathonDataList = marathonDataList.filter(d => String(d.id) !== String(id));
-            marathonResCollapsedIds.delete(id);
             renderMarathonAll();
             queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除訓練資源' });
         }
-        // v1.18：訓練資源縮放（收合／展開）
-        function toggleMarathonResCollapse(id) {
-            if (marathonResCollapsedIds.has(id)) marathonResCollapsedIds.delete(id); else marathonResCollapsedIds.add(id);
+        // ---- v1.23：訓練資源樹狀（分類 → 編號+名稱）／單選／收合展開／右側內容 ----
+        const MARATHON_UNCATEGORIZED = '(未分類)';
+        function marathonResCategoryKey(d) {
+            const c = safeStr(d.col2).trim();
+            return (c && c !== '-') ? c : MARATHON_UNCATEGORIZED;
+        }
+        function marathonResAllRows() {
+            return marathonDataList.filter(d => d.col1 === '資源').slice().sort((a, b) => compareResNumber(a.col7, b.col7));
+        }
+        function marathonResCategoryKeys() {
+            const set = new Set(); marathonResAllRows().forEach(d => set.add(marathonResCategoryKey(d)));
+            return Array.from(set).sort((a, b) => a.localeCompare(b));
+        }
+        function marathonResMembersOfCategory(key) {
+            return marathonResAllRows().filter(d => marathonResCategoryKey(d) === key);
+        }
+        // 單選：點到項目（文字或 checkbox 都算）就選取並在右邊顯示內容；再點一次已勾選的 checkbox 會取消選取
+        function marathonResSelect(type, key) {
+            marathonResSelected = { type: type, key: String(key) };
+            if (type === 'res') {
+                const d = marathonDataList.find(x => x.col1 === '資源' && String(x.id) === String(key));
+                if (d) marathonResCatCollapsed.delete(marathonResCategoryKey(d)); // 選到的資源所在的分類一定要是展開的，不然看不到被選的項目
+            }
+            renderMarathonResTable();
+            if (window.innerWidth <= 768) { // 手機版內容在樹狀下方，選完自動捲到內容區
+                const detail = document.getElementById('marathonResDetail');
+                if (detail && detail.scrollIntoView) detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+        function marathonResToggleSelect(type, key) {
+            if (marathonResSelected && marathonResSelected.type === type && marathonResSelected.key === String(key)) {
+                marathonResSelected = null;
+                renderMarathonResTable();
+            } else {
+                marathonResSelect(type, key);
+            }
+        }
+        function marathonResToggleCat(key) {
+            if (marathonResCatCollapsed.has(key)) marathonResCatCollapsed.delete(key); else marathonResCatCollapsed.add(key);
+            renderMarathonResTable();
+        }
+        // 上方「收合」：勾選分類 → 收合/展開那個分類；勾選資源 → 收合它所在的分類（選取改成那個分類，才不會選到看不見的項目）
+        function toggleMarathonResCollapse() {
+            const sel = marathonResSelected; if (!sel) return;
+            let key = sel.key;
+            if (sel.type === 'res') {
+                const d = marathonDataList.find(x => x.col1 === '資源' && String(x.id) === String(sel.key)); if (!d) return;
+                key = marathonResCategoryKey(d);
+                marathonResSelected = { type: 'cat', key: key };
+                marathonResCatCollapsed.add(key);
+            } else {
+                if (marathonResCatCollapsed.has(key)) marathonResCatCollapsed.delete(key); else marathonResCatCollapsed.add(key);
+            }
             renderMarathonResTable();
         }
         function toggleMarathonResAllCollapse() {
-            const rows = marathonDataList.filter(d => d.col1 === '資源');
-            const allCollapsed = rows.length > 0 && rows.every(d => marathonResCollapsedIds.has(d.id));
-            if (allCollapsed) { marathonResCollapsedIds.clear(); } else { rows.forEach(d => marathonResCollapsedIds.add(d.id)); }
+            const keys = marathonResCategoryKeys();
+            const allCollapsed = keys.length > 0 && keys.every(k => marathonResCatCollapsed.has(k));
+            if (allCollapsed) { marathonResCatCollapsed.clear(); } else { keys.forEach(k => marathonResCatCollapsed.add(k)); }
             renderMarathonResTable();
+        }
+        // 上方「編輯」：勾選資源 → 帶到上面的表單編輯；勾選分類 → 重新命名分類（要提醒＋輸入密碼）
+        function marathonResActionEdit() {
+            const sel = marathonResSelected; if (!sel) return;
+            if (sel.type === 'res') editMarathonResource(sel.key);
+            else marathonResRenameCategory(sel.key);
+        }
+        // 上方「刪除」：只對勾選的資源有效（分類層級不開放刪除）
+        function marathonResActionDelete() {
+            const sel = marathonResSelected; if (!sel || sel.type !== 'res') return;
+            deleteMarathonResource(sel.key);
+        }
+        function marathonResRenameCategory(key) {
+            const members = marathonResMembersOfCategory(key); if (members.length === 0) return;
+            const input = prompt(`請輸入「${key}」的新分類名稱：`, key === MARATHON_UNCATEGORIZED ? '' : key);
+            if (input === null) return;
+            const newName = input.trim();
+            if (!newName) { alert('分類名稱不能是空白！'); return; }
+            if (newName === key) { alert('分類名稱沒有變動。'); return; }
+            const merging = marathonResCategoryKeys().includes(newName);
+            const warn = `⚠️ 注意：修改分類名稱會一次更動「${key}」底下 ${members.length} 筆資源的分類` +
+                (merging ? `，而且「${newName}」這個分類已經存在，兩個分類會合併在一起` : '') +
+                `。\n\n確定要把「${key}」改成「${newName}」嗎？`;
+            if (!confirm(warn)) return;
+            const pwd = prompt('請輸入密碼以確認修改分類：');
+            if (pwd === null) return;
+            if (pwd !== MARATHON_CAT_PASSWORD) { alert('密碼錯誤，分類沒有被修改。'); return; }
+            const stored = (newName === MARATHON_UNCATEGORIZED) ? '-' : newName;
+            members.forEach(function (data) {
+                const payload = {
+                    sheetName: currentPageName, id: data.id, action: 'edit', col1: '資源',
+                    col2: stored, col3: data.col3, col4: data.col4, col5: data.col5, col6: data.col6,
+                    col7: data.col7, col8: data.col8 || '0'
+                };
+                upsertMarathonLocal(payload);
+                queuedPost(payload, { label: '修改資源分類名稱' });
+            });
+            const wasCollapsed = marathonResCatCollapsed.has(key);
+            marathonResCatCollapsed.delete(key);
+            if (wasCollapsed) marathonResCatCollapsed.add(newName);
+            marathonResSelected = { type: 'cat', key: newName };
+            renderMarathonResTable();
+            alert(`已更新 ${members.length} 筆資源的分類！`);
         }
         // v1.21：全部資源共用一個「顯示/隱藏說明」開關（不管收合或展開狀態都套用）
         function toggleMarathonResShowDesc() {
@@ -3216,71 +3343,144 @@
             closeMarathonResBatchRenumber();
             alert(`已更新 ${changes.length} 筆資源的編號！`);
         }
-        // v1.19：訓練資源改成依「分類」分開顯示成卡片（仿連結(3)頁的卡片呈現方式），不再是單一大表格
-        // v1.21：收合狀態不再只顯示編號+名稱一行，改成顯示編號/分類/名稱/連結/說明（說明過長會截斷），整體限制最多5行；收合狀態不顯示編輯/刪除等操作按鈕，要點擊展開才會出現
+        // v1.23：訓練資源改成「左邊樹狀、右邊內容」。樹狀：分類 → 「#編號 名稱」；每個節點前面有 checkbox（單選）。
+        //        右邊：勾選/點選「分類」→ 列出該分類的所有名稱；勾選/點選「名稱」→ 顯示編號、分類、名稱、連結、說明＋日期、使用次數
+        //        （取代 v1.19~v1.22 的卡片；原本每張卡片上的收合/編輯/刪除按鈕，移到樹狀上方的工具列）
+        // v1.24：解析 YouTube 連結，回傳 {id, start} 或 null（非 YouTube / 格式不認得就回 null）
+        function parseYouTubeLink(url) {
+            const raw = safeStr(url).trim();
+            if (!raw || raw === '-') return null;
+            let u;
+            try { u = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw); } catch (e) { return null; }
+            const host = u.hostname.toLowerCase().replace(/^(www\.|m\.|music\.)/, '');
+            let id = '';
+            if (host === 'youtu.be') {
+                id = u.pathname.split('/')[1] || '';
+            } else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+                if (u.pathname === '/watch') id = u.searchParams.get('v') || '';
+                else {
+                    const m = u.pathname.match(/^\/(?:shorts|embed|live|v)\/([^/?#]+)/);
+                    if (m) id = m[1];
+                }
+            } else {
+                return null;
+            }
+            if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return null;
+            // 起始秒數：t=90 / t=90s / t=1m30s / start=90
+            let start = 0;
+            const t = u.searchParams.get('t') || u.searchParams.get('start') || '';
+            const tm = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/i);
+            if (tm && t) start = (parseInt(tm[1] || 0, 10) * 3600) + (parseInt(tm[2] || 0, 10) * 60) + parseInt(tm[3] || 0, 10);
+            return { id, start };
+        }
+
+        function buildYouTubeEmbedHtml(url) {
+            const yt = parseYouTubeLink(url);
+            if (!yt) return '';
+            const src = 'https://www.youtube-nocookie.com/embed/' + yt.id + '?rel=0' + (yt.start > 0 ? '&start=' + yt.start : '');
+            return `<div class="mrd-video">
+                <div class="mrd-video-frame"><iframe src="${src}" title="YouTube 影片" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+                <div class="mrd-video-hint">影片無法播放？可以直接 <a href="https://www.youtube.com/watch?v=${yt.id}" target="_blank" rel="noopener">在 YouTube 開啟</a></div>
+            </div>`;
+        }
+
         function renderMarathonResTable() {
-            const container = document.getElementById('marathonResCardContainer'); if (!container) return; container.innerHTML = '';
+            const tree = document.getElementById('marathonResTree'); if (!tree) return;
             refreshMarathonResNumberSuggestion();
-            const rows = marathonDataList.filter(d => d.col1 === '資源').slice().sort((a, b) => compareResNumber(a.col7, b.col7));
+            const rows = marathonResAllRows();
             const toggleBtn = document.getElementById('marathonResToggleAllBtn');
             const toggleDescBtn = document.getElementById('marathonResToggleDescBtn');
             if (toggleDescBtn) toggleDescBtn.textContent = marathonResShowDesc ? '🙈 隱藏說明' : '👁️ 顯示說明';
-            if (rows.length === 0) {
-                container.innerHTML = `<div style="opacity:.6; padding:10px 0;">還沒有新增訓練資源</div>`;
-                if (toggleBtn) toggleBtn.textContent = '🔽 全部收合';
-                return;
-            }
 
             const groups = new Map();
             rows.forEach(d => {
-                const k = (safeStr(d.col2).trim() && d.col2 !== '-') ? safeStr(d.col2).trim() : '(未分類)';
+                const k = marathonResCategoryKey(d);
                 if (!groups.has(k)) groups.set(k, []);
                 groups.get(k).push(d);
             });
+            const catKeys = Array.from(groups.keys()).sort((a, b) => a.localeCompare(b));
 
-            Array.from(groups.keys()).sort((a, b) => a.localeCompare(b)).forEach(function (catName) {
-                const arr = groups.get(catName);
-                let itemsHtml = '';
-                arr.forEach(function (data) {
-                    const url = safeStr(data.col4).trim();
-                    const href = /^https?:\/\//i.test(url) ? url : (url ? 'http://' + url : '');
-                    const hasDesc = marathonResShowDesc && data.col5 && data.col5 !== '-';
-                    if (marathonResCollapsedIds.has(data.id)) {
-                        const linkLineHtml = (url && url !== '-') ? `<div class="mri-link">🔗 <a href="${escapeHtml(href)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escapeHtml(url)}</a></div>` : '';
-                        const descLineHtml = hasDesc ? `<div class="mri-desc">${escapeHtml(truncateText(data.col5, 120))}</div>` : '';
-                        itemsHtml += `<div class="marathon-res-item collapsed" onclick="toggleMarathonResCollapse('${escapeJsAttr(data.id)}')">
-                            <div class="mri-collapsed-body">
-                                <span class="mri-num">#${escapeHtml(data.col7 || '-')}</span><span class="mri-cat">📁 ${escapeHtml(catName)}</span><span class="mri-name">${escapeHtml(data.col3)}</span>
-                                ${linkLineHtml}
-                                ${descLineHtml}
-                            </div>
-                            <div class="mri-collapsed-hint">🔽 （點擊展開）</div>
-                        </div>`;
-                        return;
-                    }
-                    const linkHtml = (url && url !== '-') ? `<div class="mri-link">🔗 <a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(url)}</a></div>` : '';
-                    const descHtml = hasDesc ? `<div class="mri-desc">${escapeHtml(data.col5)}</div>` : '';
-                    itemsHtml += `<div class="marathon-res-item">
-                        <span class="mri-num">#${escapeHtml(data.col7 || '-')}</span><span class="mri-name">${escapeHtml(data.col3)}</span>
-                        ${linkHtml}
-                        ${descHtml}
-                        <div class="mri-meta"><span>📅 ${escapeHtml(formatDate(data.col6))}</span><span>🔁 使用 ${escapeHtml(data.col8 || '0')} 次</span></div>
-                        <div class="mri-actions">
-                            <button class="btn-copy" style="padding:3px 8px; font-size:12px;" onclick="toggleMarathonResCollapse('${escapeJsAttr(data.id)}')">收合</button>
-                            <button class="btn-edit" style="padding:3px 8px; font-size:12px;" onclick="editMarathonResource('${escapeJsAttr(data.id)}')">編輯</button>
-                            <button class="btn-delete" style="padding:3px 8px; font-size:12px;" onclick="deleteMarathonResource('${escapeJsAttr(data.id)}')">刪除</button>
-                        </div>
+            // 被刪除/改名而不存在的選取項目，自動取消選取
+            if (marathonResSelected) {
+                if (marathonResSelected.type === 'res' && !rows.some(d => String(d.id) === marathonResSelected.key)) marathonResSelected = null;
+                else if (marathonResSelected.type === 'cat' && !groups.has(marathonResSelected.key)) marathonResSelected = null;
+            }
+            const sel = marathonResSelected;
+
+            if (rows.length === 0) {
+                tree.innerHTML = `<div style="opacity:.6; padding:10px 0;">還沒有新增訓練資源</div>`;
+            } else {
+                let html = '';
+                catKeys.forEach(function (catName) {
+                    const arr = groups.get(catName);
+                    const collapsed = marathonResCatCollapsed.has(catName);
+                    const catSelected = !!sel && sel.type === 'cat' && sel.key === catName;
+                    html += `<div class="mrt-row cat${catSelected ? ' selected' : ''}" onclick="marathonResSelect('cat','${escapeJsAttr(catName)}')">
+                        <span class="mrt-caret" onclick="event.stopPropagation(); marathonResToggleCat('${escapeJsAttr(catName)}')">${collapsed ? '▶' : '▼'}</span>
+                        <input type="checkbox" class="marathon-res-check" ${catSelected ? 'checked' : ''} onclick="event.stopPropagation(); marathonResToggleSelect('cat','${escapeJsAttr(catName)}')">
+                        <span class="mrt-label">📁 ${escapeHtml(catName)} <span class="mrt-count">(${arr.length})</span></span>
                     </div>`;
+                    if (collapsed) return;
+                    arr.forEach(function (data) {
+                        const resSelected = !!sel && sel.type === 'res' && sel.key === String(data.id);
+                        html += `<div class="mrt-row res${resSelected ? ' selected' : ''}" onclick="marathonResSelect('res','${escapeJsAttr(data.id)}')">
+                            <input type="checkbox" class="marathon-res-check" ${resSelected ? 'checked' : ''} onclick="event.stopPropagation(); marathonResToggleSelect('res','${escapeJsAttr(data.id)}')">
+                            <span class="mrt-num">#${escapeHtml(data.col7 || '-')}</span><span class="mrt-label">${escapeHtml(data.col3)}</span>
+                        </div>`;
+                    });
                 });
-                const card = document.createElement('div');
-                card.className = 'marathon-res-card';
-                card.innerHTML = `<div class="marathon-res-card-title">📁 ${escapeHtml(catName)} <span>(${arr.length})</span></div>${itemsHtml}`;
-                container.appendChild(card);
-            });
+                tree.innerHTML = html;
+            }
 
+            // ---- 上方工具列 ----
+            const editBtn = document.getElementById('marathonResActEdit');
+            const delBtn = document.getElementById('marathonResActDelete');
+            const colBtn = document.getElementById('marathonResActToggle');
+            const hint = document.getElementById('marathonResSelectedHint');
+            if (editBtn) editBtn.disabled = !sel;
+            if (delBtn) delBtn.disabled = !(sel && sel.type === 'res');
+            if (colBtn) {
+                colBtn.disabled = !sel;
+                colBtn.textContent = (sel && sel.type === 'cat' && marathonResCatCollapsed.has(sel.key)) ? '🔼 展開' : '🔽 收合';
+            }
+            if (hint) {
+                if (!sel) hint.textContent = '尚未選取，請勾選下方的分類或名稱';
+                else if (sel.type === 'cat') hint.textContent = `已選取分類：${sel.key}`;
+                else {
+                    const d = rows.find(x => String(x.id) === sel.key);
+                    hint.textContent = d ? `已選取：#${d.col7 || '-'} ${d.col3}` : '';
+                }
+            }
             if (toggleBtn) {
-                const allCollapsed = rows.every(d => marathonResCollapsedIds.has(d.id));
+                const allCollapsed = catKeys.length > 0 && catKeys.every(k => marathonResCatCollapsed.has(k));
                 toggleBtn.textContent = allCollapsed ? '🔼 全部展開' : '🔽 全部收合';
+            }
+
+            // ---- 右邊內容 ----
+            const detailEl = document.getElementById('marathonResDetail'); if (!detailEl) return;
+            // v1.24：內容沒變就不重寫 innerHTML，避免背景重新整理資料時把正在播放的 YouTube 影片重新載入
+            const detail = { set innerHTML(h) { if (detailEl.__lastHtml !== h) { detailEl.innerHTML = h; detailEl.__lastHtml = h; } } };
+            if (!sel) {
+                detail.innerHTML = `<div class="mrd-empty">請從左邊的樹狀選擇一個「分類」或「名稱」，這裡就會顯示相關內容。</div>`;
+            } else if (sel.type === 'cat') {
+                const arr = groups.get(sel.key) || [];
+                detail.innerHTML = `<div class="mrd-title">📁 ${escapeHtml(sel.key)} <span>（共 ${arr.length} 筆名稱）</span></div>` +
+                    arr.map(d => `<div class="mrd-list-item" onclick="marathonResSelect('res','${escapeJsAttr(d.id)}')"><span class="mrd-num">#${escapeHtml(d.col7 || '-')}</span>${escapeHtml(d.col3)}</div>`).join('');
+            } else {
+                const d = rows.find(x => String(x.id) === sel.key);
+                if (!d) { detail.innerHTML = ''; return; }
+                const url = safeStr(d.col4).trim();
+                const href = /^https?:\/\//i.test(url) ? url : (url ? 'http://' + url : '');
+                const hasLink = url && url !== '-';
+                const hasDesc = d.col5 && d.col5 !== '-';
+                detail.innerHTML = `<div class="mrd-title">${escapeHtml(d.col3)}</div>
+                    <div class="mrd-field"><div class="k">編號</div><div class="v">#${escapeHtml(d.col7 || '-')}</div></div>
+                    <div class="mrd-field"><div class="k">分類</div><div class="v">${escapeHtml(marathonResCategoryKey(d))}</div></div>
+                    <div class="mrd-field"><div class="k">名稱</div><div class="v">${escapeHtml(d.col3)}</div></div>
+                    <div class="mrd-field"><div class="k">連結</div><div class="v">${hasLink ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(url)}</a>` : '-'}</div></div>
+                    ${marathonResShowDesc ? `<div class="mrd-field"><div class="k">說明</div><div class="v">${hasDesc ? escapeHtml(d.col5) : '-'}</div></div>` : ''}
+                    ${buildYouTubeEmbedHtml(url)}
+                    <div class="mrd-meta"><span>📅 ${escapeHtml(formatDate(d.col6))}</span><span>🔁 使用 ${escapeHtml(d.col8 || '0')} 次</span></div>`;
             }
         }
 
