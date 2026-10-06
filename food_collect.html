@@ -241,6 +241,65 @@
         .marathon-tab-btn { background: #eee; color: #555; padding: 8px 16px; border-radius: 20px; }
         .marathon-tab-btn.active { background: var(--theme-primary); color: #fff; }
         .marathon-tab-panel h2 { font-size: 17px; }
+        /* v1.25：日評分表 */
+        .dsc-wrap { --dsc-series: #2a78d6; --dsc-low: #d03b3b; --dsc-grid: #e4e4e1; --dsc-text: #52514e; --dsc-ink: #222; }
+        .dsc-form { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+        .dsc-form-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 10px; }
+        .dsc-form-head label { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+        .dsc-status { font-size: 13px; color: #666; }
+        .dsc-help { font-size: 12px; color: #888; margin: 0 0 8px; }
+        .dsc-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 6px 12px; }
+        .dsc-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; background: #f6f6f4; border: 1px solid transparent; }
+        .dsc-item.yes { background: #eaf6ec; border-color: #bfe0c4; }
+        .dsc-item-name { font-size: 14px; color: var(--dsc-ink); min-width: 0; word-break: break-all; }
+        .dsc-yn { display: inline-flex; flex: 0 0 auto; border: 1px solid #ccc; border-radius: 16px; overflow: hidden; background: #fff; }
+        .dsc-yn label { position: relative; margin: 0; padding: 4px 14px; font-size: 13px; font-weight: bold; color: #777; cursor: pointer; }
+        .dsc-yn label input { position: absolute; opacity: 0; pointer-events: none; }
+        .dsc-yn label.on { background: #8a8a85; color: #fff; }
+        .dsc-yn label.on.yes { background: #1f8a3b; }
+        .dsc-live { margin: 10px 0 6px; font-size: 16px; font-weight: bold; color: var(--dsc-ink); }
+        .dsc-live .dsc-low-flag { color: #b02a2a; font-size: 13px; margin-left: 8px; }
+        .dsc-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; background: var(--theme-light); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
+        .dsc-settings input[type="number"] { width: 70px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .dsc-seg { display: inline-flex; gap: 0; }
+        .dsc-seg button { margin: 0; border-radius: 0; background: #ddd; color: #555; padding: 6px 14px; }
+        .dsc-seg button:first-child { border-radius: 16px 0 0 16px; }
+        .dsc-seg button:last-child { border-radius: 0 16px 16px 0; }
+        .dsc-seg button.active { background: var(--theme-primary); color: #fff; }
+        .dsc-card { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; }
+        .dsc-card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 12px; margin-bottom: 6px; }
+        .dsc-card-title { font-weight: bold; color: var(--theme-dark); font-size: 15px; }
+        .dsc-card-title small { font-weight: normal; color: #777; font-size: 12px; margin-left: 6px; }
+        .dsc-card-nav button { margin: 0 0 0 4px; padding: 4px 10px; background: #8a8a85; font-size: 13px; }
+        .dsc-hist-ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 8px; font-size: 13px; }
+        .dsc-hist-ctrl label { display: inline-flex; align-items: center; gap: 4px; margin: 0; font-weight: normal; }
+        .dsc-hist-ctrl select { width: auto; padding: 5px 8px; }
+        .dsc-chart-body { position: relative; width: 100%; }
+        .dsc-chart-body svg { display: block; width: 100%; height: auto; }
+        .dsc-grid { stroke: var(--dsc-grid); stroke-width: 1; }
+        .dsc-axis-text { fill: var(--dsc-text); font-size: 11px; }
+        .dsc-line { fill: none; stroke: var(--dsc-series); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+        .dsc-pt { fill: var(--dsc-series); stroke: #fff; stroke-width: 2; }
+        .dsc-pt-low { fill: var(--dsc-low); stroke: #fff; stroke-width: 2; }
+        .dsc-thr { stroke: var(--dsc-low); stroke-width: 1; opacity: .55; }
+        .dsc-thr-text { fill: var(--dsc-text); font-size: 11px; }
+        .dsc-xhair { stroke: #999; stroke-width: 1; }
+        .dsc-empty-text { fill: #999; font-size: 13px; }
+        .dsc-tip { position: absolute; top: 0; z-index: 5; background: rgba(30,30,30,.92); color: #fff; padding: 6px 9px; border-radius: 6px; font-size: 12px; line-height: 1.5; pointer-events: none; white-space: nowrap; display: none; }
+        .dsc-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--dsc-text); margin-top: 4px; }
+        .dsc-key i { font-style: normal; margin-right: 4px; }
+        .dsc-key .k-dot { color: var(--dsc-series); } .dsc-key .k-low { color: var(--dsc-low); }
+        .dsc-details { margin-top: 6px; font-size: 13px; }
+        .dsc-details summary { cursor: pointer; color: #555; }
+        .dsc-table { border-collapse: collapse; width: 100%; margin-top: 6px; font-size: 13px; }
+        .dsc-table th, .dsc-table td { border-bottom: 1px solid #eee; padding: 4px 8px; text-align: left; }
+        .dsc-table tr.low td { background: #fdecea; }
+        .dsc-stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+        .dsc-stat { background: #f6f6f4; border-radius: 8px; padding: 6px 12px; font-size: 12px; color: #666; }
+        .dsc-stat b { display: block; font-size: 17px; color: var(--dsc-ink); }
+        .dsc-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; font-size: 12px; }
+        .dsc-chip { background: #fdecea; color: #8e2222; border-radius: 12px; padding: 2px 10px; }
+        .dsc-note { font-size: 12px; color: #888; }
         .marathon-week-summary { margin: 12px 0; padding: 10px 14px; background: var(--theme-light); color: var(--theme-dark); border-radius: 6px; font-weight: bold; font-size: 14px; }
         .marathon-note-list { margin-top: 10px; }
         .marathon-note-item { background: #f5f5f5; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
@@ -668,6 +727,7 @@
                 <button type="button" class="marathon-tab-btn" id="marathonTabBtn_shoe" onclick="switchMarathonTab('shoe')">👟 跑鞋</button>
                 <button type="button" class="marathon-tab-btn" id="marathonTabBtn_resource" onclick="switchMarathonTab('resource')">🔗 訓練資源</button>
                 <button type="button" class="marathon-tab-btn" id="marathonTabBtn_overview" onclick="switchMarathonTab('overview')">📅 Overview</button>
+                <button type="button" class="marathon-tab-btn" id="marathonTabBtn_score" onclick="switchMarathonTab('score')">📋 日評分表</button>
             </div>
 
             <!-- 訓練記錄 -->
@@ -703,6 +763,76 @@
                         <thead><tr><th>日期</th><th>訓練類型</th><th>距離(km)</th><th>時間/配速</th><th>最快速度</th><th>地點</th><th>跑鞋</th><th>引用資源</th><th>心得備註</th><th>操作</th></tr></thead>
                         <tbody id="marathonLogTableBody"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- v1.25：日評分表 -->
+            <div id="marathonTab_score" class="marathon-tab-panel dsc-wrap" style="display:none;">
+                <h2>📋 日評分表</h2>
+                <div class="dsc-form">
+                    <div class="dsc-form-head">
+                        <label>日期 <input type="date" id="dscDate" onchange="dscOnDateChange()"></label>
+                        <span class="dsc-status" id="dscStatus"></span>
+                    </div>
+                    <p class="dsc-help">每一項選「是」＝有達成，得 1 分；預設都是「否」。同一天只會有一筆，重新儲存會覆蓋。</p>
+                    <div class="dsc-items" id="dscItems"></div>
+                    <div class="dsc-live" id="dscLive"></div>
+                    <button type="button" class="btn-add" onclick="dscSave()">💾 儲存這天的評分</button>
+                    <button type="button" class="btn-copy" onclick="dscResetAnswers()">全部設為「否」</button>
+                    <button type="button" class="btn-delete" id="dscDeleteBtn" onclick="dscDelete()">刪除這天紀錄</button>
+                </div>
+
+                <div class="dsc-settings">
+                    <span>⚠️ 分數低於 <input type="number" id="dscThreshold" min="0" step="1" onchange="dscSaveThreshold()"> 分就標紅</span>
+                    <span>圖表縱軸：
+                        <span class="dsc-seg">
+                            <button type="button" id="dscYBtn_score" onclick="dscSetYMode('score')">分數</button><button type="button" id="dscYBtn_pct" onclick="dscSetYMode('pct')">百分比</button>
+                        </span>
+                    </span>
+                </div>
+
+                <div class="dsc-card">
+                    <div class="dsc-card-head">
+                        <div class="dsc-card-title" id="dscTitle_week"></div>
+                        <div class="dsc-card-nav"><button type="button" onclick="dscShift('week',-1)">◀ 上週</button><button type="button" onclick="dscShift('week',0)">本週</button><button type="button" onclick="dscShift('week',1)">下週 ▶</button></div>
+                    </div>
+                    <div class="dsc-chart-body" id="dscChart_week"></div>
+                </div>
+
+                <div class="dsc-card">
+                    <div class="dsc-card-head">
+                        <div class="dsc-card-title" id="dscTitle_month"></div>
+                        <div class="dsc-card-nav"><button type="button" onclick="dscShift('month',-1)">◀ 上月</button><button type="button" onclick="dscShift('month',0)">本月</button><button type="button" onclick="dscShift('month',1)">下月 ▶</button></div>
+                    </div>
+                    <div class="dsc-chart-body" id="dscChart_month"></div>
+                </div>
+
+                <div class="dsc-card">
+                    <div class="dsc-card-head"><div class="dsc-card-title" id="dscTitle_total"></div></div>
+                    <div class="dsc-stats" id="dscStats"></div>
+                    <div class="dsc-chart-body" id="dscChart_total"></div>
+                    <div class="dsc-chips" id="dscLowChips"></div>
+                </div>
+
+                <div class="dsc-card">
+                    <div class="dsc-card-head"><div class="dsc-card-title" id="dscTitle_hist"></div></div>
+                    <div class="dsc-hist-ctrl">
+                        <label>方式
+                            <select id="dscHistMode" onchange="dscOnHistChange()">
+                                <option value="range">自選起訖日期</option>
+                                <option value="7">從第一天起每 7 天</option>
+                                <option value="10">從第一天起每 10 天</option>
+                                <option value="30">從第一天起每 30 天</option>
+                            </select>
+                        </label>
+                        <span id="dscHistRange"><label>起 <input type="date" id="dscHistFrom" onchange="dscOnHistChange(true)"></label> <label>迄 <input type="date" id="dscHistTo" onchange="dscOnHistChange(true)"></label></span>
+                    </div>
+                    <div class="dsc-chart-body" id="dscChart_hist"></div>
+                </div>
+
+                <div class="dsc-card">
+                    <div class="dsc-card-head"><div class="dsc-card-title">🗓️ 最近 14 筆紀錄</div></div>
+                    <div class="table-responsive"><table class="dsc-table"><thead><tr><th>日期</th><th>得分</th><th>百分比</th><th>狀態</th></tr></thead><tbody id="dscRecentBody"></tbody></table></div>
                 </div>
             </div>
 
@@ -2494,6 +2624,7 @@
         //   col1='筆記'     → col2=時間(YYYY-MM-DD HH:mm) col3=內容
         //   col1='資源'     → col2=分類 col3=名稱 col4=連結 col5=說明 col6=建立日期 col7=編號（v1.18起流水號；v1.22起可自行改成「x.x.x」階層式編碼，例如 2.3.4.12，排序見 compareResNumber） col8=使用次數（v1.18）
         //   col1='跑鞋'     → col2=名稱 col3=備註 col4=購入日期（v1.17）
+        //   col1='日評分'（v1.25） → 一天一筆：col2=日期 col3=JSON{項目名:0/1} col4=得分 col5=當天總項目數；col1='日評分設定'（v1.25） → col2=低分門檻
         //   col1='訓練類型設定'（v1.20） → col2=名稱 col3=顏色分類(run/strength/stretch/cross/rest) col4=排序 col5=停用('1'=已刪除/停用，其餘=啟用中；用停用而不是真的刪除列，是為了讓改名/刪除後，舊的訓練記錄還是能正確解析回當時的類型名稱與顏色）
 
         function upsertMarathonLocal(payload) {
@@ -2506,10 +2637,11 @@
 
         function switchMarathonTab(tab) {
             marathonSubTab = tab;
-            ['log', 'shoe', 'note', 'resource', 'overview'].forEach(t => {
+            ['log', 'shoe', 'note', 'resource', 'overview', 'score'].forEach(t => {
                 safeDisplay(`marathonTab_${t}`, t === tab ? 'block' : 'none');
                 safeClass(`marathonTabBtn_${t}`, 'marathon-tab-btn' + (t === tab ? ' active' : ''));
             });
+            if (tab === 'score') renderMarathonScore(); // v1.25：切到日評分表時重畫（確保圖表依實際寬度繪製）
         }
 
         function renderMarathonAll() {
@@ -2525,6 +2657,7 @@
             renderMarathonNoteList();
             renderMarathonResTable();
             renderMarathonOverview();
+            renderMarathonScore(); // v1.25
         }
 
         // ---- 倒數計時 + 訓練階段提示 ----
@@ -3483,6 +3616,412 @@
                     <div class="mrd-meta"><span>📅 ${escapeHtml(formatDate(d.col6))}</span><span>🔁 使用 ${escapeHtml(d.col8 || '0')} 次</span></div>`;
             }
         }
+
+        // ======== v1.25：日評分表 ========
+        // 資料（存在東京馬頁的同一張分頁，用 col1 區分）：
+        //   col1='日評分'     → 一天一筆。col2=日期(YYYY-MM-DD) col3=JSON {項目名:0或1}（當天「被問到的所有項目」，所以總項目數可隨時間增減）col4=得分 col5=當天總項目數
+        //   col1='日評分設定' → col2=低分門檻（分數低於此值就標紅）
+        // 要新增/移除評分項目：直接改下面 DSC_ITEMS（項目名稱就是紀錄的鍵，改名會讓舊紀錄對不上，所以請用「新增」而不是「改名」）。
+        const DSC_ITEMS = ['早餐', '中餐', '晚餐', '糖', '炸', '量', '水(3000)', '睡覺（5+）', '核心', '背部', '臀大肌', '臀中肌', '股四頭肌', '小腿', '腿後', '腳底', '練寬', '開髖', '送髖訓練', '腳踝活動度', '擺手', '腰部訓練'];
+        const DSC_DEFAULT_THRESHOLD = 15;
+        let dscAnswers = {};        // 畫面上目前填的答案（項目名 → 0/1），尚未儲存前只存在畫面
+        let dscDirty = false;       // 畫面上有沒有「還沒儲存的修改」
+        let dscLoadedDate = '';
+        let dscMsg = '';
+        let dscWeekAnchor = '', dscMonthAnchor = '';
+        let dscHistMode = 'range', dscHistFrom = '', dscHistTo = '', dscHistTouched = false;
+        let dscYMode = 'score';     // 'score' | 'pct'
+        const dscTableOpen = {};
+        const dscEl = (id) => document.getElementById(id);
+
+        function dscToday() { return formatLocalDate(new Date()); }
+        function dscParse(s) { const p = String(s).split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+        function dscAdd(s, n) { const d = dscParse(s); d.setDate(d.getDate() + n); return formatLocalDate(d); }
+        function dscDiff(a, b) { return Math.round((dscParse(b) - dscParse(a)) / 86400000); }
+        function dscMD(s) { const d = dscParse(s); return (d.getMonth() + 1) + '/' + d.getDate(); }
+        function dscWeekday(s) { return '日一二三四五六'[dscParse(s).getDay()]; }
+        function dscRound1(n) { return Math.round(n * 10) / 10; }
+
+        // ---- 資料讀取 ----
+        function dscRecords() {
+            const map = new Map();
+            marathonDataList.filter(d => d.col1 === '日評分').forEach(d => {
+                const date = formatDate(d.col2).slice(0, 10);
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+                let answers = {};
+                try { const o = JSON.parse(d.col3); if (o && typeof o === 'object' && !Array.isArray(o)) answers = o; } catch (e) { /* 忽略壞掉的 JSON */ }
+                const keys = Object.keys(answers);
+                let score = keys.filter(k => Number(answers[k]) === 1).length;
+                let total = keys.length;
+                if (!total) {
+                    const s = parseInt(d.col4, 10), t = parseInt(d.col5, 10);
+                    if (isNaN(s) || isNaN(t) || t <= 0) return;
+                    score = s; total = t;
+                }
+                map.set(date, { id: d.id, date, answers, score, total });
+            });
+            return map;
+        }
+        function dscThresholdRow() { return marathonDataList.find(d => d.col1 === '日評分設定'); }
+        function dscGetThreshold() {
+            const r = dscThresholdRow();
+            const n = r ? parseFloat(r.col2) : NaN;
+            return isNaN(n) ? DSC_DEFAULT_THRESHOLD : n;
+        }
+        function dscSaveThreshold() {
+            const el = dscEl('dscThreshold'); if (!el) return;
+            const v = parseFloat(el.value);
+            if (isNaN(v) || v < 0) { alert('請輸入大於等於 0 的數字'); el.value = dscGetThreshold(); return; }
+            const row = dscThresholdRow();
+            const payload = { sheetName: currentPageName, id: row ? row.id : newId(), action: row ? 'edit' : 'add', col1: '日評分設定', col2: String(v) };
+            upsertMarathonLocal(payload);
+            queuedPost(payload, { label: '修改日評分門檻' });
+        }
+        function dscSetYMode(m) { dscYMode = m; renderMarathonScore(); }
+
+        // ---- 每日填寫表單 ----
+        function dscApplyDate(date) {
+            const rec = dscRecords().get(date);
+            dscAnswers = {};
+            DSC_ITEMS.forEach(n => { dscAnswers[n] = rec && Number(rec.answers[n]) === 1 ? 1 : 0; });
+            dscLoadedDate = date;
+            dscDirty = false;
+        }
+        function dscOnDateChange() {
+            const el = dscEl('dscDate'); if (!el) return;
+            if (dscDirty && !confirm('這天的修改還沒儲存，確定要切換日期嗎？（沒儲存的內容會消失）')) { el.value = dscLoadedDate; return; }
+            if (!el.value) el.value = dscToday();
+            dscMsg = '';
+            dscApplyDate(el.value);
+            renderMarathonScore();
+        }
+        function dscSet(i, v) {
+            dscAnswers[DSC_ITEMS[i]] = v;
+            dscDirty = true; dscMsg = '';
+            dscRenderForm();
+        }
+        function dscResetAnswers() {
+            DSC_ITEMS.forEach(n => { dscAnswers[n] = 0; });
+            dscDirty = true; dscMsg = '';
+            dscRenderForm();
+        }
+        function dscCurrentScore() { return DSC_ITEMS.filter(n => dscAnswers[n] === 1).length; }
+        function dscRenderForm() {
+            const box = dscEl('dscItems'); if (!box) return;
+            box.innerHTML = DSC_ITEMS.map((name, i) => {
+                const yes = dscAnswers[name] === 1;
+                return `<div class="dsc-item ${yes ? 'yes' : ''}"><span class="dsc-item-name">${i + 1}. ${escapeHtml(name)}</span>` +
+                    `<span class="dsc-yn"><label class="${yes ? '' : 'on'}"><input type="radio" name="dscq${i}" value="0" ${yes ? '' : 'checked'} onchange="dscSet(${i},0)">否</label>` +
+                    `<label class="${yes ? 'on yes' : ''}"><input type="radio" name="dscq${i}" value="1" ${yes ? 'checked' : ''} onchange="dscSet(${i},1)">是</label></span></div>`;
+            }).join('');
+            const score = dscCurrentScore(), total = DSC_ITEMS.length, thr = dscGetThreshold();
+            const live = dscEl('dscLive');
+            if (live) live.innerHTML = `目前得分：${score} / ${total}` + (score < thr ? `<span class="dsc-low-flag">▼ 低於門檻 ${thr}</span>` : '') + (dscDirty ? `<span class="dsc-note">　（尚未儲存）</span>` : '');
+            const date = (dscEl('dscDate') || {}).value;
+            const rec = dscRecords().get(date);
+            const st = dscEl('dscStatus');
+            if (st) st.textContent = dscMsg || (rec ? `✏️ 這天已有紀錄（${rec.score}/${rec.total}），儲存會覆蓋` : '🆕 這天還沒有紀錄');
+            const del = dscEl('dscDeleteBtn'); if (del) del.style.display = rec ? 'inline-block' : 'none';
+        }
+        function dscSave() {
+            const date = (dscEl('dscDate') || {}).value;
+            if (!date) { alert('請先選擇日期'); return; }
+            const rec = dscRecords().get(date);
+            const answers = {}; let score = 0;
+            DSC_ITEMS.forEach(n => { const v = dscAnswers[n] === 1 ? 1 : 0; answers[n] = v; score += v; });
+            const payload = {
+                sheetName: currentPageName, id: rec ? rec.id : newId(), action: rec ? 'edit' : 'add',
+                col1: '日評分', col2: date, col3: JSON.stringify(answers), col4: String(score), col5: String(DSC_ITEMS.length)
+            };
+            dscDirty = false;
+            dscMsg = `✅ 已儲存 ${date}：${score} / ${DSC_ITEMS.length}`;
+            upsertMarathonLocal(payload);
+            queuedPost(payload, { label: rec ? '修改日評分' : '新增日評分' });
+        }
+        function dscDelete() {
+            const date = (dscEl('dscDate') || {}).value;
+            const rec = dscRecords().get(date); if (!rec) return;
+            if (!confirm(`確定刪除 ${date} 的評分紀錄？`)) return;
+            // 同一天理論上只有一筆；保險起見把同日期的所有「日評分」列都刪掉
+            const ids = marathonDataList.filter(d => d.col1 === '日評分' && formatDate(d.col2).slice(0, 10) === date).map(d => d.id);
+            marathonDataList = marathonDataList.filter(d => !ids.some(id => String(id) === String(d.id)));
+            dscDirty = false; dscMsg = `🗑️ 已刪除 ${date} 的紀錄`;
+            dscApplyDate(date);
+            renderMarathonAll();
+            ids.forEach(id => queuedPost({ id: id, action: 'delete', sheetName: currentPageName }, { label: '刪除日評分' }));
+        }
+
+        // ---- 圖表資料 ----
+        function dscValue(score, total) { return dscYMode === 'pct' ? dscRound1(score / total * 100) : score; }
+        function dscDayPoints(from, to, recs, thr, labeler) {
+            const pts = [];
+            const n = dscDiff(from, to);
+            for (let i = 0; i <= n; i++) {
+                const date = dscAdd(from, i);
+                const r = recs.get(date);
+                const lab = labeler ? labeler(date) : dscMD(date);
+                const p = { label: (typeof lab === 'object' ? lab.label : lab), sub: (typeof lab === 'object' ? lab.sub : ''), full: `${date}（週${dscWeekday(date)}）`, has: !!r };
+                if (r) {
+                    p.score = r.score; p.total = r.total; p.y = dscValue(r.score, r.total);
+                    p.low = r.score < thr;
+                    p.valueText = `${r.score} / ${r.total} 分（${dscRound1(r.score / r.total * 100)}%）`;
+                }
+                pts.push(p);
+            }
+            return pts;
+        }
+        function dscTotalNote(pts, fallbackTotal) {
+            const totals = Array.from(new Set(pts.filter(p => p.has).map(p => p.total))).sort((a, b) => a - b);
+            if (!totals.length) return `總項目 ${fallbackTotal}`;
+            if (totals.length === 1) return `總項目 ${totals[0]}`;
+            return `總項目 ${totals[0]}～${totals[totals.length - 1]}（這段期間項目有增減）`;
+        }
+
+        // ---- 折線圖（純 SVG，不依賴外部套件） ----
+        function dscRenderChart(boxId, pts, opts) {
+            const box = dscEl(boxId); if (!box) return;
+            opts = opts || {};
+            const prevOpen = box.querySelector('details') ? box.querySelector('details').open : !!dscTableOpen[boxId];
+            dscTableOpen[boxId] = prevOpen;
+            const W = Math.max(300, Math.min(900, Math.round(box.clientWidth || 640)));
+            const hasSub = pts.some(p => p.sub);
+            const H = hasSub ? 244 : 230, ml = 38, mr = 14, mt = 18, mb = hasSub ? 46 : 32;
+            const pw = W - ml - mr, ph = H - mt - mb, pad = 10;
+            const n = pts.length;
+            const thr = dscGetThreshold();
+            const curTotal = DSC_ITEMS.length;
+
+            let yTop;
+            if (dscYMode === 'pct') yTop = 100;
+            else yTop = Math.max(1, curTotal, ...pts.filter(p => p.has).map(p => Math.max(p.total || 0, p.y || 0)));
+            const yTopR = Math.ceil(yTop);
+            const steps = [1, 2, 5, 10, 20, 25, 50];
+            const step = steps.find(s => yTopR / s <= 6) || 50;
+            const ticks = [];
+            for (let v = 0; v <= yTopR; v += step) ticks.push(v);
+            if (ticks[ticks.length - 1] !== yTopR && yTopR - ticks[ticks.length - 1] >= step * 0.5) ticks.push(yTopR);
+            const Y = (v) => mt + ph - (v / yTopR) * ph;
+            const X = (i) => n === 1 ? ml + pw / 2 : ml + pad + i * (pw - 2 * pad) / (n - 1);
+
+            let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${escapeHtml(opts.aria || '折線圖')}">`;
+            ticks.forEach(v => {
+                s += `<line class="dsc-grid" x1="${ml}" x2="${W - mr}" y1="${Y(v)}" y2="${Y(v)}"/>`;
+                s += `<text class="dsc-axis-text" x="${ml - 6}" y="${Y(v) + 4}" text-anchor="end">${v}${dscYMode === 'pct' ? '%' : ''}</text>`;
+            });
+            // 門檻線（百分比模式用「現在的總項目數」換算）
+            const thrY = dscYMode === 'pct' ? (thr / curTotal * 100) : thr;
+            if (thrY > 0 && thrY < yTopR) {
+                s += `<line class="dsc-thr" x1="${ml}" x2="${W - mr}" y1="${Y(thrY)}" y2="${Y(thrY)}"/>`;
+                s += `<text class="dsc-thr-text" x="${W - mr}" y="${Y(thrY) - 4}" text-anchor="end">門檻 ${thr}</text>`;
+            }
+            // X 軸刻度
+            const maxLabels = Math.max(2, Math.floor(pw / 48));
+            const every = Math.max(1, Math.ceil(n / maxLabels));
+            pts.forEach((p, i) => {
+                if (i % every === 0 || (n <= 8)) {
+                    s += `<text class="dsc-axis-text" x="${X(i)}" y="${p.sub ? H - 24 : H - 10}" text-anchor="middle">${escapeHtml(p.label)}</text>`;
+                    if (p.sub) s += `<text class="dsc-axis-text" x="${X(i)}" y="${H - 9}" text-anchor="middle">${escapeHtml(p.sub)}</text>`;
+                }
+            });
+            // 折線（沒有紀錄的日子斷開，不當成 0 分）
+            let d = '', prev = false;
+            pts.forEach((p, i) => { if (p.has) { d += `${prev ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(p.y).toFixed(1)} `; prev = true; } else prev = false; });
+            if (d) s += `<path class="dsc-line" d="${d.trim()}"/>`;
+            // 標記
+            pts.forEach((p, i) => {
+                if (!p.has) return;
+                const x = X(i), y = Y(p.y);
+                if (p.low) s += `<path class="dsc-pt-low" d="M${(x - 6).toFixed(1)} ${(y - 5).toFixed(1)} L${(x + 6).toFixed(1)} ${(y - 5).toFixed(1)} L${x.toFixed(1)} ${(y + 6).toFixed(1)} Z"/>`;
+                else s += `<circle class="dsc-pt" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5"/>`;
+            });
+            if (!pts.some(p => p.has)) s += `<text class="dsc-empty-text" x="${ml + pw / 2}" y="${mt + ph / 2}" text-anchor="middle">這段期間還沒有紀錄</text>`;
+            s += `<line class="dsc-xhair" x1="0" x2="0" y1="${mt}" y2="${mt + ph}" style="display:none"/>`;
+            s += `<rect class="dsc-hit" x="${ml}" y="${mt}" width="${pw}" height="${ph}" fill="transparent"/>`;
+            s += `</svg>`;
+            s += `<div class="dsc-tip"></div>`;
+            s += `<div class="dsc-key"><span><i class="k-dot">●</i>${escapeHtml(opts.seriesName || '每日得分')}</span><span><i class="k-low">▼</i>低於門檻（&lt; ${thr} 分）</span></div>`;
+            // 數字表（無障礙／想看精確數字時用）
+            const rows = pts.filter(p => p.has).map(p => `<tr class="${p.low ? 'low' : ''}"><td>${escapeHtml(p.full)}</td><td>${escapeHtml(p.valueText)}</td><td>${p.low ? '▼ 低於門檻' : ''}</td></tr>`).join('');
+            s += `<details class="dsc-details" ${prevOpen ? 'open' : ''}><summary>📋 看數字表</summary><table class="dsc-table"><thead><tr><th>${escapeHtml(opts.xName || '日期')}</th><th>得分</th><th>狀態</th></tr></thead><tbody>${rows || '<tr><td colspan="3">沒有資料</td></tr>'}</tbody></table></details>`;
+            box.innerHTML = s;
+
+            // 滑過／觸碰：十字線＋提示框
+            const svg = box.querySelector('svg'), tip = box.querySelector('.dsc-tip'), xh = svg.querySelector('.dsc-xhair');
+            const det = box.querySelector('details'); if (det) det.addEventListener('toggle', () => { dscTableOpen[boxId] = det.open; });
+            const show = (ev) => {
+                const r = svg.getBoundingClientRect(); if (!r.width) return;
+                const px = (ev.clientX - r.left) * (W / r.width);
+                let i = n === 1 ? 0 : Math.round((px - ml - pad) / ((pw - 2 * pad) / (n - 1)));
+                i = Math.max(0, Math.min(n - 1, i));
+                const p = pts[i];
+                xh.setAttribute('x1', X(i)); xh.setAttribute('x2', X(i)); xh.style.display = '';
+                tip.innerHTML = `<b>${escapeHtml(p.full)}</b><br>${p.has ? escapeHtml(p.valueText) : '未記錄'}${p.low ? '<br>▼ 低於門檻' : ''}`;
+                tip.style.display = 'block';
+                const left = X(i) * (r.width / W);
+                const tw = tip.offsetWidth;
+                tip.style.left = Math.max(0, Math.min(r.width - tw, left - tw / 2)) + 'px';
+            };
+            const hide = () => { xh.style.display = 'none'; tip.style.display = 'none'; };
+            const hit = svg.querySelector('.dsc-hit');
+            hit.addEventListener('pointermove', show);
+            hit.addEventListener('pointerdown', show);
+            hit.addEventListener('pointerleave', hide);
+        }
+
+        // ---- 四張圖＋最近紀錄 ----
+        function dscRenderWeek() {
+            const recs = dscRecords(), thr = dscGetThreshold();
+            if (!dscWeekAnchor) dscWeekAnchor = dscToday();
+            const [mon, sun] = isoWeekRange(dscParse(dscWeekAnchor));
+            const from = formatLocalDate(mon), to = formatLocalDate(sun);
+            const pts = dscDayPoints(from, to, recs, thr, (d) => ({ label: dscMD(d), sub: '週' + dscWeekday(d) }));
+            const t = dscEl('dscTitle_week');
+            if (t) t.innerHTML = `📅 當週（${dscMD(from)} ～ ${dscMD(to)}）<small>${escapeHtml(dscTotalNote(pts, DSC_ITEMS.length))}</small>`;
+            dscRenderChart('dscChart_week', pts, { aria: '當週每日得分折線圖' });
+        }
+        function dscRenderMonth() {
+            const recs = dscRecords(), thr = dscGetThreshold();
+            if (!dscMonthAnchor) dscMonthAnchor = dscToday().slice(0, 7);
+            const [y, m] = dscMonthAnchor.split('-').map(Number);
+            const from = `${y}-${String(m).padStart(2, '0')}-01`;
+            const to = formatLocalDate(new Date(y, m, 0));
+            const pts = dscDayPoints(from, to, recs, thr, (d) => String(dscParse(d).getDate()));
+            const t = dscEl('dscTitle_month');
+            if (t) t.innerHTML = `🗓️ 當月（${y} 年 ${m} 月）<small>${escapeHtml(dscTotalNote(pts, DSC_ITEMS.length))}</small>`;
+            dscRenderChart('dscChart_month', pts, { aria: '當月每日得分折線圖' });
+        }
+        function dscShift(kind, dir) {
+            if (kind === 'week') dscWeekAnchor = dir === 0 ? dscToday() : dscAdd(dscWeekAnchor || dscToday(), dir * 7);
+            else {
+                const base = dscMonthAnchor || dscToday().slice(0, 7);
+                if (dir === 0) dscMonthAnchor = dscToday().slice(0, 7);
+                else { const [y, m] = base.split('-').map(Number); dscMonthAnchor = formatLocalDate(new Date(y, m - 1 + dir, 1)).slice(0, 7); }
+            }
+            renderMarathonScore();
+        }
+        function dscRenderTotal() {
+            const recs = dscRecords(), thr = dscGetThreshold();
+            const dates = Array.from(recs.keys()).sort();
+            const t = dscEl('dscTitle_total'), stats = dscEl('dscStats'), chips = dscEl('dscLowChips');
+            if (!dates.length) {
+                if (t) t.innerHTML = `📈 總統計（從第一天到今天）`;
+                if (stats) stats.innerHTML = '';
+                if (chips) chips.innerHTML = '';
+                dscRenderChart('dscChart_total', [], { aria: '總統計折線圖' });
+                return;
+            }
+            const today = dscToday();
+            const first = dates[0], last = dates[dates.length - 1] > today ? dates[dates.length - 1] : today;
+            const pts = dscDayPoints(first, last, recs, thr, (d) => dscMD(d));
+            if (t) t.innerHTML = `📈 總統計（${first} ～ ${last}）<small>${escapeHtml(dscTotalNote(pts, DSC_ITEMS.length))}</small>`;
+            const has = pts.filter(p => p.has);
+            const avg = has.reduce((a, p) => a + p.score, 0) / has.length;
+            const avgPct = has.reduce((a, p) => a + p.score / p.total * 100, 0) / has.length;
+            const best = has.reduce((b, p) => (p.score / p.total > b.score / b.total ? p : b), has[0]);
+            const worst = has.reduce((b, p) => (p.score / p.total < b.score / b.total ? p : b), has[0]);
+            const lows = has.filter(p => p.low);
+            if (stats) stats.innerHTML =
+                `<div class="dsc-stat">已記錄天數<b>${has.length} / ${pts.length}</b></div>` +
+                `<div class="dsc-stat">平均得分<b>${dscRound1(avg)}</b>（${dscRound1(avgPct)}%）</div>` +
+                `<div class="dsc-stat">最高<b>${best.score} / ${best.total}</b>${escapeHtml(dscMD(best.full.slice(0, 10)))}</div>` +
+                `<div class="dsc-stat">最低<b>${worst.score} / ${worst.total}</b>${escapeHtml(dscMD(worst.full.slice(0, 10)))}</div>` +
+                `<div class="dsc-stat">低於門檻<b>${lows.length} 天</b></div>`;
+            if (chips) chips.innerHTML = lows.length ? `<span class="dsc-note">▼ 低於門檻的日子：</span>` + lows.map(p => `<span class="dsc-chip">${escapeHtml(dscMD(p.full.slice(0, 10)))}（${p.score}/${p.total}）</span>`).join('') : '';
+            dscRenderChart('dscChart_total', pts, { aria: '總統計每日得分折線圖' });
+        }
+        function dscOnHistChange(touched) {
+            const m = dscEl('dscHistMode'); if (m) dscHistMode = m.value;
+            if (touched) {
+                dscHistTouched = true;
+                dscHistFrom = (dscEl('dscHistFrom') || {}).value || dscHistFrom;
+                dscHistTo = (dscEl('dscHistTo') || {}).value || dscHistTo;
+            }
+            renderMarathonScore();
+        }
+        function dscRenderHist() {
+            const recs = dscRecords(), thr = dscGetThreshold();
+            const dates = Array.from(recs.keys()).sort();
+            const today = dscToday();
+            const first = dates.length ? dates[0] : today;
+            if (!dscHistTouched) { dscHistFrom = first; dscHistTo = today; }
+            const modeEl = dscEl('dscHistMode'); if (modeEl) modeEl.value = dscHistMode;
+            const fromEl = dscEl('dscHistFrom'), toEl = dscEl('dscHistTo');
+            if (fromEl) fromEl.value = dscHistFrom;
+            if (toEl) toEl.value = dscHistTo;
+            const rangeBox = dscEl('dscHistRange'); if (rangeBox) rangeBox.style.display = dscHistMode === 'range' ? '' : 'none';
+            const t = dscEl('dscTitle_hist');
+
+            if (dscHistMode === 'range') {
+                if (!dscHistFrom || !dscHistTo || dscHistFrom > dscHistTo) {
+                    if (t) t.innerHTML = `🔍 歷史回顧`;
+                    const box = dscEl('dscChart_hist'); if (box) box.innerHTML = `<div class="dsc-note">起日不能晚於迄日，請重新選擇日期。</div>`;
+                    return;
+                }
+                const pts = dscDayPoints(dscHistFrom, dscHistTo, recs, thr, (d) => dscMD(d));
+                if (t) t.innerHTML = `🔍 歷史回顧（${dscHistFrom} ～ ${dscHistTo}）<small>${escapeHtml(dscTotalNote(pts, DSC_ITEMS.length))}</small>`;
+                dscRenderChart('dscChart_hist', pts, { aria: '歷史回顧每日得分折線圖' });
+                return;
+            }
+            // 從第一天起，每 N 天切一塊，看每塊的平均
+            const N = parseInt(dscHistMode, 10);
+            if (!dates.length) {
+                if (t) t.innerHTML = `🔍 歷史回顧（每 ${N} 天）`;
+                dscRenderChart('dscChart_hist', [], { aria: '歷史回顧折線圖', xName: '區間' });
+                return;
+            }
+            const last = dates[dates.length - 1] > today ? dates[dates.length - 1] : today;
+            const blocks = [];
+            for (let k = 0; ; k++) {
+                const bs = dscAdd(first, k * N);
+                if (bs > last) break;
+                const be = dscAdd(bs, N - 1);
+                const endClamped = be > last ? last : be;
+                const inBlock = dates.filter(d => d >= bs && d <= endClamped).map(d => recs.get(d));
+                const lenDays = dscDiff(bs, endClamped) + 1;
+                const p = { label: dscMD(bs), full: `第 ${k + 1} 段 ${bs} ～ ${endClamped}`, has: inBlock.length > 0 };
+                if (p.has) {
+                    const avgScore = inBlock.reduce((a, r) => a + r.score, 0) / inBlock.length;
+                    const avgTotal = inBlock.reduce((a, r) => a + r.total, 0) / inBlock.length;
+                    const avgPct = inBlock.reduce((a, r) => a + r.score / r.total * 100, 0) / inBlock.length;
+                    p.score = dscRound1(avgScore); p.total = dscRound1(avgTotal);
+                    p.y = dscYMode === 'pct' ? dscRound1(avgPct) : dscRound1(avgScore);
+                    p.low = avgScore < thr;
+                    p.valueText = `平均 ${p.score} / ${p.total} 分（${dscRound1(avgPct)}%），有記錄 ${inBlock.length} / ${lenDays} 天` + (endClamped < be ? '（這一段還沒結束）' : '');
+                }
+                blocks.push(p);
+            }
+            if (t) t.innerHTML = `🔍 歷史回顧（從 ${first} 起，每 ${N} 天一段，看平均）<small>${blocks.length} 段</small>`;
+            dscRenderChart('dscChart_hist', blocks, { aria: `歷史回顧：每 ${N} 天平均得分折線圖`, seriesName: `每 ${N} 天平均得分`, xName: '區間' });
+        }
+        function dscRenderRecent() {
+            const body = dscEl('dscRecentBody'); if (!body) return;
+            const thr = dscGetThreshold();
+            const list = Array.from(dscRecords().values()).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 14);
+            body.innerHTML = list.length ? list.map(r => {
+                const low = r.score < thr;
+                return `<tr class="${low ? 'low' : ''}"><td>${escapeHtml(r.date)}（週${dscWeekday(r.date)}）</td><td>${r.score} / ${r.total}</td><td>${dscRound1(r.score / r.total * 100)}%</td><td>${low ? '▼ 低於門檻' : ''}</td></tr>`;
+            }).join('') : `<tr><td colspan="4">還沒有任何紀錄</td></tr>`;
+        }
+        function renderMarathonScore() {
+            if (!dscEl('marathonTab_score')) return;
+            const dateEl = dscEl('dscDate');
+            if (dateEl && !dateEl.value) dateEl.value = dscToday();
+            // 沒有未儲存的修改時，每次都從資料重新載入（這樣資料晚一點載入完成，畫面也會跟上）
+            if (dateEl && (!dscDirty || dscLoadedDate !== dateEl.value)) dscApplyDate(dateEl.value);
+            const thrEl = dscEl('dscThreshold');
+            if (thrEl && document.activeElement !== thrEl) thrEl.value = dscGetThreshold();
+            ['score', 'pct'].forEach(m => { const b = dscEl('dscYBtn_' + m); if (b) b.className = dscYMode === m ? 'active' : ''; });
+            dscRenderForm();
+            dscRenderWeek();
+            dscRenderMonth();
+            dscRenderTotal();
+            dscRenderHist();
+            dscRenderRecent();
+        }
+        window.addEventListener('resize', function () {
+            clearTimeout(window.__dscResizeTimer);
+            window.__dscResizeTimer = setTimeout(function () { if (marathonSubTab === 'score') renderMarathonScore(); }, 200);
+        });
 
         // ---- Overview（依日期整合訓練記錄／筆記／訓練資源） ----
         function addMarathonOverviewDate() {
